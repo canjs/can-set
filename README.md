@@ -3,13 +3,13 @@
 ## equal
 
 ```
-set..equal({type: "critical"}, {type: "critical"}) //-> true
+set.equal({type: "critical"}, {type: "critical"}) //-> true
 ```
 
 ## subset
 
 ```
-set..subset({type: "critical"}, {}) //-> true
+set.subset({type: "critical"}, {}) //-> true
 ```
 
 ## union
