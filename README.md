@@ -45,6 +45,11 @@ set.intersection(
 ```js
 set.difference( {} , {completed: true}, {...} ) //-> {completed: false}
 set.difference( {completed: true}, {}, {...} )  //-> null
+
+
+set.difference( {start: 0, end: 99}, {start: 50, end: 99} })
+
+set.difference( {start: 0, end: 99}, {start: 50, end: 98} })
 ```
 
 ## compare
