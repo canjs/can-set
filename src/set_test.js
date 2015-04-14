@@ -1,76 +1,57 @@
 require("steal-qunit");
 
-var set = require('./set');
+var set = require('./set-core');
 
-test('set.difference object', function() {
-	set.difference({ name: 'david' }, { name: 'David' }); //-> null
+test('set.difference({ function })', function() {
+	var res = set.difference({ colors: ['red'] }, { colors: ['blue'] }, {
+		colors: function() {
+			return {
+				// can’t always be privided … but COULD if we were gods
+				diff: ['blue' ],
+				intersection: ['red']
+			};
+		}
+	});
+
+	deepEqual(res, { colors: [ 'blue' ] });
 });
 
-test('set.difference enumerations', function() {
-	set.subset( {colors: ['blue']}, {} );
-	set.difference( { colors: ['red']}, {colors: ['blue','red']} );
-	set.difference({ colors: ['red']},  {colors: ['blue','red']} );
+test('set.difference(set.boolean)', function() {
+	var comparator = set.boolean('completed');
+	var res = set.difference({} , { completed: true }, comparator);
+	deepEqual(res, { completed: false });
+
+	res = set.difference({}, { completed: false }, comparator);
+	deepEqual(res, { completed: true });
+
+	res = set.difference({ completed: true }, { completed: true });
+	equal(res, null);
+
+	res = set.difference({ completed: true }, {});
+	equal(res, null);
+
+	res = set.difference({ completed: true }, { foo: 'bar' });
+	equal(res, undefined);
 });
 
-//set.difference({ colors: ['red'] }, { color: ['green'] }, { colors: [“red”, “green”, “blue”] } ) //-> {colors: [“blue”]}
-//
-//set.difference( {} , {completed: true}, {...} ) //-> {completed: false}
-//set.difference( {completed: true}, {}, {...} )  //-> null
-//
-//set.difference( {start: 0, end: 99}, {start: 50, end: 99} }, {})
-//set.difference( {start: 0, end: 99}, {start: 50, end: 98} }, {})
-//
-//set.difference( {name: “david”}, {name: “David”}, {...} ) //-> null
-//set.difference( {name: “david”}, {}, {...} ) //-> null
-//set.difference( {name: “david”}, {foo: “bar”}, {...} ) //-> undefined
-//set.subset( {colors: [“blue”]}, {} )
-//set.difference( { colors: [“red”]}, {colors: [“blue”,”red”]} )
-//set.difference({ colors: [“red”]},  {colors: [“blue”,”red”]} )
-//
-//set.difference( {name: “david”}, {}, {...} ) //-> undefined
-//set.difference( {}, {name: “david”}, {...} ) //-> null
-//
-//
-//{
-//	colors: function(aColors, bColors){
-//		return {
-//			diff: [“blue”], // can’t always be privided … but COULD if we were gods
-//		intersection: [“red”],
-//	}
-//},
-//name: function(Aname, Bname){
-//	if(Aname) {
-//		return {union: Aname}
-//	}
-//	if(Bname) {
-//		return {union: BName, diff: null}
-//	}
-//}
-//// return the difference or undefined if a difference can not be taken, same, or size
-//// difference and union
-//completed: function(A, B){
-//	if(A === undefined) {
-//		return {
-//			diff: !B,
-//			union: B,
-//			adjacent: true
-//		}
-//	}
-//	return undefined;
-//},
-//start: function(Astart = 0, Bstart) {
-//	return {
-//		diff: 0,
-//		union: 50,
-//		adjacent: “before”
-//}
-//},
-//end: function(Astart = 0, Bstart) {
-//	return {
-//		diff: 49,
-//		union: 99,
-//		adjacent: “before”
-//}
-//},
-//rangedProperties: [“start”,”end”]
-//}
+test('set.difference(set.property)', function() {
+	var comparator = set.property('name');
+	var res = set.difference({ name: 'david' }, { name: 'David' }, comparator);
+	equal(res, null);
+
+	res = set.difference({ name: 'david' }, {}, comparator);
+	equal(res, null);
+
+	res = set.difference({ name: 'david' }, { foo: 'bar' }, comparator);
+	equal(res, undefined);
+});
+
+test('set.difference(set.range)', function() {
+	var comparator = set.range('start', 'end');
+	var res = set.difference({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
+
+	deepEqual(res, { start: 100, end: 101 });
+
+	res = set.difference({}, { start: 0, end: 10 }, comparator);
+	deepEqual(res, null);
+});
