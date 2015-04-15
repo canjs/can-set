@@ -18,6 +18,7 @@ test('set.difference({ function })', function() {
 
 test('set.difference(set.boolean)', function() {
 	var comparator = set.boolean('completed');
+	
 	var res = set.difference({} , { completed: true }, comparator);
 	deepEqual(res, { completed: false });
 

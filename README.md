@@ -1,36 +1,61 @@
 # can-set
 
-## equal
+__can-set__ is a utility for comparing [sets](http://en.wikipedia.org/wiki/Set_theory#Basic_concepts_and_notation) that 
+are represented by the parameters commonly passed to service requests.
+
+For example, the set `{type: "critical"}` might represent all 
+critical todos.  It is a superset of the set `{type: "critical", due: "today"}` 
+which might represent all critical todos due today.
+
+__can-set__ is useful for building caching and other data-layer
+optimizations.  [can-connect] uses can-set to create data modeling
+utilities and middleware for the client. 
+
+
+## Set
+
+In __can-set__ a set is a plain JavaScript object 
+like `{start: 0, end: 100, filter: "top"}`.  Often, these are the 
+parameters you pass to the server to retrieve some list of data.
+
+Unlike [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)), these
+set objects don't contain the items of the set, instead they represent the items within the set.
+
+### Special Sets
+
+Unlike in common [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)) the set `{}` represents the 
+superset of all sets.  For instance if you load all items represented by set `{}`, you have loaded 
+every item in that "universe".
+
+## equal.equal(a, b, algebra) -> Boolean
+
+Returns true if the two sets the exact same.
 
 ```js
 set.equal({type: "critical"}, {type: "critical"}) //-> true
 ```
 
-## subset
+## set.subset(a, b, algebra) -> Boolean
+
+Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_.
 
 ```js
 set.subset({type: "critical"}, {}) //-> true
 set.subset({}, {}) //-> true
 ```
 
-## properSubset
+## set.properSubset(a, b, algebra)
+
+Returns true if _A_ is a subset of _B_ and _A_ is no equal to _B_.
 
 ```js
 set.properSubset({type: "critical"}, {}) //-> true
 set.properSubset({}, {}) //-> false
 ```
 
+## set.intersection(a, b, algebra) -> set
 
-## union
-
-```js
-set.union( 
-  {start: 0, end: 99}, 
-  {start: 100, end: 199},
-  {...} ) //-> {start: 0, end: 199}
-```
-
-## intersection
+Returns a set that represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
 
 ```js
 set.intersection( 
@@ -40,22 +65,51 @@ set.intersection(
 ```
 
 
-## difference
+## set.difference(a, b, algebra) -> set|null|undefined
+
+Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_).
+
+If `null` is returned, that means that _A_ is a subset of _B_, but no set object
+can be returned that represents that set.
+
+If `undefined` is returned, that means there is no difference or the sets are not comparable.
 
 ```js
-set.difference( {} , {completed: true}, {...} ) //-> {completed: false}
-set.difference( {completed: true}, {}, {...} )  //-> null
+// A has all of B
+set.difference( {} , {completed: true}, set.boolean("completed") ) //-> {completed: false}
 
+// A has all of B, but we can't figure out how to create a set object
+set.difference( {} , {completed: true} ) //-> null
 
-set.difference( {start: 0, end: 99}, {start: 50, end: 99} })
-
-set.difference( {start: 0, end: 99}, {start: 50, end: 98} })
+// A is totally inside B
+set.difference( {completed: true}, {} )  //-> undefined
 ```
 
-## compare `Object<String: comparitor>`
+## set.count(a, algebra) -> Number
+
+Returns the number of items that might be loaded by set _A_. This makes use of set.Algebra's
+`count` method.  By default, this returns Infinity.
+
+## set.union(a, b, algebra) -> set | undefined
+
+Returns a set that represents the union of _A_ and _B_ (_A_ ∪ _B_).
+
+```js
+set.union( 
+  {start: 0, end: 99}, 
+  {start: 100, end: 199},
+  {...} ) //-> {start: 0, end: 199}
+```
 
 
+## new set.Algebra(compare, [count])
 
+Creates an object that can perform binary operations on sets with an awareness of
+how certain properties represent the set.
+
+### compare `Object<String: comparitor>`
+
+An object of property names and `comparitor` functions.
 
 ```js
 {
@@ -69,13 +123,14 @@ set.difference( {start: 0, end: 99}, {start: 50, end: 98} })
 }
 ```
 
-### comparitor(aValue, bValue, a, b, compare)
+### comparitor(aValue, bValue, a, b, algebra)
 
 A comparitor function returns information 
 
 - `aValue` - the value of A's property in a set difference A and B (A \ B).
-
-
+- `bValue` - the value of A's property in a set difference A and B (A \ B).
+- `a` - the A set in a set difference A and B (A \ B).
+- `a` - the B set in a set difference A and B (A \ B).
 - returns 
 	- intersection - A set that represents the intersection of A and B.
 	
@@ -106,10 +161,6 @@ A comparitor function returns information
 	  
 	  Setting merge to before might mean that the items loaded by the `difference`
 	  set can be inserted before the `B` set.
-	  
-	- [count] - the total number of items that are represented by the difference set. This 
-	  can be useful indicator to find the smallest diff that should be loaded. If count
-	  is not provided, it is assumed to be Infinity.
 	  
 
 
