@@ -1,53 +1,61 @@
+var h = require("./helpers"),
+	compare = require("./compare");
 
-function makeComparator(fn) {
-	return function() {
-		var result = {};
-		for(var i = 0; i < arguments.length; i++) {
-			result[arguments[i]] = fn;
-		}
-		return result;
-	};
-}
 
-module.exports = {
-	boolean: makeComparator(function(propA, propB) {
-		if(propA === undefined) {
-			return {
-				diff: !propB,
-				union: undefined,
-				intersection: propB,
-				adjacent: true
-			};
-		}
-	}),
+var Algebra = function(compare, count){
+	this.compare = compare;
+	this.count = count;
+};
+Algebra.make = function(compare, count){
+	if(compare instanceof Algebra) {
+		return compare;
+	} else {
+		return new Algebra(compare, count);
+	}
+};
 
-	property: makeComparator(function(propA, propB) {
-		if(propA) {
-			return { union: propA };
-		}
-
-		if(propB) {
-			return { union: propB, diff: null };
-		}
-	}),
-
-	range: makeComparator(function(propA, propB) {
-
-	}),
-
-	difference: function(a, b, config) {
-		var result = {};
-		var compared;
-
-		for(var key in config) {
-			if(config.hasOwnProperty(key)) {
-				compared = config[key](a[key], b[key], a, b);
-				if(compared && typeof compared.diff !== 'undefined') {
-					result[key] = compared.diff;
-				}
+h.extend(Algebra.prototype, {
+	equal: function(a, b){
+		return compare.equal(a, b, undefined, undefined, undefined, this.compare, {});
+	},
+	subset: function(a, b){
+		// A is a subset of B if A has every property in B
+		var compares = this.compare || {};
+		for (var prop in b) {
+			if ( !compare.subset(a[prop], b[prop], a, b, prop, compares[prop], {}) ) {
+				return false;
 			}
 		}
+		return true;
+	},
+	// what a has that b doesn't
+	/**
+	 * // A has all of B
+	 * set.difference( {} , {completed: true}, set.boolean("completed") ) //-> {completed: false}
+	 * 
+	 * // A has all of B, but we can't figure out how to create a set object
+	 * set.difference( {} , {completed: true} ) //-> false
+	 * 
+	 * // A is totally inside B
+	 * set.difference( {completed: true}, {} )  //-> undefined
+	 * @param {Object} a
+	 * @param {Object} b
+	 */
+	difference: function(a, b){
+		// if everything is equal or has a difference
+		return compare.difference(a, b, undefined, undefined, undefined, this.compare, {});
+	}
+});
 
-		return result;
+module.exports = {
+	Algebra : Algebra,
+	difference: function(a, b, config) {
+		return Algebra.make(config).difference(a, b);
+	},
+	equal: function(a, b, config) {
+		return Algebra.make(config).equal(a, b);
+	},
+	subset: function(a, b, config) {
+		return Algebra.make(config).subset(a, b);
 	}
 };

@@ -2,57 +2,150 @@ require("steal-qunit");
 
 var set = require('./set-core');
 
+var ignoreProp = function(){ return true };
+
+QUnit.module("set core");
+
+test('set.equal', function(){
+	
+	ok(set.equal({
+		type: 'FOLDER'
+	}, {
+		type: 'FOLDER',
+		count: 5
+	}, {
+		count: ignoreProp
+	}), 'count ignored');
+
+	ok(set.equal({
+		type: 'folder'
+	}, {
+		type: 'FOLDER'
+	}, {
+		type: function (a, b) {
+			return ('' + a)
+					.toLowerCase() === ('' + b)
+					.toLowerCase();
+		}
+	}), 'folder case ignored');
+
+	// Issue #773
+	ok(!set.equal(
+		{foo: null},
+		{foo: new Date()}
+	), 'nulls and Dates are not considered the same. (#773)');
+
+	ok(!set.equal(
+		{foo: null},
+		{foo: {}}
+	), 'nulls and empty objects are not considered the same. (#773)');
+	
+});
+
+
+test('set.subset', function(){
+	
+	ok(set.subset({
+		type: 'FOLDER'
+	}, {
+		type: 'FOLDER'
+	}), 'equal sets');
+	
+	ok(set.subset({
+		type: 'FOLDER',
+		parentId: 5
+	}, {
+		type: 'FOLDER'
+	}), 'sub set');
+
+	
+	ok(!set.subset({
+		type: 'FOLDER'
+	}, {
+		type: 'FOLDER',
+		parentId: 5
+	}), 'wrong way');
+	
+	
+	ok(!set.subset({
+		type: 'FOLDER',
+		parentId: 7
+	}, {
+		type: 'FOLDER',
+		parentId: 5
+	}), 'different values');
+	
+	
+	ok(set.subset({
+		type: 'FOLDER',
+		count: 5
+	}, {
+		type: 'FOLDER'
+	}, {
+		count: ignoreProp
+	}), 'count ignored');
+	
+	
+	ok(set.subset({
+		type: 'FOLDER',
+		kind: 'tree'
+	}, {
+		type: 'FOLDER',
+		foo: true,
+		bar: true
+	}, {
+		foo: ignoreProp,
+		bar: ignoreProp
+	}), 'understands a subset');
+	
+	ok(set.subset({
+		type: 'FOLDER',
+		foo: true,
+		bar: true
+	}, {
+		type: 'FOLDER',
+		kind: 'tree'
+	}, {
+		foo: ignoreProp,
+		bar: ignoreProp,
+		kind: ignoreProp
+	}), 'ignores nulls');
+
+});
+
+
+test('set.difference', function(){
+	
+	var res = set.difference({}, { completed: true });
+	ok(res === true, "diff should be true");
+	
+
+	res = set.difference({ completed: true }, { completed: true });
+	equal(res, false);
+	
+	res = set.difference({ completed: true }, {});
+	equal(res, false);
+
+	res = set.difference({ completed: true }, { foo: 'bar' });
+	equal(res, false);
+	
+	
+});
+
 test('set.difference({ function })', function() {
-	var res = set.difference({ colors: ['red'] }, { colors: ['blue'] }, {
+	var res = set.difference({ colors: ['red','blue'] }, { colors: ['blue'] }, {
 		colors: function() {
 			return {
 				// can’t always be privided … but COULD if we were gods
-				diff: ['blue' ],
-				intersection: ['red']
+				difference: ['red' ],
+				intersection: ['blue']
 			};
 		}
 	});
 
-	deepEqual(res, { colors: [ 'blue' ] });
+	deepEqual(res, { colors: [ 'red' ] });
 });
 
-test('set.difference(set.boolean)', function() {
-	var comparator = set.boolean('completed');
-	
-	var res = set.difference({} , { completed: true }, comparator);
-	deepEqual(res, { completed: false });
 
-	res = set.difference({}, { completed: false }, comparator);
-	deepEqual(res, { completed: true });
 
-	res = set.difference({ completed: true }, { completed: true });
-	equal(res, null);
 
-	res = set.difference({ completed: true }, {});
-	equal(res, null);
-
-	res = set.difference({ completed: true }, { foo: 'bar' });
-	equal(res, undefined);
-});
-
-test('set.difference(set.property)', function() {
-	var comparator = set.property('name');
-	var res = set.difference({ name: 'david' }, { name: 'David' }, comparator);
-	equal(res, null);
-
-	res = set.difference({ name: 'david' }, {}, comparator);
-	equal(res, null);
-
-	res = set.difference({ name: 'david' }, { foo: 'bar' }, comparator);
-	equal(res, undefined);
-});
-
-test('set.difference(set.range)', function() {
-	var comparator = set.range('start', 'end');
-	var res = set.difference({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
-
-	deepEqual(res, { start: 100, end: 101 });
-
-	res = set.difference({}, { start: 0, end: 10 }, comparator);
-	deepEqual(res, null);
-});

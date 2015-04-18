@@ -67,22 +67,23 @@ set.intersection(
 
 ## set.difference(a, b, algebra) -> set|null|undefined
 
-Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_).
+Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_), or
+returns if a difference exists.
 
-If `null` is returned, that means that _A_ is a subset of _B_, but no set object
+If `true` is returned, that means that _A_ is a subset of _B_, but no set object
 can be returned that represents that set.
 
-If `undefined` is returned, that means there is no difference or the sets are not comparable.
+If `false` is returned, that means there is no difference or the sets are not comparable.
 
 ```js
 // A has all of B
 set.difference( {} , {completed: true}, set.boolean("completed") ) //-> {completed: false}
 
 // A has all of B, but we can't figure out how to create a set object
-set.difference( {} , {completed: true} ) //-> null
+set.difference( {} , {completed: true} ) //-> false
 
 // A is totally inside B
-set.difference( {completed: true}, {} )  //-> undefined
+set.difference( {completed: true}, {} )  //-> null
 ```
 
 ## set.count(a, algebra) -> Number
@@ -102,12 +103,12 @@ set.union(
 ```
 
 
-## new set.Algebra(compare, [count])
+## new set.Algebra(compares, [count])
 
 Creates an object that can perform binary operations on sets with an awareness of
 how certain properties represent the set.
 
-### compare `Object<String: comparitor>`
+### compares `Object<String: comparitor>`
 
 An object of property names and `comparitor` functions.
 
@@ -132,7 +133,7 @@ A comparitor function returns information
 - `a` - the A set in a set difference A and B (A \ B).
 - `a` - the B set in a set difference A and B (A \ B).
 - returns 
-	- intersection - A set that represents the intersection of A and B.
+	- [intersection] - A set that represents the intersection of A and B.
 	
 	- [difference] - A set that represents all items in A that are not in B. For example:
 	
