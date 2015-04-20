@@ -44,7 +44,12 @@ h.extend(Algebra.prototype, {
 	difference: function(a, b){
 		// if everything is equal or has a difference
 		return compare.difference(a, b, undefined, undefined, undefined, this.compare, {});
+	},
+	union: function(a, b){
+		// if everything is equal or has a difference
+		return compare.union(a, b, undefined, undefined, undefined, this.compare, {});
 	}
+	
 });
 
 module.exports = {
@@ -57,5 +62,8 @@ module.exports = {
 	},
 	subset: function(a, b, config) {
 		return Algebra.make(config).subset(a, b);
+	},
+	union: function(a, b, config) {
+		return Algebra.make(config).union(a, b);
 	}
 };

@@ -146,6 +146,34 @@ test('set.difference({ function })', function() {
 	deepEqual(res, { colors: [ 'red' ] });
 });
 
+test('set.union', function(){
+	
+	// set / subset
+	var res = set.union({}, { completed: true });
+	deepEqual(res , {}, "set / subset");
+	
+	var res = set.union({ completed: true }, {});
+	deepEqual(res , {}, "subset / set");
+	
+	var res = set.union({foo: "bar"},{foo: "bar"});
+	deepEqual(res, {foo: "bar"}, "equal");
+	
+	var res = set.union({foo: "bar"},{foo: "zed"});
+	ok(!res, "values not equal");
+	
+});
 
+/*
+test('set.union({ function })', function() {
+	var res = set.difference({ colors: ['red','blue'] }, { colors: ['blue'] }, {
+		colors: function() {
+			return {
+				// can’t always be privided … but COULD if we were gods
+				difference: ['red' ],
+				intersection: ['blue']
+			};
+		}
+	});
 
-
+	deepEqual(res, { colors: [ 'red' ] });
+});*/

@@ -63,6 +63,15 @@ test('rangeInclusive set.difference', function() {
 	equal(res, true);
 });
 
+test('rangeInclusive set.union', function() {
+	var comparator = comparators.rangeInclusive('start', 'end');
+	var res = set.union({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
+	deepEqual(res, { start: 0, end: 101 }, "got a diff");
+	
+	//res = set.difference({}, { start: 0, end: 10 }, comparator);
+	//equal(res, true);
+});
+
 test('boolean set.difference', function() {
 	var comparator = comparators.boolean('completed');
 	

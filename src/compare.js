@@ -21,9 +21,10 @@ var addToResult = function(fn, name){
 		var res = fn.apply(this, arguments);
 		console.log(name, res);
 		if(res === true) {
-			if(! prop in options.result) {
+			if(prop !== undefined && ! ( prop in options.result )) {
 				options.result[prop] = a;
 			}
+			return true;
 		} else {
 			return res;
 		}
@@ -288,6 +289,93 @@ module.exports = compareHelpers = {
 					return false;
 				}
 			}
+			return true;
+		}
+	},
+	// A u B
+	union: function(a, b, aParent, bParent, prop, compares, options){
+		// if everything is the same OR doesn't have a property on the left or right (only)
+		// and union values
+		options.result = {};
+		options.performedUnion = 0;
+		options.checks = [
+			compareHelpers.unionComparesType,
+			addToResult(compareHelpers.equalBasicTypes,"equalBasicTypes"),
+			addToResult(compareHelpers.unionArrayLike,"unionArrayLike"),
+			addToResult(compareHelpers.unionObject, "unionObject")
+		];
+		
+		options["default"] = false;
+		
+		var res = loop(a, b, aParent, bParent, prop, compares, options);
+		if(res === true) {
+			return options.result;
+		}
+		return false;
+	},
+	unionComparesType: function(a, b, aParent, bParent, prop, compares, options){
+		if(typeof compares === "function") {
+			var compareResult = compares(a, b, aParent, bParent, prop, options);
+			if(typeof compareResult === "boolean") {
+				if(res === true) {
+					options.result[prop] = a;
+					return true;
+				} else {
+					return res;
+				}
+			} else if(compareResult && typeof compareResult === "object"){
+				// is there a difference?
+				if("union" in compareResult) {
+					options.result[prop] = compareResult.union;
+					options.performedUnion++;
+					return true;
+				}
+			}
+		}
+	},
+	// if everything is the same OR doesn't have a property on the left or right (only)
+	unionObject: function(a, b, aParent, bParent, prop, compares, options){
+		var subsetCompare = function(a, b, aParent, bParent, prop){
+			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+			
+			if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
+				var subsetCheck;
+				if( !(prop in aParent)) {
+					subsetCheck = "subsetB";
+				}
+				if( !(prop in bParent) ) {
+					subsetCheck = "subsetA";
+				}
+				if(subsetCheck) {
+					if( !options.subset ) {
+						options.subset = subsetCheck;
+					}
+					return options.subset === subsetCheck;
+				}
+				
+				return false;
+			}
+		};
+		
+		
+		var aType = typeof a;
+		if(aType === 'object' || aType === 'function') {
+			return h.eachInUnique(a, 
+				subsetCompare, 
+				b, 
+				subsetCompare, 
+				true);
+		}
+	},
+	// this might be expensive, but work that out later
+	unionArrayLike: function( a, b, aParent, bParent, prop, compares, options ) {
+		if(h.isArrayLike(a) && h.isArrayLike(b) ) {
+			var combined = h.makeArray(a) = h.makeArray(b);
+			// unique's the combination
+			h.doubleLoop(combined, function(item, cur){
+				return !compareHelpers.equal(cur, item, aParent, bParent, undefined, compares['*'], {"default": false});
+			});
+			options.result[prop] = combined;
 			return true;
 		}
 	},
