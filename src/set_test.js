@@ -1,76 +1,179 @@
 require("steal-qunit");
 
-var set = require('./set');
+var set = require('./set-core');
 
-test('set.difference object', function() {
-	set.difference({ name: 'david' }, { name: 'David' }); //-> null
+var ignoreProp = function(){ return true; };
+
+QUnit.module("set core");
+
+test('set.equal', function(){
+	
+	ok(set.equal({
+		type: 'FOLDER'
+	}, {
+		type: 'FOLDER',
+		count: 5
+	}, {
+		count: ignoreProp
+	}), 'count ignored');
+
+	ok(set.equal({
+		type: 'folder'
+	}, {
+		type: 'FOLDER'
+	}, {
+		type: function (a, b) {
+			return ('' + a)
+					.toLowerCase() === ('' + b)
+					.toLowerCase();
+		}
+	}), 'folder case ignored');
+
+	// Issue #773
+	ok(!set.equal(
+		{foo: null},
+		{foo: new Date()}
+	), 'nulls and Dates are not considered the same. (#773)');
+
+	ok(!set.equal(
+		{foo: null},
+		{foo: {}}
+	), 'nulls and empty objects are not considered the same. (#773)');
+	
 });
 
-test('set.difference enumerations', function() {
-	set.subset( {colors: ['blue']}, {} );
-	set.difference( { colors: ['red']}, {colors: ['blue','red']} );
-	set.difference({ colors: ['red']},  {colors: ['blue','red']} );
+
+test('set.subset', function(){
+	
+	ok(set.subset({
+		type: 'FOLDER'
+	}, {
+		type: 'FOLDER'
+	}), 'equal sets');
+	
+	ok(set.subset({
+		type: 'FOLDER',
+		parentId: 5
+	}, {
+		type: 'FOLDER'
+	}), 'sub set');
+
+	
+	ok(!set.subset({
+		type: 'FOLDER'
+	}, {
+		type: 'FOLDER',
+		parentId: 5
+	}), 'wrong way');
+	
+	
+	ok(!set.subset({
+		type: 'FOLDER',
+		parentId: 7
+	}, {
+		type: 'FOLDER',
+		parentId: 5
+	}), 'different values');
+	
+	
+	ok(set.subset({
+		type: 'FOLDER',
+		count: 5
+	}, {
+		type: 'FOLDER'
+	}, {
+		count: ignoreProp
+	}), 'count ignored');
+	
+	
+	ok(set.subset({
+		type: 'FOLDER',
+		kind: 'tree'
+	}, {
+		type: 'FOLDER',
+		foo: true,
+		bar: true
+	}, {
+		foo: ignoreProp,
+		bar: ignoreProp
+	}), 'understands a subset');
+	
+	ok(set.subset({
+		type: 'FOLDER',
+		foo: true,
+		bar: true
+	}, {
+		type: 'FOLDER',
+		kind: 'tree'
+	}, {
+		foo: ignoreProp,
+		bar: ignoreProp,
+		kind: ignoreProp
+	}), 'ignores nulls');
+
 });
 
-//set.difference({ colors: ['red'] }, { color: ['green'] }, { colors: [“red”, “green”, “blue”] } ) //-> {colors: [“blue”]}
-//
-//set.difference( {} , {completed: true}, {...} ) //-> {completed: false}
-//set.difference( {completed: true}, {}, {...} )  //-> null
-//
-//set.difference( {start: 0, end: 99}, {start: 50, end: 99} }, {})
-//set.difference( {start: 0, end: 99}, {start: 50, end: 98} }, {})
-//
-//set.difference( {name: “david”}, {name: “David”}, {...} ) //-> null
-//set.difference( {name: “david”}, {}, {...} ) //-> null
-//set.difference( {name: “david”}, {foo: “bar”}, {...} ) //-> undefined
-//set.subset( {colors: [“blue”]}, {} )
-//set.difference( { colors: [“red”]}, {colors: [“blue”,”red”]} )
-//set.difference({ colors: [“red”]},  {colors: [“blue”,”red”]} )
-//
-//set.difference( {name: “david”}, {}, {...} ) //-> undefined
-//set.difference( {}, {name: “david”}, {...} ) //-> null
-//
-//
-//{
-//	colors: function(aColors, bColors){
-//		return {
-//			diff: [“blue”], // can’t always be privided … but COULD if we were gods
-//		intersection: [“red”],
-//	}
-//},
-//name: function(Aname, Bname){
-//	if(Aname) {
-//		return {union: Aname}
-//	}
-//	if(Bname) {
-//		return {union: BName, diff: null}
-//	}
-//}
-//// return the difference or undefined if a difference can not be taken, same, or size
-//// difference and union
-//completed: function(A, B){
-//	if(A === undefined) {
-//		return {
-//			diff: !B,
-//			union: B,
-//			adjacent: true
-//		}
-//	}
-//	return undefined;
-//},
-//start: function(Astart = 0, Bstart) {
-//	return {
-//		diff: 0,
-//		union: 50,
-//		adjacent: “before”
-//}
-//},
-//end: function(Astart = 0, Bstart) {
-//	return {
-//		diff: 49,
-//		union: 99,
-//		adjacent: “before”
-//}
-//},
-//rangedProperties: [“start”,”end”]
-//}
+
+test('set.difference', function(){
+	
+	var res = set.difference({}, { completed: true });
+	ok(res === true, "diff should be true");
+	
+
+	res = set.difference({ completed: true }, { completed: true });
+	equal(res, false);
+	
+	res = set.difference({ completed: true }, {});
+	equal(res, false);
+
+	res = set.difference({ completed: true }, { foo: 'bar' });
+	equal(res, false);
+	
+	
+});
+
+test('set.difference({ function })', function() {
+	var res = set.difference({ colors: ['red','blue'] }, { colors: ['blue'] }, {
+		colors: function() {
+			return {
+				// can’t always be privided … but COULD if we were gods
+				difference: ['red' ],
+				intersection: ['blue']
+			};
+		}
+	});
+
+	deepEqual(res, { colors: [ 'red' ] });
+});
+
+test('set.union', function(){
+	
+	// set / subset
+	var res = set.union({}, { completed: true });
+	deepEqual(res , {}, "set / subset");
+	
+	res = set.union({ completed: true }, {});
+	deepEqual(res , {}, "subset / set");
+	
+	res = set.union({foo: "bar"},{foo: "bar"});
+	deepEqual(res, {foo: "bar"}, "equal");
+	
+	res = set.union({foo: "bar"},{foo: "zed"});
+	ok(!res, "values not equal");
+	
+});
+
+/*
+test('set.union({ function })', function() {
+	var res = set.difference({ colors: ['red','blue'] }, { colors: ['blue'] }, {
+		colors: function() {
+			return {
+				// can’t always be privided … but COULD if we were gods
+				difference: ['red' ],
+				intersection: ['blue']
+			};
+		}
+	});
+
+	deepEqual(res, { colors: [ 'red' ] });
+});*/
