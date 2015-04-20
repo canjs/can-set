@@ -32,12 +32,6 @@ var addToResult = function(fn, name){
 	
 };
 
-var reverse = function(fn) {
-	return function(a, b, aParent, bParent, prop, compares, options){
-		return fn.call(this, b,a, bParent, aParent, prop, compares, options);
-	};
-};
-
 module.exports = compareHelpers = {
 	equal: function(a, b, aParent, bParent, prop, compares, options) {
 		options.checks = [
@@ -74,7 +68,7 @@ module.exports = compareHelpers = {
 			return a === b;
 		}
 		if (options.deep === -1) {
-			return aType === 'object' || a === b;
+			return typeof a === 'object' || a === b;
 		}
 		if (typeof a !== typeof b || h.isArrayLike(a) !== h.isArrayLike(b)) {
 			return false;
@@ -97,7 +91,7 @@ module.exports = compareHelpers = {
 			return true;
 		}
 	},
-	equalObject: function( a, b, aParent, bParent, prop, compares, options ){
+	equalObject: function( a, b, aParent, bParent, parentProp, compares, options ){
 		var aType = typeof a;
 		if(aType === 'object' || aType === 'function') {
 			var bCopy = h.extend({}, b);
@@ -106,7 +100,7 @@ module.exports = compareHelpers = {
 			}
 			
 			for (var prop in a) {
-				compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 				if (! loop(a[prop], b[prop], a, b, prop, compare, options ) ) {
 					return false;
 				}
@@ -159,7 +153,7 @@ module.exports = compareHelpers = {
 	},
 	// returns true if A is superset of B
 	// A is a superset if it has fewer properties
-	properSupersetObject: function( a, b, aParent, bParent, prop, compares, options ){
+	properSupersetObject: function( a, b, aParent, bParent, parentProp, compares, options ){
 		var bType = typeof b;
 		var hasAdditionalProp = false;
 		if(bType === 'object' || bType === 'function') {
@@ -169,7 +163,7 @@ module.exports = compareHelpers = {
 			}
 			
 			for (var prop in b) {
-				compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 				// run the comparison no matter what
 				var compareResult = loop(a[prop], b[prop], a, b, prop, compare, options );
 				// if there wasn't a prop or we performed a diff
@@ -239,11 +233,11 @@ module.exports = compareHelpers = {
 		if(typeof compares === "function") {
 			var compareResult = compares(a, b, aParent, bParent, prop, options);
 			if(typeof compareResult === "boolean") {
-				if(res === true) {
+				if(compareResult === true) {
 					options.result[prop] = a;
 					return true;
 				} else {
-					return res;
+					return compareResult;
 				}
 			} else if(compareResult && typeof compareResult === "object"){
 				// is there a difference?
@@ -268,7 +262,7 @@ module.exports = compareHelpers = {
 		}
 	},
 	// A has every property B has ... and then some
-	diffObject: function(a, b, aParent, bParent, prop, compares, options){
+	diffObject: function(a, b, aParent, bParent, parentProp, compares, options){
 		var aType = typeof a;
 		if(aType === 'object' || aType === 'function') {
 			var bCopy = h.extend({}, b);
@@ -277,7 +271,7 @@ module.exports = compareHelpers = {
 			}
 			
 			for (var prop in a) {
-				compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 				if (! loop(a[prop], b[prop], a, b, prop, compare, options ) ) {
 					return false;
 				}
@@ -317,11 +311,11 @@ module.exports = compareHelpers = {
 		if(typeof compares === "function") {
 			var compareResult = compares(a, b, aParent, bParent, prop, options);
 			if(typeof compareResult === "boolean") {
-				if(res === true) {
+				if(compareResult === true) {
 					options.result[prop] = a;
 					return true;
 				} else {
-					return res;
+					return compareResult;
 				}
 			} else if(compareResult && typeof compareResult === "object"){
 				// is there a difference?
@@ -372,7 +366,7 @@ module.exports = compareHelpers = {
 	// this might be expensive, but work that out later
 	unionArrayLike: function( a, b, aParent, bParent, prop, compares, options ) {
 		if(h.isArrayLike(a) && h.isArrayLike(b) ) {
-			var combined = h.makeArray(a) = h.makeArray(b);
+			var combined = h.makeArray(a).concat(h.makeArray(b));
 			// unique's the combination
 			h.doubleLoop(combined, function(item, cur){
 				return !compareHelpers.equal(cur, item, aParent, bParent, undefined, compares['*'], {"default": false});

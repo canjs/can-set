@@ -57,7 +57,7 @@ var diff = function(setA, setB, property1, property2){
 		};
 	}
 	// setB starts earlier and overlaps setA, OR A starts at B but A ends later
-	else if(sBv1 < sAv1 && within(sBv2, [sAv1, sAv2]) || (sAv1 == sBv1 && sBv2 < sAv2) ) {
+	else if(sBv1 < sAv1 && within(sBv2, [sAv1, sAv2]) || (sAv1 === sBv1 && sBv2 < sAv2) ) {
 		return {
 			difference: [sBv2+1, sAv2],
 			insertNeeds: "after",
@@ -140,7 +140,9 @@ module.exports = {
 	 */
 	"boolean": makeComparator(function(propA, propB) {
 		// prop a is probably true
-		if(propA === !propB && propB === !propA) {
+		var notA = !propA,
+			notB = !propB;
+		if( propA === notB && propB === notA ) {
 			return {
 				difference: !propB,
 				union: undefined

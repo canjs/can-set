@@ -2,7 +2,7 @@ require("steal-qunit");
 
 var set = require('./set-core');
 
-var ignoreProp = function(){ return true };
+var ignoreProp = function(){ return true; };
 
 QUnit.module("set core");
 
@@ -152,13 +152,13 @@ test('set.union', function(){
 	var res = set.union({}, { completed: true });
 	deepEqual(res , {}, "set / subset");
 	
-	var res = set.union({ completed: true }, {});
+	res = set.union({ completed: true }, {});
 	deepEqual(res , {}, "subset / set");
 	
-	var res = set.union({foo: "bar"},{foo: "bar"});
+	res = set.union({foo: "bar"},{foo: "bar"});
 	deepEqual(res, {foo: "bar"}, "equal");
 	
-	var res = set.union({foo: "bar"},{foo: "zed"});
+	res = set.union({foo: "bar"},{foo: "zed"});
 	ok(!res, "values not equal");
 	
 });

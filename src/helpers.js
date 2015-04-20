@@ -2,12 +2,12 @@ var helpers;
 module.exports = helpers = {
 	extend: function(d, s){
 		for(var prop in s) {
-			d[prop] = s[prop]
+			d[prop] = s[prop];
 		}
 		return d;
 	},
 	isArrayLike: function(arr){
-		return arr && (typeof arr == "object") && (typeof arr.length == "number") && (arr.length >= 0) && (arr.length === 0 || ( (arr.length-1) in arr) );
+		return arr && (typeof arr === "object") && (typeof arr.length === "number") && (arr.length >= 0) && (arr.length === 0 || ( (arr.length-1) in arr) );
 	},
 	each: function(obj, cb){
 		if(helpers.isArrayLike(obj)) {
@@ -29,16 +29,17 @@ module.exports = helpers = {
 	},
 	// loops through all unique props in a and then in b
 	eachInUnique: function(a, acb, b, bcb, defaultReturn){
-		var bCopy = helpers.extend({}, b);
+		var bCopy = helpers.extend({}, b),
+			res;
 		for (var prop in a) {
-			var res = acb(a[prop], b[prop], a, b, prop );
+			res = acb(a[prop], b[prop], a, b, prop );
 			if(res !== undefined) {
 				return res;
 			}
 			delete bCopy[prop];
 		}
 		for (prop in bCopy) {
-			var res = bcb(undefined, b[prop], a, b, prop );
+			res = bcb(undefined, b[prop], a, b, prop );
 			if(res !== undefined) {
 				return res;
 			}
@@ -47,7 +48,7 @@ module.exports = helpers = {
 	},
 	makeArray: function(arr){
 		var array = [];
-		each(arr, function(item){
+		helpers.each(arr, function(item){
 			array.push(item);
 		});
 		return array;
