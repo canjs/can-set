@@ -326,7 +326,9 @@ module.exports = compareHelpers = {
 			} else if(compareResult && typeof compareResult === "object"){
 				// is there a difference?
 				if("union" in compareResult) {
-					options.result[prop] = compareResult.union;
+					if(compareResult.union !== undefined) {
+						options.result[prop] = compareResult.union;
+					}
 					options.performedUnion++;
 					return true;
 				}

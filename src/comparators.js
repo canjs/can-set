@@ -139,10 +139,17 @@ module.exports = {
 	 * Makes boolean 
 	 */
 	"boolean": makeComparator(function(propA, propB) {
-		if(propA === undefined) {
+		// prop a is probably true
+		if(propA === !propB && propB === !propA) {
 			return {
 				difference: !propB,
-				intersection: propB
+				union: undefined
+			};
+		} else if(propA === undefined) {
+			return {
+				difference: !propB,
+				intersection: propB,
+				union: undefined
 			};
 		}
 	})

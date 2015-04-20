@@ -83,5 +83,9 @@ test('boolean set.difference', function() {
 });
 
 
-
+test('boolean set.union', function(){
+	var comparator = comparators.boolean('completed');
+	var res = set.union({completed: false} , { completed: true }, comparator);
+	deepEqual(res, { }, "union has everything");
+});
 
