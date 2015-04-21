@@ -22,20 +22,23 @@ var diff = function(setA, setB, property1, property2){
 	var sAv1 = setA[property1],
 		sAv2 = setA[property2],
 		sBv1 = setB[property1],
-		sBv2 = setB[property2];
+		sBv2 = setB[property2],
+		count = sAv2 - sAv1 + 1;
 
 	// if the sets are equal
 	if(sAv1 === sBv1 && sAv2 === sBv2) {
 		return {
 			intersection: [sAv1,sAv2],
-			union: [sAv1,sAv2]
+			union: [sAv1,sAv2],
+			count: count
 		};
 	} 
 	// B contains A
 	else if( within(sAv1, [sBv1, sBv2]) && within(sAv2, [sBv1, sBv2]) ) {
 		return {
 			intersection: [sAv1,sAv2],
-			union: [sBv1, sBv2]
+			union: [sBv1, sBv2],
+			count: count
 		};
 	}
 	// A contains B
@@ -44,7 +47,8 @@ var diff = function(setA, setB, property1, property2){
 			intersection: [sBv1,sBv2],
 			// there is a difference in what A has
 			difference: [null, null],
-			union: [sAv1, sAv2]
+			union: [sAv1, sAv2],
+			count: count
 		};
 	}
 	// setA starts earlier and overlaps setB
@@ -53,7 +57,8 @@ var diff = function(setA, setB, property1, property2){
 			difference: [sAv1, sBv1-1],
 			merge: "befre",
 			intersection: [sBv1,sAv2],
-			union: [sAv1, sBv2]
+			union: [sAv1, sBv2],
+			count: count
 		};
 	}
 	// setB starts earlier and overlaps setA, OR A starts at B but A ends later
@@ -62,7 +67,8 @@ var diff = function(setA, setB, property1, property2){
 			difference: [sBv2+1, sAv2],
 			insertNeeds: "after",
 			intersection: [sAv1,sBv2],
-			union: [sBv1, sAv2]
+			union: [sBv1, sAv2],
+			count: count
 		};
 	} 
 	// side by side ... nothing intersection
@@ -70,7 +76,8 @@ var diff = function(setA, setB, property1, property2){
 		return {
 			difference: [sAv1,sAv2],
 			insertNeeds: "before",
-			union: [sAv1, sBv2]
+			union: [sAv1, sBv2],
+			count: count
 		};
 	} 
 	
@@ -78,8 +85,12 @@ var diff = function(setA, setB, property1, property2){
 		return {
 			difference: [sAv1,sAv2],
 			insertNeeds: "after",
-			union: [sBv1, sAv2]
+			union: [sBv1, sAv2],
+			count: count
 		};
+	}
+	if(!isNaN(count)) {
+		return {count: count};
 	}
 	
 };
@@ -114,6 +125,9 @@ module.exports = {
 			}
 			if(result.union) {
 				res.union = result.union[index];
+			}
+			if(result.count) {
+				res.count = result.count;
 			}
 			return res;
 		};

@@ -72,6 +72,20 @@ test('rangeInclusive set.union', function() {
 	//equal(res, true);
 });
 
+test('rangeInclusive set.count', function(){
+	var comparator = comparators.rangeInclusive('start', 'end');
+	var res = set.count({ start: 0, end: 99 }, comparator);
+	equal(res, 100, "count is right");
+});
+
+test('rangeInclusive set.intersection', function(){
+	var comparator = comparators.rangeInclusive('start', 'end');
+	var res = set.intersection({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
+	deepEqual(res, { start: 50, end: 99 }, "got a intersection");
+});
+
+
+
 test('boolean set.difference', function() {
 	var comparator = comparators.boolean('completed');
 	
@@ -88,4 +102,5 @@ test('boolean set.union', function(){
 	var res = set.union({completed: false} , { completed: true }, comparator);
 	deepEqual(res, { }, "union has everything");
 });
+
 

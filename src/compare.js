@@ -5,7 +5,6 @@ var compareHelpers;
 
 var loop = function(a, b, aParent, bParent, prop, compares, options) {
 	var checks = options.checks;
-	console.log("loop", a, b);
 	for(var i =0 ; i < checks.length; i++) {
 		var res = checks[i](a, b, aParent, bParent, prop, compares || {}, options);
 		if(res !== undefined) {
@@ -19,7 +18,6 @@ var addToResult = function(fn, name){
 	
 	return function(a, b, aParent, bParent, prop, compares, options){
 		var res = fn.apply(this, arguments);
-		console.log(name, res);
 		if(res === true) {
 			if(prop !== undefined && ! ( prop in options.result )) {
 				options.result[prop] = a;
@@ -136,7 +134,6 @@ module.exports = compareHelpers = {
 	subsetComparesType: function(a, b, aParent, bParent, prop, compares, options){
 		if(typeof compares === "function") {
 			var compareResult = compares(a, b, aParent, bParent, prop, options);
-			console.log(compareResult);
 			if(typeof compareResult === "boolean") {
 				return compareResult;
 			} else if(compareResult && typeof compareResult === "object"){
@@ -190,7 +187,6 @@ module.exports = compareHelpers = {
 	properSubsetComparesType: function(a, b, aParent, bParent, prop, compares, options){
 		if(typeof compares === "function") {
 			var compareResult = compares(a, b, aParent, bParent, prop, options);
-			console.log(compareResult);
 			if(typeof compareResult === "boolean") {
 				return compareResult;
 			} else if(compareResult && typeof compareResult === "object"){
@@ -375,4 +371,150 @@ module.exports = compareHelpers = {
 			return true;
 		}
 	},
+	count: function(a, b, aParent, bParent, prop, compares, options){
+		// go through and ask for count
+		options.checks = [
+			compareHelpers.countComparesType,
+			compareHelpers.equalBasicTypes,
+			compareHelpers.equalArrayLike,
+			compareHelpers.loopObject
+		];
+		
+		options["default"] = false;
+		
+		var res = loop(a, b, aParent, bParent, prop, compares, options);
+		
+		if( typeof options.count === "number") {
+			return options.count;
+		}
+		return Infinity;
+	},
+	countComparesType: function(a, b, aParent, bParent, prop, compares, options){
+		if(typeof compares === "function") {
+			var compareResult = compares(a, b, aParent, bParent, prop, options);
+			if(typeof compareResult === "boolean") {
+				return true;
+			} else if(compareResult && typeof compareResult === "object"){
+				// is there a difference?
+				if(typeof compareResult.count === "number") {
+					
+					if(!("count" in options) || compareResult.count === options.count) {
+						options.count = compareResult.count;
+					} else {
+						options.count = Infinity;
+					}
+				}
+				return true;
+			}
+		}
+	},
+	loopObject: function(a, b, aParent, bParent, prop, compares, options){
+		var aType = typeof a;
+		if(aType === 'object' || aType === 'function') {
+			h.each(a, function(aValue, prop){
+				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+				loop( aValue, b[prop], a, b, prop, compare, options );
+			});
+			return true;
+		}
+	},
+	intersection: function(a, b, aParent, bParent, prop, compares, options){
+		// if everything is the same OR doesn't have a property on the left or right (only)
+		// and union values
+		options.result = {};
+		options.performedIntersection = 0;
+		options.checks = [
+			compareHelpers.intersectionComparesType,
+			addToResult(compareHelpers.equalBasicTypes,"equalBasicTypes"),
+			addToResult(compareHelpers.intersectionArrayLike,"intersectionArrayLike"),
+			compareHelpers.intersectionObject,
+		];
+		
+		options["default"] = false;
+		
+		var res = loop(a, b, aParent, bParent, prop, compares, options);
+		if(res === true) {
+			return options.result;
+		}
+		return false;
+	},
+	intersectionComparesType: function(a, b, aParent, bParent, prop, compares, options){
+		if(typeof compares === "function") {
+			var compareResult = compares(a, b, aParent, bParent, prop, options);
+			if(typeof compareResult === "boolean") {
+				if(compareResult === true) {
+					options.result[prop] = a;
+					return true;
+				} else {
+					return compareResult;
+				}
+			} else if(compareResult && typeof compareResult === "object"){
+				// is there a difference?
+				if("intersection" in compareResult) {
+					if(compareResult.intersection !== undefined) {
+						options.result[prop] = compareResult.intersection;
+					}
+					options.performedIntersection++;
+					return true;
+				}
+			}
+		}
+	},
+	intersectionObject: function(a, b, aParent, bParent, prop, compares, options){
+		var subsetCompare = function(a, b, aParent, bParent, prop){
+			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+			
+			if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
+				var subsetCheck;
+				if( !(prop in aParent)) {
+					subsetCheck = "subsetB";
+				}
+				if( !(prop in bParent) ) {
+					subsetCheck = "subsetA";
+				}
+				if(subsetCheck) {
+					if( !options.subset ) {
+						options.subset = subsetCheck;
+					}
+					var addProp = options.subset === subsetCheck;
+					if(addProp) {
+						if(subsetCheck === "subsetB") {
+							options.result[prop] = b;
+						} else {
+							options.result[prop] = a;
+						}
+					}
+					return addProp;
+				}
+				
+				return false;
+			}
+		};
+		
+		
+		var aType = typeof a;
+		if(aType === 'object' || aType === 'function') {
+			return h.eachInUnique(a, 
+				subsetCompare, 
+				b, 
+				subsetCompare, 
+				true);
+		}
+	},
+	// this might be expensive, but work that out later
+	intersectionArrayLike: function( a, b, aParent, bParent, prop, compares, options ) {
+		if(h.isArrayLike(a) && h.isArrayLike(b) ) {
+			var intersection = [];
+			h.each(h.makeArray(a), function(cur){
+				for(var i = 0; i < b.length; i++) {
+					if( compareHelpers.equal(cur, b[i], aParent, bParent, undefined, compares['*'], {"default": false}) ) {
+						intersection.push(cur);
+						break;
+					}
+				}
+			});
+			options.result[prop] = intersection;
+			return true;
+		}
+	}
 };

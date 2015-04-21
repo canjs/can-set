@@ -2,9 +2,8 @@ var h = require("./helpers"),
 	compare = require("./compare");
 
 
-var Algebra = function(compare, count){
+var Algebra = function(compare){
 	this.compare = compare;
-	this.count = count;
 };
 Algebra.make = function(compare, count){
 	if(compare instanceof Algebra) {
@@ -48,6 +47,13 @@ h.extend(Algebra.prototype, {
 	union: function(a, b){
 		// if everything is equal or has a difference
 		return compare.union(a, b, undefined, undefined, undefined, this.compare, {});
+	},
+	intersection: function(a, b){
+		// if everything is equal or has a difference
+		return compare.intersection(a, b, undefined, undefined, undefined, this.compare, {});
+	},
+	count: function(a){
+		return compare.count(a, {}, undefined, undefined, undefined, this.compare, {});
 	}
 	
 });
@@ -65,5 +71,11 @@ module.exports = {
 	},
 	union: function(a, b, config) {
 		return Algebra.make(config).union(a, b);
+	},
+	intersection: function(a, b, config){
+		return Algebra.make(config).intersection(a, b);
+	},
+	count: function(a, config){
+		return Algebra.make(config).count(a);
 	}
 };

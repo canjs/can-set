@@ -163,17 +163,29 @@ test('set.union', function(){
 	
 });
 
-/*
-test('set.union({ function })', function() {
-	var res = set.difference({ colors: ['red','blue'] }, { colors: ['blue'] }, {
-		colors: function() {
+test('set.count', function(){
+	ok( set.count({}) === Infinity, "defaults to infinity");
+	ok( set.count({foo: "bar"},{}) === Infinity, "defaults to infinity");
+	
+	equal( set.count({foo: "bar"}, {
+		foo: function(){
 			return {
-				// can’t always be privided … but COULD if we were gods
-				difference: ['red' ],
-				intersection: ['blue']
+				count: 100
 			};
 		}
-	});
+	}), 100,  "works with a single value"  );
+});
 
-	deepEqual(res, { colors: [ 'red' ] });
-});*/
+test('set.intersection', function(){
+	var res = set.intersection({}, { completed: true });
+	deepEqual(res , { completed: true }, "set / subset");
+	
+	res = set.intersection({ completed: true }, {});
+	deepEqual(res , { completed: true }, "subset / set");
+	
+	res = set.intersection({foo: "bar"},{foo: "bar"});
+	deepEqual(res, {foo: "bar"}, "equal");
+	
+	res = set.intersection({foo: "bar"},{foo: "zed"});
+	ok(!res, "values not equal");
+});

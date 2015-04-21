@@ -86,11 +86,6 @@ set.difference( {} , {completed: true} ) //-> false
 set.difference( {completed: true}, {} )  //-> null
 ```
 
-## set.count(a, algebra) -> Number
-
-Returns the number of items that might be loaded by set _A_. This makes use of set.Algebra's
-By default, this returns Infinity.
-
 ## set.union(a, b, algebra) -> set | undefined
 
 Returns a set that represents the union of _A_ and _B_ (_A_ ∪ _B_).
@@ -101,6 +96,13 @@ set.union(
   {start: 100, end: 199},
   {...} ) //-> {start: 0, end: 199}
 ```
+
+
+## set.count(a, algebra) -> Number
+
+Returns the number of items that might be loaded by set _A_. This makes use of set.Algebra's
+By default, this returns Infinity.
+
 
 
 ## new set.Algebra(compares)
