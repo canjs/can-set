@@ -89,7 +89,7 @@ set.difference( {completed: true}, {} )  //-> null
 ## set.count(a, algebra) -> Number
 
 Returns the number of items that might be loaded by set _A_. This makes use of set.Algebra's
-`count` method.  By default, this returns Infinity.
+By default, this returns Infinity.
 
 ## set.union(a, b, algebra) -> set | undefined
 
@@ -103,14 +103,14 @@ set.union(
 ```
 
 
-## new set.Algebra(compares, [count])
+## new set.Algebra(compares)
 
 Creates an object that can perform binary operations on sets with an awareness of
 how certain properties represent the set.
 
-### compares `Object<String: comparitor>`
+### compares `Object<String: comparator>`
 
-An object of property names and `comparitor` functions.
+An object of property names and `comparator` functions.
 
 ```js
 {
@@ -124,45 +124,44 @@ An object of property names and `comparitor` functions.
 }
 ```
 
-### comparitor(aValue, bValue, a, b, algebra)
+### comparator(aValue, bValue, a, b, prop, algebra)
 
-A comparitor function returns information 
+A comparator function returns algebra values for two values for a given property.
+
+
+#### params
 
 - `aValue` - the value of A's property in a set difference A and B (A \ B).
 - `bValue` - the value of A's property in a set difference A and B (A \ B).
 - `a` - the A set in a set difference A and B (A \ B).
 - `a` - the B set in a set difference A and B (A \ B).
-- returns 
-	- [intersection] - A set that represents the intersection of A and B.
-	
-	- [difference] - A set that represents all items in A that are not in B. For example:
-	
-	  ```
-	  A{start: 0, end: 10} \ B{start: 5, end: 10} = {start: 0, end: 4}
-	  ```
-	  
-	  If a set exists, but can not be represented, `null` should be provided.
-	  For example:
-	  
-	  ```
-	  A{} \ B{type: "tacos"} = null
-	  ```
-	  
-	  By providing `null`, we know that B is a subset of A.
-	  
-	- [merge] - Additional metadata that can be used if merging the difference and
-	  B set. For example,
-	
-	  ```
-	  A = {start: 0, end: 10} 
-	  B = {start: 5, end: 10}
-	  difference = {start: 0, end: 4}
-	  merge = "before"
-	  ```
-	  
-	  Setting merge to before might mean that the items loaded by the `difference`
-	  set can be inserted before the `B` set.
-	  
 
+#### returns
+
+A comparator function should either return a Boolean which indicates if `aValue` and `bValue` are
+equal or an `AlgebraResult` object that details information about the union, intersection, and
+difference of `aValue` and `bValue`.
+
+An `AlgebraResult` object has the following values:
+
+- [union] - A value the represents the union of A and B.
+- [intersection] - A value that represents the intersection of A and B.
+- [difference] - A value that represents all items in A that are not in B. 
+- [count] - The count of the items in A.
+
+For example, if you had a `colors` property and A is `["Red","Blue"]` and B is `["Green","Yellow","Blue"]`, the 
+AlgebraResult object might look like:
+
+```js
+{
+  union: ["Red","Blue","Green","Yellow"],
+  intersection: ["Blue"],
+  difference: ["Red"],
+  count: 2000
+}
+```
+
+The count is `2000` because there might be 2000 items represented by colors "Red" and "Blue".  Often 
+the real number can not be known.
 
 
