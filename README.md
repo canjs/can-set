@@ -15,7 +15,7 @@ utilities and middleware for the client.
  - Install
  - Use
  - API
-   - [equal]()
+   - [equal](#set.equal)
    - subset
    - properSubset
    - intersection
@@ -38,7 +38,7 @@ Use `require` in Node/Browserify workflows to import `can-set` like:
 var set = require('can-set');
 ```
 
-Use `define`, `require` or `import` in [http://stealjs.com]  workflows to import `can-set` like:
+Use `define`, `require` or `import` in [StealJS](http://stealjs.com)  workflows to import `can-set` like:
 
 ```
 import set from 'can-set'
