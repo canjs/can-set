@@ -90,7 +90,7 @@ Unlike in common [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)
 superset of all sets.  For instance if you load all items represented by set `{}`, you have loaded 
 every item in that "universe".
 
-## equal
+## set.equal
 
 `set.equal(a, b, algebra) -> Boolean`
 
