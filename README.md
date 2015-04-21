@@ -25,7 +25,7 @@ utilities and middleware for the client.
    - [Algebra](#setAlgebra)
    - [comparators](#setcomparators)
      - [boolean](#setcomparatorsboolean)
-     - [rangeInclusive](#setcomparatorsrangeInclusive)
+     - [rangeInclusive](#setcomparatorsrangeinclusive)
     
 ## Install
 
