@@ -113,6 +113,11 @@ test('set.subset', function(){
 
 });
 
+test('set.properSubset', function(){
+	equal( set.properSubset({foo: "bar"},{}), true );
+	equal( set.properSubset({},{}), false );
+	equal( set.properSubset({},{foo: "bar"}), false );
+});
 
 test('set.difference', function(){
 	
@@ -160,6 +165,13 @@ test('set.union', function(){
 	
 	res = set.union({foo: "bar"},{foo: "zed"});
 	ok(!res, "values not equal");
+});
+
+test('set.union Array', function(){
+	
+	// set / subset
+	var res = set.union({foo: ["a","b"]}, { foo: ["a","c"] });
+	deepEqual(res , {foo: ["a","b","c"]}, "set / subset");
 	
 });
 
@@ -188,4 +200,12 @@ test('set.intersection', function(){
 	
 	res = set.intersection({foo: "bar"},{foo: "zed"});
 	ok(!res, "values not equal");
+});
+
+test('set.intersection Array', function(){
+	
+	// set / subset
+	var res = set.intersection({foo: ["a","b"]}, { foo: ["a","c"] });
+	deepEqual(res , {foo: ["a"]}, "intersection");
+	
 });

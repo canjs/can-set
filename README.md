@@ -1,18 +1,81 @@
 # can-set
 
 __can-set__ is a utility for comparing [sets](http://en.wikipedia.org/wiki/Set_theory#Basic_concepts_and_notation) that 
-are represented by the parameters commonly passed to service requests.
+are represented by the parameters commonly passed to service requests. 
 
 For example, the set `{type: "critical"}` might represent all 
 critical todos.  It is a superset of the set `{type: "critical", due: "today"}` 
 which might represent all critical todos due today.
 
 __can-set__ is useful for building caching and other data-layer
-optimizations.  [can-connect] uses can-set to create data modeling
+optimizations.  It can be used in client or server
+environments. [can-connect](https://github.com/canjs/can-connect) uses can-set to create data modeling
 utilities and middleware for the client. 
 
+ - Install
+ - Use
+ - API
+   - [equal]()
+   - subset
+   - properSubset
+   - intersection
+   - difference
+   - union
+   - count
+   - Algebra
 
-## Set
+## Install
+
+Use npm to install `can-set`:
+
+> npm install can-set --save
+
+## Use
+
+Use `require` in Node/Browserify workflows to import `can-set` like:
+
+```
+var set = require('can-set');
+```
+
+Use `define`, `require` or `import` in [http://stealjs.com]  workflows to import `can-set` like:
+
+```
+import set from 'can-set'
+```
+
+Once you've imported `set` into your project, use it to compare sets.  The following example
+defines a `getTodos` function that gets todo data from a memory cache or from the server.
+
+```js
+var cache = [];
+
+var getTodos = function(params, cb) {
+  
+  // check cache
+  for(var i = 0 ; i < cache.length; i++) {
+    var cacheEntry = cache[i];
+    if(set.subset( cacheEntry.params, params ) ) {
+      var matchingTodos = cacheEntry.items.filter(function(item){
+        return set.subset(item, params);
+      })
+      return cb(matchingTodos);
+    }
+  }
+  
+  // not in cache, get and save in cache
+  $.get("/todos",params, function(todos){
+    cache.push({
+      params: params,
+      items: todos
+    });
+    cb(todos);
+  });
+}
+```
+
+
+## API
 
 In __can-set__ a set is a plain JavaScript object 
 like `{start: 0, end: 100, filter: "top"}`.  Often, these are the 
@@ -27,7 +90,9 @@ Unlike in common [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)
 superset of all sets.  For instance if you load all items represented by set `{}`, you have loaded 
 every item in that "universe".
 
-## equal.equal(a, b, algebra) -> Boolean
+## equal
+
+`set.equal(a, b, algebra) -> Boolean`
 
 Returns true if the two sets the exact same.
 

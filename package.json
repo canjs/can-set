@@ -21,10 +21,6 @@
     "url": "https://github.com/canjs/can-set/issues"
   },
   "homepage": "https://github.com/canjs/can-set",
-  "dependencies": {
-    "can": "^2.2.4",
-    "jquery": "^2.1.3"
-  },
   "devDependencies": {
     "jshint": "^2.7.0",
     "steal": "^0.8.3",

@@ -1,4 +1,4 @@
-var h = require("./helpers"),
+var h = require("./helpers")
 	compare = require("./compare");
 
 
@@ -26,6 +26,9 @@ h.extend(Algebra.prototype, {
 			}
 		}
 		return true;
+	},
+	properSubset: function(a, b){
+		return this.subset(a, b) && !this.equal(a, b);
 	},
 	// what a has that b doesn't
 	/**
@@ -68,6 +71,9 @@ module.exports = {
 	},
 	subset: function(a, b, config) {
 		return Algebra.make(config).subset(a, b);
+	},
+	properSubset: function(a, b, config) {
+		return Algebra.make(config).properSubset(a, b);
 	},
 	union: function(a, b, config) {
 		return Algebra.make(config).union(a, b);

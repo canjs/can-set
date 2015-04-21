@@ -59,7 +59,10 @@ module.exports = helpers = {
 		}
 		var i = 0;
 		while(i < arr.length) {
-			callbacks.start(arr[i]);
+			if(callbacks.start) {
+				callbacks.start(arr[i]);
+			}
+			
 			var j = i+1;
 			while( j < arr.length ) {
 				if(callbacks.iterate(arr[j], j, arr[i], i) === false) {

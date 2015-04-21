@@ -66,10 +66,10 @@ test('rangeInclusive set.difference', function() {
 test('rangeInclusive set.union', function() {
 	var comparator = comparators.rangeInclusive('start', 'end');
 	var res = set.union({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
-	deepEqual(res, { start: 0, end: 101 }, "got a diff");
+	deepEqual(res, { start: 0, end: 101 }, "got a union");
 	
-	//res = set.difference({}, { start: 0, end: 10 }, comparator);
-	//equal(res, true);
+	res = set.union({}, { start: 0, end: 10 }, comparator);
+	deepEqual(res, {}, "union has everything");
 });
 
 test('rangeInclusive set.count', function(){
@@ -92,8 +92,8 @@ test('boolean set.difference', function() {
 	var res = set.difference({} , { completed: true }, comparator);
 	deepEqual(res, { completed: false }, "inverse to false");
 
-	//res = set.difference({}, { completed: false }, comparator);
-	//deepEqual(res, { completed: true }, "inverse to true");
+	res = set.difference({}, { completed: false }, comparator);
+	deepEqual(res, { completed: true }, "inverse to true");
 });
 
 

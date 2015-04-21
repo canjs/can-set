@@ -364,8 +364,9 @@ module.exports = compareHelpers = {
 		if(h.isArrayLike(a) && h.isArrayLike(b) ) {
 			var combined = h.makeArray(a).concat(h.makeArray(b));
 			// unique's the combination
-			h.doubleLoop(combined, function(item, cur){
-				return !compareHelpers.equal(cur, item, aParent, bParent, undefined, compares['*'], {"default": false});
+			h.doubleLoop(combined, function(item, j, cur, i){
+				var res = !compareHelpers.equal(cur, item, aParent, bParent, undefined, compares['*'], {"default": false});
+				return res;
 			});
 			options.result[prop] = combined;
 			return true;
