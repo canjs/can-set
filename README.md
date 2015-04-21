@@ -15,14 +15,14 @@ utilities and middleware for the client.
  - Install
  - Use
  - API
-   - [equal](#set.equal)
-   - subset
-   - properSubset
-   - intersection
-   - difference
-   - union
-   - count
-   - Algebra
+   - [equal](#setequal)
+   - [subset](#setsubset)
+   - [properSubset](#setproperSubset)
+   - [intersection](#setintersection)
+   - [difference](#setdifference)
+   - [union](#setunion)
+   - [count](#setcount)
+   - [Algebra](#setAlgebra)
 
 ## Install
 
@@ -100,7 +100,9 @@ Returns true if the two sets the exact same.
 set.equal({type: "critical"}, {type: "critical"}) //-> true
 ```
 
-## set.subset(a, b, algebra) -> Boolean
+## set.subset
+
+`set.subset(a, b, algebra) -> Boolean`
 
 Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_.
 
@@ -109,7 +111,9 @@ set.subset({type: "critical"}, {}) //-> true
 set.subset({}, {}) //-> true
 ```
 
-## set.properSubset(a, b, algebra)
+## set.properSubset
+
+`set.properSubset(a, b, algebra)`
 
 Returns true if _A_ is a subset of _B_ and _A_ is no equal to _B_.
 
@@ -118,7 +122,9 @@ set.properSubset({type: "critical"}, {}) //-> true
 set.properSubset({}, {}) //-> false
 ```
 
-## set.intersection(a, b, algebra) -> set
+## set.intersection
+
+`set.intersection(a, b, algebra) -> set`
 
 Returns a set that represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
 
@@ -130,7 +136,9 @@ set.intersection(
 ```
 
 
-## set.difference(a, b, algebra) -> set|null|undefined
+## set.difference
+
+`set.difference(a, b, algebra) -> set|null|undefined`
 
 Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_), or
 returns if a difference exists.
@@ -151,7 +159,9 @@ set.difference( {} , {completed: true} ) //-> false
 set.difference( {completed: true}, {} )  //-> null
 ```
 
-## set.union(a, b, algebra) -> set | undefined
+## set.union
+
+`set.union(a, b, algebra) -> set | undefined`
 
 Returns a set that represents the union of _A_ and _B_ (_A_ ∪ _B_).
 
@@ -163,14 +173,17 @@ set.union(
 ```
 
 
-## set.count(a, algebra) -> Number
+## set.count
+
+`set.count(a, algebra) -> Number`
 
 Returns the number of items that might be loaded by set _A_. This makes use of set.Algebra's
 By default, this returns Infinity.
 
 
+## set.Algebra
 
-## new set.Algebra(compares)
+`new set.Algebra(compares)`
 
 Creates an object that can perform binary operations on sets with an awareness of
 how certain properties represent the set.
