@@ -301,3 +301,10 @@ To setup your dev environment:
 4. Run `npm test`.  Everything should pass.
 5. Run `npm run-script build`.  Everything should build ok.
 
+To publish:
+
+1.  Update the version number in package.json and commit and push this.
+2.  Run `npm publish`.  This should generate the dist folder.
+3.  Create and checkout a "release" branch.
+4.  Run `git add -f dist`.
+5.  Commit the addition and tag it.  Push the tag.

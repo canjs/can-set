@@ -7,7 +7,8 @@
     "jshint": "jshint src/. --config",
     "testee": "testee test.html",
     "test": "npm run jshint && npm run testee",
-    "build": "node build.js"
+    "build": "node build.js",
+    "prepublish": "node build.js"
   },
   "repository": {
     "type": "git",
