@@ -15,14 +15,17 @@ utilities and middleware for the client.
  - Install
  - Use
  - API
-   - [equal]()
-   - subset
-   - properSubset
-   - intersection
-   - difference
-   - union
-   - count
-   - Algebra
+   - [equal](#setequal)
+   - [subset](#setsubset)
+   - [properSubset](#setproperSubset)
+   - [intersection](#setintersection)
+   - [difference](#setdifference)
+   - [union](#setunion)
+   - [count](#setcount)
+   - [Algebra](#setAlgebra)
+   - [comparators](#setcomparators)
+     - [boolean](#setcomparatorsboolean)
+     - [rangeInclusive](#setcomparatorsrangeinclusive)
  - Contributing
  
 ## Install
@@ -39,7 +42,7 @@ Use `require` in Node/Browserify workflows to import `can-set` like:
 var set = require('can-set');
 ```
 
-Use `define`, `require` or `import` in [http://stealjs.com]  workflows to import `can-set` like:
+Use `define`, `require` or `import` in [StealJS](http://stealjs.com)  workflows to import `can-set` like:
 
 ```
 import set from 'can-set'
@@ -101,7 +104,9 @@ Returns true if the two sets the exact same.
 set.equal({type: "critical"}, {type: "critical"}) //-> true
 ```
 
-## set.subset(a, b, algebra) -> Boolean
+## set.subset
+
+`set.subset(a, b, algebra) -> Boolean`
 
 Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_.
 
@@ -110,7 +115,9 @@ set.subset({type: "critical"}, {}) //-> true
 set.subset({}, {}) //-> true
 ```
 
-## set.properSubset(a, b, algebra)
+## set.properSubset
+
+`set.properSubset(a, b, algebra)`
 
 Returns true if _A_ is a subset of _B_ and _A_ is no equal to _B_.
 
@@ -119,7 +126,9 @@ set.properSubset({type: "critical"}, {}) //-> true
 set.properSubset({}, {}) //-> false
 ```
 
-## set.intersection(a, b, algebra) -> set
+## set.intersection
+
+`set.intersection(a, b, algebra) -> set`
 
 Returns a set that represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
 
@@ -131,7 +140,9 @@ set.intersection(
 ```
 
 
-## set.difference(a, b, algebra) -> set|null|undefined
+## set.difference
+
+`set.difference(a, b, algebra) -> set|null|undefined`
 
 Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_), or
 returns if a difference exists.
@@ -152,7 +163,9 @@ set.difference( {} , {completed: true} ) //-> false
 set.difference( {completed: true}, {} )  //-> null
 ```
 
-## set.union(a, b, algebra) -> set | undefined
+## set.union
+
+`set.union(a, b, algebra) -> set | undefined`
 
 Returns a set that represents the union of _A_ and _B_ (_A_ ∪ _B_).
 
@@ -164,14 +177,17 @@ set.union(
 ```
 
 
-## set.count(a, algebra) -> Number
+## set.count
+
+`set.count(a, algebra) -> Number`
 
 Returns the number of items that might be loaded by set _A_. This makes use of set.Algebra's
 By default, this returns Infinity.
 
 
+## set.Algebra
 
-## new set.Algebra(compares)
+`new set.Algebra(compares)`
 
 Creates an object that can perform binary operations on sets with an awareness of
 how certain properties represent the set.
@@ -232,6 +248,49 @@ AlgebraResult object might look like:
 The count is `2000` because there might be 2000 items represented by colors "Red" and "Blue".  Often 
 the real number can not be known.
 
+## set.comparators
+
+The following functions create `compares` objects that can be mixed together to create a set `Algebra`. 
+
+For example, the following uses jQuery's extend to mixin two comparator behaviors into a compares object:
+
+```js
+var compares = $.extend(
+  {
+    // ignore this property in set algebra
+    sessionId:  function(){ return true }
+  }, 
+  set.comparators.boolean("completed"),
+  set.comparators.range("start","end") );
+  
+var algebra = new set.Algebra( compares )
+```
+
+### set.comparators.boolean
+
+`set.comparators.boolean(property) -> compare`
+
+Makes a compare object with a `property` function that has the following logic:
+
+```
+A(true) ∪ B(false) = undefined
+
+A(undefined) \ B(true) = false
+A(undefined) \ B(false) = true
+```
+
+It understands that `true` and `false` are complementary sets that
+combined to `undefined`.  Another way to think of this is that if you
+load `{complete: false}` and `{complete: true}` you've loaded `{}`.
+
+### set.comparators.rangeInclusive
+
+`set.comparators.rangeInclusive(startIndexProperty, endIndexProperty) -> compare`
+
+Makes a comparator for two ranged properties that specify a range of items
+that includes both the startIndex and endIndex.  For example, a range of
+[0,20] loads 21 items.
+
 ## Contributing
 
 To setup your dev environment:
@@ -241,5 +300,4 @@ To setup your dev environment:
 3. Open `test.html` in your browser.  Everything should pass.
 4. Run `npm test`.  Everything should pass.
 5. Run `npm run-script build`.  Everything should build ok.
-
 
