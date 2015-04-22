@@ -383,7 +383,7 @@ module.exports = compareHelpers = {
 		
 		options["default"] = false;
 		
-		var res = loop(a, b, aParent, bParent, prop, compares, options);
+		loop(a, b, aParent, bParent, prop, compares, options);
 		
 		if( typeof options.count === "number") {
 			return options.count;

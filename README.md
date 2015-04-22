@@ -23,7 +23,8 @@ utilities and middleware for the client.
    - union
    - count
    - Algebra
-
+ - Contributing
+ 
 ## Install
 
 Use npm to install `can-set`:
@@ -230,5 +231,15 @@ AlgebraResult object might look like:
 
 The count is `2000` because there might be 2000 items represented by colors "Red" and "Blue".  Often 
 the real number can not be known.
+
+## Contributing
+
+To setup your dev environment:
+
+1. Clone and fork this repo.  
+2. Run `npm install`.
+3. Open `test.html` in your browser.  Everything should pass.
+4. Run `npm test`.  Everything should pass.
+5. Run `npm run-script build`.  Everything should build ok.
 
 

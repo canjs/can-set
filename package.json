@@ -6,7 +6,8 @@
   "scripts": {
     "jshint": "jshint src/. --config",
     "testee": "testee test.html",
-    "test": "npm run jshint && npm run testee"
+    "test": "npm run jshint && npm run testee",
+    "build": "node build.js"
   },
   "repository": {
     "type": "git",
@@ -23,8 +24,9 @@
   "homepage": "https://github.com/canjs/can-set",
   "devDependencies": {
     "jshint": "^2.7.0",
-    "steal": "^0.8.3",
+    "steal": "^0.9.3",
     "steal-qunit": "0.0.4",
-    "testee": "^0.2.0"
+    "testee": "^0.2.0",
+    "steal-tools": "^0.9.3"
   }
 }
