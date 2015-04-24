@@ -119,11 +119,36 @@ module.exports = compareHelpers = {
 			compareHelpers.subsetComparesType,
 			compareHelpers.equalBasicTypes,
 			compareHelpers.equalArrayLike,
-			compareHelpers.equalObject
+			compareHelpers.subsetObject
 		];
+		options.getSubsets = [];
+		options.removeProps = [];
+		
 		options["default"] = false;
 		
 		return loop(a, b, aParent, bParent, prop, compares, options);
+	},
+	subsetObject: function( a, b, aParent, bParent, parentProp, compares, options ){
+		var aType = typeof a;
+		if(aType === 'object' || aType === 'function') {
+			
+			return h.eachInUnique(a, 
+				function(a, b, aParent, bParent, prop){
+					var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+					if ( ! loop(a, b, aParent, bParent, prop, compare, options ) && (prop in bParent) ) {
+						return false;
+					}
+				}, 
+				b, 
+				function(a, b, aParent, bParent, prop){
+					var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+					if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
+						return false;
+					}
+				}, 
+				true);
+		}
+		
 	},
 	/**
 	 * Checks if A is a subset of B.  If A is a subset of B if:
@@ -137,6 +162,14 @@ module.exports = compareHelpers = {
 			if(typeof compareResult === "boolean") {
 				return compareResult;
 			} else if(compareResult && typeof compareResult === "object"){
+				
+				if( compareResult.getSubset ) {
+					options.removeProps.push(prop);
+					if(options.getSubsets.indexOf(compareResult.getSubset) === -1) {
+						options.getSubsets.push(compareResult.getSubset);
+					}
+				}
+				
 				// A \ B subset intersects in both directions
 				// but does not diff from 
 				if( ("intersection" in compareResult) && !("difference" in compareResult)) {
@@ -294,6 +327,7 @@ module.exports = compareHelpers = {
 			addToResult(compareHelpers.unionArrayLike,"unionArrayLike"),
 			addToResult(compareHelpers.unionObject, "unionObject")
 		];
+		options.getUnions = [];
 		
 		options["default"] = false;
 		
@@ -314,6 +348,14 @@ module.exports = compareHelpers = {
 					return compareResult;
 				}
 			} else if(compareResult && typeof compareResult === "object"){
+				if( compareResult.getUnion ) {
+					//options.removeProps.push(prop);
+					if(options.getUnions.indexOf(compareResult.getUnion) === -1) {
+						options.getUnions.push(compareResult.getUnion);
+					}
+				}
+				
+				
 				// is there a difference?
 				if("union" in compareResult) {
 					if(compareResult.union !== undefined) {

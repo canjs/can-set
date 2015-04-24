@@ -19,13 +19,7 @@ h.extend(Algebra.prototype, {
 	},
 	subset: function(a, b){
 		// A is a subset of B if A has every property in B
-		var compares = this.compare || {};
-		for (var prop in b) {
-			if ( !compare.subset(a[prop], b[prop], a, b, prop, compares[prop], {}) ) {
-				return false;
-			}
-		}
-		return true;
+		return compare.subset(a, b, undefined, undefined, undefined, this.compare, {});
 	},
 	properSubset: function(a, b){
 		return this.subset(a, b) && !this.equal(a, b);

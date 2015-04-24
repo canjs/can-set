@@ -22,6 +22,8 @@ utilities and middleware for the client.
    - [difference](#setdifference)
    - [union](#setunion)
    - [count](#setcount)
+   - [getUnion](#setgetUnion)
+   - [getSubset](#setgetSubset)
    - [Algebra](#setAlgebra)
    - [comparators](#setcomparators)
      - [boolean](#setcomparatorsboolean)
@@ -142,12 +144,12 @@ set.intersection(
 
 ## set.difference
 
-`set.difference(a, b, algebra) -> set|null|undefined`
+`set.difference(a, b, algebra) -> set|true|false`
 
 Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_), or
 returns if a difference exists.
 
-If `true` is returned, that means that _A_ is a subset of _B_, but no set object
+If `true` is returned, that means that _B_ is a subset of _A_, but no set object
 can be returned that represents that set.
 
 If `false` is returned, that means there is no difference or the sets are not comparable.
@@ -157,10 +159,10 @@ If `false` is returned, that means there is no difference or the sets are not co
 set.difference( {} , {completed: true}, set.boolean("completed") ) //-> {completed: false}
 
 // A has all of B, but we can't figure out how to create a set object
-set.difference( {} , {completed: true} ) //-> false
+set.difference( {} , {completed: true} ) //-> true
 
 // A is totally inside B
-set.difference( {completed: true}, {} )  //-> null
+set.difference( {completed: true}, {} )  //-> false
 ```
 
 ## set.union
@@ -219,6 +221,9 @@ A comparator function returns algebra values for two values for a given property
 - `bValue` - the value of A's property in a set difference A and B (A \ B).
 - `a` - the A set in a set difference A and B (A \ B).
 - `a` - the B set in a set difference A and B (A \ B).
+
+
+
 
 #### returns
 
@@ -290,6 +295,20 @@ load `{complete: false}` and `{complete: true}` you've loaded `{}`.
 Makes a comparator for two ranged properties that specify a range of items
 that includes both the startIndex and endIndex.  For example, a range of
 [0,20] loads 21 items.
+
+## set.getSubset
+
+`set.get.subset(a, b, bItems, algebra) //-> aItems`
+
+Gets A set's items given a super set B and its items.
+
+
+## set.getUnion
+
+`set.getUnion(a, b, aItems, bItems, algebra) //-> unionItems`
+
+Unifies items from set A and setB into a single array of items.
+
 
 ## Contributing
 

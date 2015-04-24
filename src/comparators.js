@@ -30,7 +30,8 @@ var diff = function(setA, setB, property1, property2){
 		return {
 			intersection: [sAv1,sAv2],
 			union: [sAv1,sAv2],
-			count: count
+			count: count,
+			meta: "equal"
 		};
 	} 
 	// B contains A
@@ -38,7 +39,8 @@ var diff = function(setA, setB, property1, property2){
 		return {
 			intersection: [sAv1,sAv2],
 			union: [sBv1, sBv2],
-			count: count
+			count: count,
+			meta: "subset"
 		};
 	}
 	// A contains B
@@ -48,52 +50,57 @@ var diff = function(setA, setB, property1, property2){
 			// there is a difference in what A has
 			difference: [null, null],
 			union: [sAv1, sAv2],
-			count: count
+			count: count,
+			meta: "superset"
 		};
 	}
 	// setA starts earlier and overlaps setB
 	else if(sAv1 < sBv1 && within(sAv2, [sBv1, sBv2]) ) {
 		return {
 			difference: [sAv1, sBv1-1],
-			merge: "befre",
 			intersection: [sBv1,sAv2],
 			union: [sAv1, sBv2],
-			count: count
+			count: count,
+			meta: "before"
 		};
 	}
 	// setB starts earlier and overlaps setA, OR A starts at B but A ends later
 	else if(sBv1 < sAv1 && within(sBv2, [sAv1, sAv2]) || (sAv1 === sBv1 && sBv2 < sAv2) ) {
 		return {
 			difference: [sBv2+1, sAv2],
-			insertNeeds: "after",
 			intersection: [sAv1,sBv2],
 			union: [sBv1, sAv2],
-			count: count
+			count: count,
+			meta: "after"
 		};
 	} 
 	// side by side ... nothing intersection
 	else if(sAv2 === sBv1-1) {
 		return {
 			difference: [sAv1,sAv2],
-			insertNeeds: "before",
 			union: [sAv1, sBv2],
-			count: count
+			count: count,
+			meta: "disjoint-before"
 		};
 	} 
 	
 	else if(sBv2 === sAv1 - 1) {
 		return {
 			difference: [sAv1,sAv2],
-			insertNeeds: "after",
 			union: [sBv1, sAv2],
-			count: count
+			count: count,
+			meta: "disjoint-after"
 		};
 	}
 	if(!isNaN(count)) {
-		return {count: count};
+		return {
+			count: count,
+			meta: "disjoint"
+		};
 	}
 	
 };
+
 
 
 module.exports = {
@@ -137,14 +144,44 @@ module.exports = {
 				return;
 			}
 			var res = diff(A, B, startIndexProperty, endIndexProperty);
-			return makeResult(res, 0);
+			
+			
+			var result = makeResult(res, 0);
+			result.getSubset = function(a, b, bItems, algebra, options){
+				return bItems;
+			};
+			result.getUnion = function(a, b, aItems, bItems, algebra, options){
+				return [aItems,bItems];
+			};
+			return result;
 		};
 		compares[endIndexProperty] = function(vA, vB, A, B){
 			if(vA === undefined) {
 				return;
 			}
-			var res = diff(A, B, startIndexProperty, endIndexProperty);
-			return makeResult(res, 1);
+			var data= diff(A, B, startIndexProperty, endIndexProperty);
+			var res = makeResult( data, 1);
+			// if getSubset ... remove from the .get
+			res.getSubset = function(a, b, bItems, algebra, options){
+				var aStartValue = a[startIndexProperty],
+					aEndValue = a[endIndexProperty];
+					
+				var bStartValue = b[startIndexProperty];
+				
+				if(  ! (endIndexProperty in b) || ! (endIndexProperty in a)  ) {
+					return bItems.slice(aStartValue, aEndValue+1);
+				}
+				return bItems.slice( aStartValue - bStartValue, aEndValue - bStartValue + 1 );
+			};
+			res.getUnion = function(a, b, aItems, bItems, algebra, options){
+				// take from a the 
+				if(data.intersection) {
+					aItems = aItems.slice( 0, data.intersection[0]-a[startIndexProperty]  );
+				}
+				return [aItems,bItems];
+			};
+			
+			return res;
 		};
 		return compares;
 	},

@@ -61,6 +61,12 @@ test('rangeInclusive set.difference', function() {
 	
 	res = set.difference({}, { start: 0, end: 10 }, comparator);
 	equal(res, true);
+	
+	// difference side by side
+	
+	comparator = comparators.rangeInclusive('start', 'end');
+	res = set.difference({ start: 0, end: 49 }, { start: 50, end: 101 }, comparator);
+	deepEqual(res, { start: 0, end: 49 }, "side by side");
 });
 
 test('rangeInclusive set.union', function() {
@@ -70,7 +76,24 @@ test('rangeInclusive set.union', function() {
 	
 	res = set.union({}, { start: 0, end: 10 }, comparator);
 	deepEqual(res, {}, "union has everything");
+	
+	res = set.union({start: 100, end: 199}, {start: 200, end: 299}, comparator);
+	deepEqual(res, {start:100, end:299}, "default compare works");
+	
+	res = set.union({start: 200, end: 299}, {start: 100, end: 199}, comparator);
+	deepEqual(res, {start:100, end:299}, "default compare works");
+	
+	res = set.union({start: 200, end: 299}, {start: 100, end: 209}, comparator);
+	deepEqual(res, {start:100, end:299}, "default compare works");
+	
+	res = set.union({start: 100, end: 299}, {start: 103, end: 209}, comparator);
+	deepEqual(res, {start:100, end:299}, "default compare works");
+	
+	res = set.union({start: 100, end: 299}, {start: 100, end: 299}, comparator);
+	deepEqual(res, {start:100, end:299}, "default compare works");
 });
+
+
 
 test('rangeInclusive set.count', function(){
 	var comparator = comparators.rangeInclusive('start', 'end');
