@@ -48,6 +48,9 @@ test("getUnion against ranged sets", function(){
 	var union = set.getUnion({start: 10, end: 13},{start: 14, end: 17},items.slice(0,4), items.slice(4,8), comparators.rangeInclusive("start","end"));
 	deepEqual(union, items);
 	
+	
+	union = set.getUnion({start: 14, end: 17}, {start: 10, end: 13}, items.slice(4,8),items.slice(0,4), comparators.rangeInclusive("start","end"));
+	deepEqual(union, items, "disjoint after");
 });
 
 test("getUnion against overlapping ranged sets", function(){
@@ -70,7 +73,14 @@ test("getUnion against overlapping ranged sets", function(){
 		
 	deepEqual(union, items);
 	
-	
+	union = set.getUnion(
+		{start: 11, end: 17}, 
+		{start: 10, end: 11},
+		items.slice(1,8), 
+		items.slice(0,2), 
+		comparators.rangeInclusive("start","end"));
+		
+	deepEqual(union, items);
 });
 
 

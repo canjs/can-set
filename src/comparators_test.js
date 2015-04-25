@@ -64,9 +64,15 @@ test('rangeInclusive set.difference', function() {
 	
 	// difference side by side
 	
-	comparator = comparators.rangeInclusive('start', 'end');
 	res = set.difference({ start: 0, end: 49 }, { start: 50, end: 101 }, comparator);
 	deepEqual(res, { start: 0, end: 49 }, "side by side");
+	
+	res = set.difference({ start: 0, end: 49 }, { start: 0, end: 20 }, comparator);
+	deepEqual(res, { start: 21, end: 49 }, "side by side");
+	
+	
+	res = set.difference({ start: 0, end: 49 }, { start: 20, end: 49 }, comparator);
+	deepEqual(res, { start: 0, end: 19 }, "side by side");
 });
 
 test('rangeInclusive set.union', function() {

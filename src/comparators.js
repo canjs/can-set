@@ -25,6 +25,21 @@ var diff = function(setA, setB, property1, property2){
 		sBv2 = setB[property2],
 		count = sAv2 - sAv1 + 1;
 
+	var after = {
+		difference: [sBv2+1, sAv2],
+		intersection: [sAv1,sBv2],
+		union: [sBv1, sAv2],
+		count: count,
+		meta: "after"
+	};
+	var before = {
+		difference: [sAv1, sBv1-1],
+		intersection: [sBv1,sAv2],
+		union: [sAv1, sBv2],
+		count: count,
+		meta: "before"
+	};
+
 	// if the sets are equal
 	if(sAv1 === sBv1 && sAv2 === sBv2) {
 		return {
@@ -33,6 +48,14 @@ var diff = function(setA, setB, property1, property2){
 			count: count,
 			meta: "equal"
 		};
+	} 
+	// A starts at B but A ends later
+	else if( sAv1 === sBv1 && sBv2 < sAv2 ) {
+		return after;
+	} 
+	// A end at B but A starts earlier
+	else if( sAv2 === sBv2 && sBv1 > sAv1 ) {
+		return before;
 	} 
 	// B contains A
 	else if( within(sAv1, [sBv1, sBv2]) && within(sAv2, [sBv1, sBv2]) ) {
@@ -56,23 +79,11 @@ var diff = function(setA, setB, property1, property2){
 	}
 	// setA starts earlier and overlaps setB
 	else if(sAv1 < sBv1 && within(sAv2, [sBv1, sBv2]) ) {
-		return {
-			difference: [sAv1, sBv1-1],
-			intersection: [sBv1,sAv2],
-			union: [sAv1, sBv2],
-			count: count,
-			meta: "before"
-		};
+		return before;
 	}
-	// setB starts earlier and overlaps setA, OR A starts at B but A ends later
-	else if(sBv1 < sAv1 && within(sBv2, [sAv1, sAv2]) || (sAv1 === sBv1 && sBv2 < sAv2) ) {
-		return {
-			difference: [sBv2+1, sAv2],
-			intersection: [sAv1,sBv2],
-			union: [sBv1, sAv2],
-			count: count,
-			meta: "after"
-		};
+	// setB starts earlier and overlaps setA
+	else if(sBv1 < sAv1 && within(sBv2, [sAv1, sAv2]) ) {
+		return after;
 	} 
 	// side by side ... nothing intersection
 	else if(sAv2 === sBv1-1) {
@@ -174,7 +185,15 @@ module.exports = {
 				return bItems.slice( aStartValue - bStartValue, aEndValue - bStartValue + 1 );
 			};
 			res.getUnion = function(a, b, aItems, bItems, algebra, options){
-				// take from a the 
+				// if a is after b
+				if(data.meta.indexOf("after") >= 0) {
+					// if they overlap ... shave some off
+					if(data.intersection) {
+						bItems = bItems.slice( 0, data.intersection[0]-b[startIndexProperty]  );
+					}
+					return [bItems, aItems];
+				}
+
 				if(data.intersection) {
 					aItems = aItems.slice( 0, data.intersection[0]-a[startIndexProperty]  );
 				}
