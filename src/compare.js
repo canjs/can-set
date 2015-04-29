@@ -370,6 +370,7 @@ module.exports = compareHelpers = {
 	// if everything is the same OR doesn't have a property on the left or right (only)
 	unionObject: function(a, b, aParent, bParent, prop, compares, options){
 		var subsetCompare = function(a, b, aParent, bParent, prop){
+
 			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 			
 			if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
@@ -384,7 +385,7 @@ module.exports = compareHelpers = {
 					if( !options.subset ) {
 						options.subset = subsetCheck;
 					}
-					return options.subset === subsetCheck;
+					return options.subset === subsetCheck ? undefined: false;
 				}
 				
 				return false;
