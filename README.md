@@ -296,6 +296,17 @@ Makes a comparator for two ranged properties that specify a range of items
 that includes both the startIndex and endIndex.  For example, a range of
 [0,20] loads 21 items.
 
+### set.comparators.enum
+
+`set.comparators.enum(property, propertyValues) -> compare`
+
+Makes a comparator for a set of values.
+
+```
+var compare = set.comparators.enum("type", ["new","accepted","pending","resolved"])
+```
+
+
 ## set.getSubset
 
 `set.get.subset(a, b, bItems, algebra) //-> aItems`
