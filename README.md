@@ -337,4 +337,4 @@ To publish:
 2.  Run `npm publish`.  This should generate the dist folder.
 3.  Create and checkout a "release" branch.
 4.  Run `git add -f dist`.
-5.  Commit the addition and tag it.  Push the tag.
+5.  Commit the addition and tag it `git tag v0.2.0`.  Push the tag `git push origin --tags`.
