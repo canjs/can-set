@@ -133,3 +133,111 @@ test('boolean set.union', function(){
 });
 
 
+
+test('enum set.intersection', function(){
+	var comparator = comparators.enum('type',['new','prep','deliver','delivered']);
+	
+	var res = set.intersection({} , { type: 'new' }, comparator);
+	deepEqual(res, {type: 'new' }, "all");
+	
+	res = set.intersection({} , { type: ['new','prep'] }, comparator);
+	deepEqual(res, {type: ['new','prep'] }, "intersection");
+	
+	res = set.intersection({type: ['prep'] } , { type: ['new','prep'] }, comparator);
+	deepEqual(res, {type: 'prep' }, "intersection");
+	
+	res = set.intersection({type: [] } , { type: ['new','prep'] }, comparator);
+	deepEqual(res, {type: ['new','prep'] }, "intersection");
+	
+	res = set.intersection({ type: 'new' },{}, comparator);
+	deepEqual(res, {type: 'new' }, "all");
+});
+
+test('enum set.difference', function(){
+	var comparator = comparators.enum('type',['new','prep','deliver','delivered']);
+	
+	var res = set.difference({} , { type: 'new' }, comparator);
+	deepEqual(res, {type: ['prep','deliver','delivered'] }, "all");
+	
+	res = set.difference({} , { type: ['new','prep'] }, comparator);
+	deepEqual(res, {type: ['deliver','delivered'] }, "intersection");
+	
+	res = set.difference({type: ['prep'] } , { type: ['new','prep'] }, comparator);
+	deepEqual(res, false, "intersection");
+	
+	res = set.difference({type: [] } , { type: ['new','prep'] }, comparator);
+	deepEqual(res, {type: ['deliver','delivered'] }, "intersection");
+	
+	res = set.difference({ type: 'new' },{}, comparator);
+	deepEqual(res, false, "all");
+});
+
+test('enum set.union', function(){
+	var comparator = comparators.enum('type',['new','prep','deliver','delivered']);
+	
+	var res = set.union({} , { type: 'new' }, comparator);
+	deepEqual(res, {}, "all");
+	
+	res = set.union({} , { type: ['new','prep'] }, comparator);
+	deepEqual(res, {}, "intersection");
+	
+	res = set.union({type: ['prep'] } , { type: ['new','prep'] }, comparator);
+	deepEqual(res, { type: ['prep','new'] }, "intersection");
+	
+	res = set.union({type: [] } , { type: ['new','prep'] }, comparator);
+	deepEqual(res, { }, "intersection");
+	
+	res = set.union({ type: 'new' },{}, comparator);
+	deepEqual(res, {}, "all");
+	
+	res = set.union({type: ['deliver','delivered'] } , { type: ['new','prep'] }, comparator);
+	deepEqual(res, {}, "intersection");
+});
+
+
+test('enum set.equal', function(){
+	
+	var comparator = comparators.enum('type',['new','prep','deliver','delivered']);
+	
+	var res = set.equal({} , { type: 'new' }, comparator);
+	deepEqual(res, false, "all");
+	
+	res = set.equal({} , { type: ['new','prep','deliver','delivered'] }, comparator);
+	deepEqual(res, true, "intersection");
+	
+	res = set.equal({type: ['prep'] } , { type: ['prep'] }, comparator);
+	deepEqual(res, true, "intersection");
+	
+	res = set.equal({type: 'prep'} , { type: 'prep' }, comparator);
+	deepEqual(res, true, "intersection");
+	
+	res = set.equal({ type: 'new' },{type: 'prep'}, comparator);
+	deepEqual(res, false, "all");
+	
+});
+
+test('enum set.subset', function(){
+	
+	var comparator = comparators.enum('type',['new','prep','deliver','delivered']);
+	
+	var res = set.subset({} , { type: 'new' }, comparator);
+	deepEqual(res, false, "all");
+	
+	res = set.subset({ type: 'new' }, {} , comparator);
+	deepEqual(res, true, "all");
+	
+	res = set.subset({} , { type: ['new','prep','deliver','delivered'] }, comparator);
+	deepEqual(res, true, "intersection");
+	
+	res = set.subset({type: ['prep'] } , { type: ['prep'] }, comparator);
+	deepEqual(res, true, "intersection");
+	
+	res = set.subset({type: 'prep'} , { type: 'prep' }, comparator);
+	deepEqual(res, true, "intersection");
+	
+	res = set.subset({ type: 'new' },{type: 'prep'}, comparator);
+	deepEqual(res, false, "all");
+	
+	res = set.subset({type: 'prep'} , { type: ['new','prep','deliver','delivered'] }, comparator);
+	deepEqual(res, true, "intersection");
+});

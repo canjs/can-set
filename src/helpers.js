@@ -76,5 +76,60 @@ module.exports = helpers = {
 			}
 			i++;
 		}
+	},
+	identityMap: function(arr){
+		var map = {};
+		helpers.each(arr, function(value){
+			map[value] = 1;
+		});
+		return map;
+	},
+	arrayUnionIntersectionDifference: function(arr1, arr2){
+		var map = {};
+		
+		var intersection = [];
+		var union = [];
+		var difference = arr1.slice(0);
+		
+		helpers.each(arr1, function(value){
+			map[value] = true;
+			union.push(value);
+		});
+		
+		helpers.each(arr2, function(value){
+			if(map[value]) {
+				intersection.push(value);
+				var index = difference.indexOf(value);
+				if(index !== -1) {
+					difference.splice(index, 1);
+				}
+				
+			} else {
+				union.push(value);
+			}
+		});
+		
+		return {
+			intersection: intersection,
+			union: union,
+			difference: difference
+		};
+	},
+	arraySame: function(arr1, arr2){
+		if(arr1.length !== arr2.length) {
+			return false;
+		}
+		var map = helpers.identityMap(arr1);
+		for(var i = 0 ; i < arr2.length; i++) {
+			var val = map[arr2[i]];
+			if(!val) {
+				return false;
+			} else if(val > 1){
+				return false
+			} else {
+				map[arr2[i]]++;
+			}
+		}
+		return true;
 	}
 };

@@ -112,9 +112,47 @@ var diff = function(setA, setB, property1, property2){
 	
 };
 
-
+var cleanUp = function(value, enumData) {
+	if(!value) {
+		return enumData;
+	}
+	if(!h.isArrayLike(value)) {
+		value = [value];
+	}
+	if(!value.length) {
+		return enumData;
+	}
+	return value;
+};
 
 module.exports = {
+	enum: function(prop, enumData){
+		var compares = {};
+		compares[prop] = function(vA, vB, A, B){
+			vA = cleanUp(vA, enumData);
+			vB = cleanUp(vB, enumData);
+			
+			var data = h.arrayUnionIntersectionDifference(vA, vB);
+			// if the difference is empty ... there is no difference
+			if( !data.difference.length ) {
+				delete data.difference;
+			}
+			
+			// if any of them have everything, return undefined
+			h.each(data, function(value, prop){
+				if(h.isArrayLike(value)) {
+					if(h.arraySame(enumData, value)) {
+						data[prop] = undefined;
+					} else if(value.length === 1) {
+						data[prop] = value[0];
+					}
+				}
+			});
+			
+			return data;
+		};
+		return compares;
+	},
 	/**
 	 * Makes a comparator for two ranged properties that specify a range of items
 	 * that includes both the startIndex and endIndex.  For example, a range of
