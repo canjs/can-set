@@ -108,11 +108,9 @@ set.equal({type: "critical"}, {type: "critical"}) //-> true
 
 ## set.subset
 
-Returns true if _A_ is a subset of _B_ (_A_ ⊆ _B_).
+Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_ (_A_ ⊆ _B_).
 
 `set.subset(a, b, algebra) -> Boolean`
-
-Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_.
 
 ```js
 set.subset({type: "critical"}, {}) //-> true
@@ -125,7 +123,6 @@ Returns true if _A_ is a strict subset of _B_ (_A_ ⊂ _B_).
 
 `set.properSubset(a, b, algebra)`
 
-Returns true if _A_ is a subset of _B_ and _A_ is no equal to _B_.
 
 ```js
 set.properSubset({type: "critical"}, {}) //-> true
