@@ -108,6 +108,8 @@ set.equal({type: "critical"}, {type: "critical"}) //-> true
 
 ## set.subset
 
+Returns true if _A_ is a subset of _B_ (_A_ ⊆ _B_).
+
 `set.subset(a, b, algebra) -> Boolean`
 
 Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_.
@@ -118,6 +120,8 @@ set.subset({}, {}) //-> true
 ```
 
 ## set.properSubset
+
+Returns true if _A_ is a strict subset of _B_ (_A_ ⊂ _B_).
 
 `set.properSubset(a, b, algebra)`
 
