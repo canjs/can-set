@@ -24,7 +24,7 @@ utilities and middleware for the client.
    - [count](#setcount)
    - [getUnion](#setgetUnion)
    - [getSubset](#setgetSubset)
-   - [Algebra](#setAlgebra)
+   - [Algebra](#setalgebra)
    - [comparators](#setcomparators)
      - [boolean](#setcomparatorsboolean)
      - [rangeInclusive](#setcomparatorsrangeinclusive)
