@@ -2,7 +2,11 @@ var h = require("./helpers"),
 	compare = require("./compare");
 
 
-var Algebra = function(compare){
+var Algebra = function(){
+	var compare = {};
+	h.each(arguments, function(arg){
+		h.extend(compare,arg);
+	});
 	this.compare = compare;
 };
 Algebra.make = function(compare, count){

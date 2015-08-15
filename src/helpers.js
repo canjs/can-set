@@ -125,7 +125,7 @@ module.exports = helpers = {
 			if(!val) {
 				return false;
 			} else if(val > 1){
-				return false
+				return false;
 			} else {
 				map[arr2[i]]++;
 			}

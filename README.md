@@ -9,7 +9,7 @@ which might represent all critical todos due today.
 
 __can-set__ is useful for building caching and other data-layer
 optimizations.  It can be used in client or server
-environments. [can-connect](https://github.com/canjs/can-connect) uses can-set to create data modeling
+environments. [can-connect](http://connect.canjs.com) uses can-set to create data modeling
 utilities and middleware for the client. 
 
  - Install
@@ -190,7 +190,7 @@ By default, this returns Infinity.
 
 ## set.Algebra
 
-`new set.Algebra(compares)`
+`new set.Algebra(compares...)`
 
 Creates an object that can perform binary operations on sets with an awareness of
 how certain properties represent the set.
@@ -201,12 +201,9 @@ An object of property names and `comparator` functions.
 
 ```js
 {
-  // return the difference or undefined if a difference can not be taken
-  completed: function(A, B){
-    if(A === undefined) {
-      return !B;
-    }
-    return undefined;
+  // return `true` if the values should be considered the same:
+  lastName: function(aValue, bValue){
+    return (""+aValue).toLowerCase() === (""+bValue).toLowerCase();
   }
 }
 ```
@@ -222,9 +219,6 @@ A comparator function returns algebra values for two values for a given property
 - `bValue` - the value of A's property in a set difference A and B (A \ B).
 - `a` - the A set in a set difference A and B (A \ B).
 - `a` - the B set in a set difference A and B (A \ B).
-
-
-
 
 #### returns
 
