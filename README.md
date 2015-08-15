@@ -15,23 +15,23 @@ utilities and middleware for the client.
 [Play around in this JSBin!](http://jsbin.com/faveda/edit?js,console,output)
 
 
- - Install
- - Use
- - API
-   - [equal](#setequal)
-   - [subset](#setsubset)
-   - [properSubset](#setproperSubset)
-   - [intersection](#setintersection)
-   - [difference](#setdifference)
-   - [union](#setunion)
-   - [count](#setcount)
-   - [getUnion](#setgetUnion)
-   - [getSubset](#setgetSubset)
-   - [Algebra](#setalgebra)
-   - [comparators](#setcomparators)
-     - [boolean](#setcomparatorsboolean)
-     - [rangeInclusive](#setcomparatorsrangeinclusive)
- - Contributing
+> - Install
+> - Use
+> - API
+>   - [equal](#setequal)
+>   - [subset](#setsubset)
+>   - [properSubset](#setproperSubset)
+>   - [intersection](#setintersection)
+>   - [difference](#setdifference)
+>   - [union](#setunion)
+>   - [count](#setcount)
+>   - [getUnion](#setgetUnion)
+>   - [getSubset](#setgetSubset)
+>   - [Algebra](#setalgebra)
+>   - [comparators](#setcomparators)
+>     - [boolean](#setcomparatorsboolean)
+>     - [rangeInclusive](#setcomparatorsrangeinclusive)
+> - [Contributing](#contributing)
  
 ## Install
 
