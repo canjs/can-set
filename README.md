@@ -12,6 +12,9 @@ optimizations.  It can be used in client or server
 environments. [can-connect](http://connect.canjs.com) uses can-set to create data modeling
 utilities and middleware for the client. 
 
+[Play around in this JSBin!](http://jsbin.com/faveda/edit?js,console,output)
+
+
  - Install
  - Use
  - API
