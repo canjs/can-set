@@ -132,6 +132,11 @@ test('boolean set.union', function(){
 	deepEqual(res, { }, "union has everything");
 });
 
+test('boolean set.intersection', function(){
+	var comparator = comparators.boolean('completed');
+	var res = set.intersection({foo: "bar"} , { completed: true }, comparator);
+	equal(res, false, "intersection is false (#4)");
+});
 
 
 test('enum set.intersection', function(){
@@ -141,16 +146,16 @@ test('enum set.intersection', function(){
 	deepEqual(res, {type: 'new' }, "all");
 	
 	res = set.intersection({} , { type: ['new','prep'] }, comparator);
-	deepEqual(res, {type: ['new','prep'] }, "intersection");
+	deepEqual(res, {type: ['new','prep'] }, "all v array intersection");
 	
 	res = set.intersection({type: ['prep'] } , { type: ['new','prep'] }, comparator);
-	deepEqual(res, {type: 'prep' }, "intersection");
+	deepEqual(res, {type: 'prep' }, "items v items intersection");
 	
 	res = set.intersection({type: [] } , { type: ['new','prep'] }, comparator);
-	deepEqual(res, {type: ['new','prep'] }, "intersection");
+	deepEqual(res, {type: ['new','prep'] }, "empty v array intersection");
 	
 	res = set.intersection({ type: 'new' },{}, comparator);
-	deepEqual(res, {type: 'new' }, "all");
+	deepEqual(res, {type: 'new' }, "single v all");
 });
 
 test('enum set.difference', function(){
@@ -241,3 +246,5 @@ test('enum set.subset', function(){
 	res = set.subset({type: 'prep'} , { type: ['new','prep','deliver','delivered'] }, comparator);
 	deepEqual(res, true, "intersection");
 });
+
+

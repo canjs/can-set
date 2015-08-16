@@ -13,6 +13,44 @@ var loop = function(a, b, aParent, bParent, prop, compares, options) {
 	}
 	return options["default"];
 };
+// only adds a or b to `options.result` if missing properties are always on the super set.
+// {foo: "bar", "zed": "ted"} intersection {} -> {foo: "bar", "zed": "ted"}
+var addIntersectedPropertyToResult = function(a, b, aParent, bParent, prop, compares, options){
+	var subsetCheck;
+	if( !(prop in aParent)) {
+		subsetCheck = "subsetB";
+	}
+	if( !(prop in bParent) ) {
+		subsetCheck = "subsetA";
+	}
+	if(subsetCheck) {
+		// If the subset side hasn't been determined, set it.
+		if( !options.subset ) {
+			options.subset = subsetCheck;
+		}
+		// only add the property to the result if it is on the same
+		// side as the identified subset.
+		var addProp = options.subset === subsetCheck;
+		if(addProp) {
+			if(subsetCheck === "subsetB") {
+				options.result[prop] = b;
+			} else {
+				options.result[prop] = a;
+			}
+			// returning undefined allows `eachInUnique` to keep checking other 
+			// properties.
+			return undefined;
+		}
+		return false;
+	}
+	// if a and b are the same ... add this to the result if no subset check.
+	if(a === b) {
+		options.result[prop] = a;
+		return true;
+	} else {
+		return false;
+	};
+};
 
 var addToResult = function(fn, name){
 	
@@ -496,42 +534,24 @@ module.exports = compareHelpers = {
 				// is there a difference?
 				if("intersection" in compareResult) {
 					if(compareResult.intersection !== undefined) {
-						options.result[prop] = compareResult.intersection;
+						options.performedIntersection++;
+						return addIntersectedPropertyToResult(compareResult.intersection, compareResult.intersection, aParent, bParent, prop, compares, options);
 					}
-					options.performedIntersection++;
-					return true;
+					
+					return undefined;
 				}
 			}
 		}
 	},
 	intersectionObject: function(a, b, aParent, bParent, prop, compares, options){
+		var self = this;
 		var subsetCompare = function(a, b, aParent, bParent, prop){
 			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 			
+			// If some property value is not the exact same
 			if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
-				var subsetCheck;
-				if( !(prop in aParent)) {
-					subsetCheck = "subsetB";
-				}
-				if( !(prop in bParent) ) {
-					subsetCheck = "subsetA";
-				}
-				if(subsetCheck) {
-					if( !options.subset ) {
-						options.subset = subsetCheck;
-					}
-					var addProp = options.subset === subsetCheck;
-					if(addProp) {
-						if(subsetCheck === "subsetB") {
-							options.result[prop] = b;
-						} else {
-							options.result[prop] = a;
-						}
-					}
-					return addProp;
-				}
-				
-				return false;
+				// figure out which set has extra properties, that set is a subset.
+				return addIntersectedPropertyToResult(a, b, aParent, bParent, prop, compares, options);
 			}
 		};
 		
