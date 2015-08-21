@@ -203,6 +203,9 @@ test('set.intersection', function(){
 	
 	res = set.intersection({foo: "bar"},{foo: "zed"});
 	ok(!res, "values not equal");
+
+	res = set.intersection({foo: 'bar'},{completed: true});
+	deepEqual(res, {foo: 'bar', completed: true}, 'intersection should combine definitions');
 });
 
 test('set.intersection Array', function(){
