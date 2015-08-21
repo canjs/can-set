@@ -34,8 +34,6 @@ test('boolean set.difference', function() {
 	 * z ∈ (X / Y) | y.completed = false
 	 */
 	res = set.difference({}, { completed: false }, comparator);
-	// FORMALLY this should actually include when completed doesn't exist or isn't a boolean
-	// replaced { completed: true } with false since I'm not sure how to define this
 	deepEqual(res, {completed: true} , "inverse of false");
 });
 
