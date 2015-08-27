@@ -1,6 +1,6 @@
 {
   "name": "can-set",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Set logic for CanJS",
   "main": "src/set.js",
   "scripts": {
