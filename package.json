@@ -4,8 +4,7 @@
   "description": "Set logic for CanJS",
   "main": "src/set.js",
   "scripts": {
-    "preversion": "npm test",
-    "version": "npm run build && git add -Af dist/ && git commit -m \"Updating dist\"",
+    "preversion": "npm test && npm run build && git add -Af dist/ && git commit -m \"Updating dist\"",
     "postversion": "git push && git push --tags",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
