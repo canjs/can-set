@@ -6,7 +6,8 @@ stealTools.export({
 	},
 	outputs: {
 		"+amd": {},
-		"+global-js": {}
+		"+global-js": {},
+    "+cjs": {}
 	}
 }).catch(function(e){
 	
