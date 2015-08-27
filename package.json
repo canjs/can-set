@@ -1,11 +1,11 @@
 {
   "name": "can-set",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Set logic for CanJS",
   "main": "src/set.js",
   "scripts": {
-    "jshint": "./node_modules/.bin/jshint src/. --config",
-    "testee": "./node_modules/.bin/testee test.html",
+    "jshint": "jshint src/. --config",
+    "testee": "testee test.html --browsers firefox",
     "test": "npm run jshint && npm run testee",
     "build": "node build.js",
     "prepublish": "node build.js"
@@ -21,6 +21,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/canjs/can-set/issues"
+  },
+  "system": {
+    "npmIgnore": ["testee"]
   },
   "homepage": "https://github.com/canjs/can-set",
   "devDependencies": {

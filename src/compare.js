@@ -49,7 +49,7 @@ var addIntersectedPropertyToResult = function(a, b, aParent, bParent, prop, comp
 		return true;
 	} else {
 		return false;
-	};
+	}
 };
 
 var addToResult = function(fn, name){
@@ -544,7 +544,6 @@ module.exports = compareHelpers = {
 		}
 	},
 	intersectionObject: function(a, b, aParent, bParent, prop, compares, options){
-		var self = this;
 		var subsetCompare = function(a, b, aParent, bParent, prop){
 			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 			
