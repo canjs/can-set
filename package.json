@@ -4,11 +4,16 @@
   "description": "Set logic for CanJS",
   "main": "src/set.js",
   "scripts": {
+    "preversion": "npm test",
+    "version": "npm run build && git add -A dist/",
+    "postversion": "git push && git push --tags",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish",
     "jshint": "jshint src/. --config",
     "testee": "testee test.html --browsers firefox",
     "test": "npm run jshint && npm run testee",
-    "build": "node build.js",
-    "prepublish": "node build.js"
+    "build": "node build.js"
   },
   "repository": {
     "type": "git",
