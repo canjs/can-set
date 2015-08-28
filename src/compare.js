@@ -24,7 +24,7 @@ var addIntersectedPropertyToResult = function(a, b, aParent, bParent, prop, comp
 		subsetCheck = "subsetA";
 	}
 	if(subsetCheck) {
-		// If the subset side hasn't been determined, set it.
+		// If the subset side hasn"t been determined, set it.
 		if( !options.subset ) {
 			options.subset = subsetCheck;
 		}
@@ -104,7 +104,7 @@ module.exports = compareHelpers = {
 			return a === b;
 		}
 		if (options.deep === -1) {
-			return typeof a === 'object' || a === b;
+			return typeof a === "object" || a === b;
 		}
 		if (typeof a !== typeof b || h.isArrayLike(a) !== h.isArrayLike(b)) {
 			return false;
@@ -119,7 +119,7 @@ module.exports = compareHelpers = {
 				return false;
 			}
 			for (var i = 0; i < a.length; i++) {
-				var compare = compares[i] === undefined ? compares['*'] : compares[i];
+				var compare = compares[i] === undefined ? compares["*"] : compares[i];
 				if (!loop(a[i], b[i], a, b, i, compare, options)) {
 					return false;
 				}
@@ -129,14 +129,14 @@ module.exports = compareHelpers = {
 	},
 	equalObject: function( a, b, aParent, bParent, parentProp, compares, options ){
 		var aType = typeof a;
-		if(aType === 'object' || aType === 'function') {
+		if(aType === "object" || aType === "function") {
 			var bCopy = h.extend({}, b);
 			if(options.deep === false) {
 				options.deep = -1;
 			}
 			
 			for (var prop in a) {
-				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+				var compare = compares[prop] === undefined ? compares["*"] : compares[prop];
 				if (! loop(a[prop], b[prop], a, b, prop, compare, options ) ) {
 					return false;
 				}
@@ -168,18 +168,18 @@ module.exports = compareHelpers = {
 	},
 	subsetObject: function( a, b, aParent, bParent, parentProp, compares, options ){
 		var aType = typeof a;
-		if(aType === 'object' || aType === 'function') {
+		if(aType === "object" || aType === "function") {
 			
 			return h.eachInUnique(a, 
 				function(a, b, aParent, bParent, prop){
-					var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+					var compare = compares[prop] === undefined ? compares["*"] : compares[prop];
 					if ( ! loop(a, b, aParent, bParent, prop, compare, options ) && (prop in bParent) ) {
 						return false;
 					}
 				}, 
 				b, 
 				function(a, b, aParent, bParent, prop){
-					var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+					var compare = compares[prop] === undefined ? compares["*"] : compares[prop];
 					if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
 						return false;
 					}
@@ -224,17 +224,17 @@ module.exports = compareHelpers = {
 	properSupersetObject: function( a, b, aParent, bParent, parentProp, compares, options ){
 		var bType = typeof b;
 		var hasAdditionalProp = false;
-		if(bType === 'object' || bType === 'function') {
+		if(bType === "object" || bType === "function") {
 			var aCopy = h.extend({}, a);
 			if(options.deep === false) {
 				options.deep = -1;
 			}
 			
 			for (var prop in b) {
-				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+				var compare = compares[prop] === undefined ? compares["*"] : compares[prop];
 				// run the comparison no matter what
 				var compareResult = loop(a[prop], b[prop], a, b, prop, compare, options );
-				// if there wasn't a prop or we performed a diff
+				// if there wasn"t a prop or we performed a diff
 				if( !(prop in a) ||  options.performedDifference ) {
 					hasAdditionalProp = true;
 				} else if(!compareResult) {
@@ -276,8 +276,8 @@ module.exports = compareHelpers = {
 	difference: function(a, b, aParent, bParent, prop, compares, options){
 		// a subset is always a difference
 		// go through a ... compare to b ....
-		// if A has something {foo: "bar"} that B doesn't {} -> return false
-		// if B has something that A doesn't and no diff -> return undefined
+		// if A has something {foo: "bar"} that B doesn"t {} -> return false
+		// if B has something that A doesn"t and no diff -> return undefined
 		// if A \ B returns a diff ... keep it
 		options.result = {};
 		options.performedDifference = 0;
@@ -331,14 +331,14 @@ module.exports = compareHelpers = {
 	// A has every property B has ... and then some
 	diffObject: function(a, b, aParent, bParent, parentProp, compares, options){
 		var aType = typeof a;
-		if(aType === 'object' || aType === 'function') {
+		if(aType === "object" || aType === "function") {
 			var bCopy = h.extend({}, b);
 			if(options.deep === false) {
 				options.deep = -1;
 			}
 			
 			for (var prop in a) {
-				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+				var compare = compares[prop] === undefined ? compares["*"] : compares[prop];
 				if (! loop(a[prop], b[prop], a, b, prop, compare, options ) ) {
 					return false;
 				}
@@ -355,7 +355,7 @@ module.exports = compareHelpers = {
 	},
 	// A u B
 	union: function(a, b, aParent, bParent, prop, compares, options){
-		// if everything is the same OR doesn't have a property on the left or right (only)
+		// if everything is the same OR doesn"t have a property on the left or right (only)
 		// and union values
 		options.result = {};
 		options.performedUnion = 0;
@@ -405,11 +405,11 @@ module.exports = compareHelpers = {
 			}
 		}
 	},
-	// if everything is the same OR doesn't have a property on the left or right (only)
+	// if everything is the same OR doesn"t have a property on the left or right (only)
 	unionObject: function(a, b, aParent, bParent, prop, compares, options){
 		var subsetCompare = function(a, b, aParent, bParent, prop){
 
-			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+			var compare = compares[prop] === undefined ? compares["*"] : compares[prop];
 			
 			if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
 				var subsetCheck;
@@ -432,7 +432,7 @@ module.exports = compareHelpers = {
 		
 		
 		var aType = typeof a;
-		if(aType === 'object' || aType === 'function') {
+		if(aType === "object" || aType === "function") {
 			return h.eachInUnique(a, 
 				subsetCompare, 
 				b, 
@@ -444,9 +444,9 @@ module.exports = compareHelpers = {
 	unionArrayLike: function( a, b, aParent, bParent, prop, compares, options ) {
 		if(h.isArrayLike(a) && h.isArrayLike(b) ) {
 			var combined = h.makeArray(a).concat(h.makeArray(b));
-			// unique's the combination
+			// unique"s the combination
 			h.doubleLoop(combined, function(item, j, cur, i){
-				var res = !compareHelpers.equal(cur, item, aParent, bParent, undefined, compares['*'], {"default": false});
+				var res = !compareHelpers.equal(cur, item, aParent, bParent, undefined, compares["*"], {"default": false});
 				return res;
 			});
 			options.result[prop] = combined;
@@ -492,16 +492,16 @@ module.exports = compareHelpers = {
 	},
 	loopObject: function(a, b, aParent, bParent, prop, compares, options){
 		var aType = typeof a;
-		if(aType === 'object' || aType === 'function') {
+		if(aType === "object" || aType === "function") {
 			h.each(a, function(aValue, prop){
-				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+				var compare = compares[prop] === undefined ? compares["*"] : compares[prop];
 				loop( aValue, b[prop], a, b, prop, compare, options );
 			});
 			return true;
 		}
 	},
 	intersection: function(a, b, aParent, bParent, prop, compares, options){
-		// if everything is the same OR doesn't have a property on the left or right (only)
+		// if everything is the same OR doesn"t have a property on the left or right (only)
 		// and union values
 		options.result = {};
 		options.performedIntersection = 0;
@@ -545,7 +545,7 @@ module.exports = compareHelpers = {
 	},
 	intersectionObject: function(a, b, aParent, bParent, prop, compares, options){
 		var subsetCompare = function(a, b, aParent, bParent, prop){
-			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
+			var compare = compares[prop] === undefined ? compares["*"] : compares[prop];
 			
 			// If some property value is not the exact same
 			if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
@@ -556,7 +556,7 @@ module.exports = compareHelpers = {
 		
 		
 		var aType = typeof a;
-		if(aType === 'object' || aType === 'function') {
+		if(aType === "object" || aType === "function") {
 			return h.eachInUnique(a, 
 				subsetCompare, 
 				b, 
@@ -570,7 +570,7 @@ module.exports = compareHelpers = {
 			var intersection = [];
 			h.each(h.makeArray(a), function(cur){
 				for(var i = 0; i < b.length; i++) {
-					if( compareHelpers.equal(cur, b[i], aParent, bParent, undefined, compares['*'], {"default": false}) ) {
+					if( compareHelpers.equal(cur, b[i], aParent, bParent, undefined, compares["*"], {"default": false}) ) {
 						intersection.push(cur);
 						break;
 					}
