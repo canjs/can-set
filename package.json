@@ -1,22 +1,12 @@
 {
   "name": "can-set",
-  "version": "0.3.8",
+  "version": "0.3.9-0",
   "description": "Set logic for CanJS",
   "main": "src/set.js",
   "scripts": {
     "preversion": "npm test && npm run build",
-    
-    "comment": "BUMP VERSION",
-    
-    "version": "git commit -m \"Update dist for release\" && git checkout release -b && git add -f dist/",
-    
-    "comment": "COMMIT AND TAG",
-    
+    "version": "git commit -am \"Update dist for release\" && git checkout release -b && git add -f dist/",
     "postversion": "git push --tags && git checkout master && git branch -D release && git push",
-    
-    
-    
-    
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
