@@ -16,3 +16,6 @@ test('set.Algebra constructors', function(){
 	deepEqual(res, true, "enum");
 	
 });
+
+
+

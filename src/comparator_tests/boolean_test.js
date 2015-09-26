@@ -72,5 +72,5 @@ test('boolean set.union', function(){
 test('boolean set.intersection', function(){
 	var comparator = comparators.boolean('completed');
 	var res = set.intersection({foo: "bar"} , { completed: true }, comparator);
-	equal(res, {foo: "bar", completed: true}, "intersection is false (#4)");
+	deepEqual(res, {foo: "bar", completed: true}, "intersection is false (#4)");
 });

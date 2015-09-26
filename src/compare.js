@@ -23,33 +23,12 @@ var addIntersectedPropertyToResult = function(a, b, aParent, bParent, prop, comp
 	if( !(prop in bParent) ) {
 		subsetCheck = "subsetA";
 	}
-	if(subsetCheck) {
-		// If the subset side hasn't been determined, set it.
-		if( !options.subset ) {
-			options.subset = subsetCheck;
-		}
-		// only add the property to the result if it is on the same
-		// side as the identified subset.
-		var addProp = options.subset === subsetCheck;
-		if(addProp) {
-			if(subsetCheck === "subsetB") {
-				options.result[prop] = b;
-			} else {
-				options.result[prop] = a;
-			}
-			// returning undefined allows `eachInUnique` to keep checking other 
-			// properties.
-			return undefined;
-		}
-		return false;
-	}
-	// if a and b are the same ... add this to the result if no subset check.
-	if(a === b) {
-		options.result[prop] = a;
-		return true;
+	if(subsetCheck === "subsetB") {
+		options.result[prop] = b;
 	} else {
-		return false;
+		options.result[prop] = a;
 	}
+	return undefined;
 };
 
 var addToResult = function(fn, name){
@@ -534,11 +513,10 @@ module.exports = compareHelpers = {
 				// is there a difference?
 				if("intersection" in compareResult) {
 					if(compareResult.intersection !== undefined) {
-						options.performedIntersection++;
-						return addIntersectedPropertyToResult(compareResult.intersection, compareResult.intersection, aParent, bParent, prop, compares, options);
+						options.result[prop] = compareResult.intersection;
 					}
-					
-					return undefined;
+					options.performedIntersection++;		
+					return true;
 				}
 			}
 		}
