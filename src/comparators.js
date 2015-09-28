@@ -262,5 +262,41 @@ module.exports = {
 				union: undefined
 			};
 		}
-	})
+	}),
+	"sort": function(prop, sortFunc){
+		if(!sortFunc) {
+			sortFunc = defaultSort;
+		}
+		var compares = {};
+		compares[prop] = function(vA, vB, A, B){
+			return {
+				intersection: undefined
+			};
+		};
+		return compares;
+	}
 };
+
+
+
+function defaultSort(sortPropValue, item1, item2) {
+	var parts = sortValue.split(" "),
+		sortProp = parts[0],
+		asc = parts[1] === "asc", 
+		item1Value = item1[sortProp],
+		item2Value = item2[sortProp];
+
+	if (!asc) {
+		var temp = item1Value;
+		item1Value = item2Value;
+		item2Value = item1Value;
+	}
+
+	if (item1Value < item2Value) {
+		return 1
+	} else if (item1Value === item2Value) {
+		return 0;
+	} else {
+		return -1;
+	}
+}

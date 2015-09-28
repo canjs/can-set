@@ -131,8 +131,8 @@ test('set.difference', function(){
 	res = set.difference({ completed: true }, {});
 	equal(res, false);
 
-	res = set.difference({ completed: true }, { foo: 'bar' });
-	equal(res, false);
+	res = set.difference({ completed: true }, { userId: 5 });
+	equal(res, false); // TODO: probably should be undefined
 	
 	
 });
@@ -192,7 +192,7 @@ test('set.count', function(){
 });
 
 test('set.intersection', function(){
-	/*var res = set.intersection({}, { completed: true });
+	var res = set.intersection({}, { completed: true });
 	deepEqual(res , { completed: true }, "set / subset");
 	
 	res = set.intersection({ completed: true }, {});
@@ -202,7 +202,7 @@ test('set.intersection', function(){
 	deepEqual(res, {foo: "bar"}, "equal");
 	
 	res = set.intersection({foo: "bar"},{foo: "zed"});
-	ok(!res, "values not equal");*/
+	ok(!res, "values not equal");
 
 	var res = set.intersection({foo: 'bar'},{completed: true});
 	deepEqual(res, {foo: 'bar', completed: true}, 'intersection should combine definitions');

@@ -19,6 +19,9 @@ var addIntersectedPropertyToResult = function(a, b, aParent, bParent, prop, comp
 	var subsetCheck;
 	if( !(prop in aParent)) {
 		subsetCheck = "subsetB";
+	} else if(prop in bParent){
+		// property in a and b and not the same
+		return false;
 	}
 	if( !(prop in bParent) ) {
 		subsetCheck = "subsetA";
