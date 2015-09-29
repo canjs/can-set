@@ -211,13 +211,16 @@ module.exports = compareHelpers = {
 			if(options.deep === false) {
 				options.deep = -1;
 			}
-
+			// Check that everything in B is the same as whats in A, or
+			// isn't in A.
 			for (var prop in b) {
 				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 				// run the comparison no matter what
 				var compareResult = loop(a[prop], b[prop], a, b, prop, compare, options );
-				// if there wasn't a prop or we performed a diff
-				if( !(prop in a) ||  options.performedDifference ) {
+				// if there wasn't a prop (and we didn't run through a compare)
+				if(compareResult === h.ignoreType) {
+					// do nothing
+				} else if(!(prop in a) ||  options.performedDifference ) {
 					hasAdditionalProp = true;
 				} else if(!compareResult) {
 					return false;
@@ -226,7 +229,7 @@ module.exports = compareHelpers = {
 			}
 			// go through aCopy props ... if there is no compare .. return false
 			for (prop in aCopy) {
-				if (compares[prop] === undefined || !loop(undefined, b[prop], a, b, prop, compares[prop], options) ) {
+				if (compares[prop] === undefined || !loop(a[prop], undefined, a, b, prop, compares[prop], options) ) {
 					return false;
 				}
 			}
@@ -262,6 +265,7 @@ module.exports = compareHelpers = {
 		// if B has something that A doesn't and no diff -> return undefined
 		// if A \ B returns a diff ... keep it
 		options.result = {};
+		// this means we should return something for difference
 		options.performedDifference = 0;
 		options.checks = [
 			compareHelpers.differenceComparesType,
@@ -291,12 +295,14 @@ module.exports = compareHelpers = {
 			} else if(compareResult && typeof compareResult === "object"){
 				// is there a difference?
 				if("difference" in compareResult) {
-					if(compareResult.difference != null) {
+					if(compareResult.difference === h.ignoreType) {
+						return h.ignoreType;
+					} else if(compareResult.difference != null) {
 						options.result[prop] = compareResult.difference;
 						options.performedDifference++;
 						return true;
 					} else {
-						return compareResult.difference;
+						return true;
 					}
 				} else {
 					// if the same ... then OK ... return the union
@@ -308,31 +314,6 @@ module.exports = compareHelpers = {
 					}
 				}
 			}
-		}
-	},
-	// A has every property B has ... and then some
-	diffObject: function(a, b, aParent, bParent, parentProp, compares, options){
-		var aType = typeof a;
-		if(aType === 'object' || aType === 'function') {
-			var bCopy = h.extend({}, b);
-			if(options.deep === false) {
-				options.deep = -1;
-			}
-
-			for (var prop in a) {
-				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
-				if (! loop(a[prop], b[prop], a, b, prop, compare, options ) ) {
-					return false;
-				}
-				delete bCopy[prop];
-			}
-			// go through bCopy props ... if there is no compare .. return false
-			for (prop in bCopy) {
-				if (compares[prop] === undefined || !loop(undefined, b[prop], a, b, prop, compares[prop], options) ) {
-					return false;
-				}
-			}
-			return true;
 		}
 	},
 	// A u B
@@ -374,10 +355,11 @@ module.exports = compareHelpers = {
 						options.getUnions.push(compareResult.getUnion);
 					}
 				}
-
-
 				// is there a difference?
 				if("union" in compareResult) {
+					if(compareResult.union === h.ignoreType) {
+						return compareResult.union;
+					}
 					if(compareResult.union !== undefined) {
 						options.result[prop] = compareResult.union;
 					}

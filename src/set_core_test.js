@@ -154,7 +154,7 @@ test('set.difference({ function })', function() {
 test('set.union', function(){
 	
 	// set / subset
-	/*var res = set.union({}, { completed: true });
+	var res = set.union({}, { completed: true });
 	deepEqual(res , {}, "set / subset");
 	
 	res = set.union({ completed: true }, {});
@@ -164,7 +164,7 @@ test('set.union', function(){
 	deepEqual(res, {foo: "bar"}, "equal");
 	
 	res = set.union({foo: "bar"},{foo: "zed"});
-	ok(!res, "values not equal");*/
+	ok(!res, "values not equal");
 	
 	var res = set.union({foo: "bar"},{name: "A"});
 	ok(!res, "values not equal");

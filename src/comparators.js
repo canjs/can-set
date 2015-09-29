@@ -270,7 +270,9 @@ module.exports = {
 		var compares = {};
 		compares[prop] = function(vA, vB, A, B){
 			return {
-				intersection: undefined
+				intersection: undefined,
+				difference: h.ignoreType,
+				union: h.ignoreType
 			};
 		};
 		return compares;

@@ -155,5 +155,7 @@ module.exports = helpers = {
 			}
 		}
 		return out;
-	}
+	},
+	// This is a dummy object that can signal to be ignored
+	ignoreType: {}
 };
