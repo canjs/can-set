@@ -232,8 +232,15 @@ test('set.subset with range', function(){
 		});
 		return {left: setA, right: setB};
 	};
+	var assertSubset = function(methods, result){
+		var sets = make.apply(null, methods);
+		equal( set.subset(sets.left, sets.right), result, JSON.stringify(sets.left)+" ⊂ "+JSON.stringify(sets.right)+" = "+result );
+	};
 	
-	var sets = make(sets.superRight, range.right, sort.right);
-	ok( ! set.subset(sets.left, sets.right), JSON.stringify(sets.left)+" ⊂ "+JSON.stringify(sets.right) );
+	assertSubset([sets.superRight, range.right, sort.right], false);
+	assertSubset([sets.same, range.same, sort.different], false);
+	assertSubset([sets.same, range.same, sort.same], true);
 	
+	assertSubset([sets.same, range.superRight, sort.left], false);
+	assertSubset([sets.same, range.superRight, sort.same], true);
 });
