@@ -268,7 +268,7 @@ module.exports = {
 			sortFunc = defaultSort;
 		}
 		var compares = {};
-		compares[prop] = function(vA, vB, A, B){
+		compares[prop] = function(vA, vB, A, B, prop, options, algebra){
 			return {
 				intersection: undefined,
 				difference: h.ignoreType,

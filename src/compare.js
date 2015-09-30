@@ -189,7 +189,9 @@ module.exports = compareHelpers = {
 						options.getSubsets.push(compareResult.getSubset);
 					}
 				}
-
+				if(compareResult.intersection === h.ignoreType || compareResult.difference === h.ignoreType) {
+					return true;
+				}
 				// A \ B subset intersects in both directions
 				// but does not diff from
 				if( ("intersection" in compareResult) && !("difference" in compareResult)) {

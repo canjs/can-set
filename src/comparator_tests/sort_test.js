@@ -107,3 +107,49 @@ test('set.intersection Array', function(){
 
 	deepEqual(res , {foo: ["a"]}, "intersection");
 });
+
+test('set.subset', function(){
+	var ignoreProp = function(){ return true; };
+	
+	var algebra = new set.Algebra(comparators.sort('sort'),{
+		foo: ignoreProp,
+		bar: ignoreProp,
+		kind: ignoreProp,
+		count: ignoreProp
+	});
+	
+	ok( algebra.subset(
+		{ type : 'FOLDER', sort: "thing" },
+		{ type : 'FOLDER' } ), 'equal sets with sort on the left');
+	
+	ok( algebra.subset(
+		{ type : 'FOLDER' },
+		{ type : 'FOLDER', sort: "thing" } ), 'equal sets with sort on the right');
+		
+	ok( algebra.subset(
+		{ type : 'FOLDER', parentId : 5, sort: 'thing' },
+		{ type : 'FOLDER'} ), 'sub set with sort on the left'); 
+
+	ok( algebra.subset(
+		{ type : 'FOLDER', parentId : 5 },
+		{ type : 'FOLDER', sort: 'thing'} ), 'sub set with sort on the right'); 
+
+	ok(!algebra.subset(
+		{ type: 'FOLDER', sort: 'thing' },
+		{ type: 'FOLDER', parentId: 5 }), 'wrong way with sort on the left');
+
+	ok(!algebra.subset(
+		{ type: 'FOLDER' },
+		{ type: 'FOLDER', parentId: 5, sort: 'thing' }), 'wrong way with sort on the right');
+	
+	ok(!algebra.subset(
+		{ type: 'FOLDER', parentId: 7, sort: 'thing' },
+		{ type: 'FOLDER', parentId: 5 }), 'different values with sort on the left');
+		
+	ok(!algebra.subset(
+		{ type: 'FOLDER', parentId: 7 },
+		{ type: 'FOLDER', parentId: 5, sort: 'thing' }), 'different values with sort on the right');
+	
+});
+
+
