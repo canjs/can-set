@@ -1,7 +1,8 @@
 var QUnit = require("steal-qunit");
 
 var set = require('src/set-core'),
-	comparators = require("src/comparators");
+	comparators = require("src/comparators"),
+	h = require("src/helpers");
 
 QUnit.module("comparators.sort");
 
@@ -152,4 +153,87 @@ test('set.subset', function(){
 	
 });
 
+test('set.subset with range', function(){
+	var ignoreProp = function(){ return true; };
+	
+	var algebra = new set.Algebra(comparators.sort('sort'),comparators.rangeInclusive('start','end'));
+	
+	// add sort .. same .. different
+	// add range .. same ... more ... less
+	// same
+	// right
+	// left
+	var addSort = function(set, value){
+		set.sort = value;
+	};
+	
+	var sort = {
+		left: function(setA, setB) {
+			addSort(setA, "prop");
+		},
+		right: function(setA, setB) {
+			addSort(setB, "prop");
+		},
+		same: function(setA, setB) {
+			addSort(setA, "prop");
+			addSort(setB, "prop");
+		},
+		different: function(setA, setB) {
+			addSort(setA, "propA");
+			addSort(setB, "propB");
+		}
+	};
+	var addRange = function(set, start, end) {
+		set.start = start;
+		set.end = end;
+	};
 
+	var range = {
+		left: function(setA,setB){
+			addRange(setA, 0,9);
+		},
+		right: function(setA,setB){
+			addRange(setB, 0,9);
+		},
+		same: function(setA,setB){
+			addRange(setA, 0,9);
+			addRange(setB, 0,9);
+		},
+		superLeft: function(setA,setB){
+			addRange(setA, 0,9);
+			addRange(setB, 3,7);
+		},
+		superRight: function(setA,setB){
+			addRange(setB, 0,9);
+			addRange(setA, 3,7);
+		}
+	};
+	
+	var sets = {
+		same: function(setA, setB){ },
+		superLeft: function(setA, setB){
+			setB.type = "apples";
+		},
+		superRight: function(setA, setB){
+			setA.type = "apples";
+		},
+		disjoint: function(){
+			setA.type = "apples";
+			setB.color = "blue";
+		}
+	};
+	
+	
+	var make = function(){
+		var setA = {},
+			setB = {};
+		h.each(arguments, function(method){
+			method(setA, setB);
+		});
+		return {left: setA, right: setB};
+	};
+	
+	var sets = make(sets.superRight, range.right, sort.right);
+	ok( ! set.subset(sets.left, sets.right), JSON.stringify(sets.left)+" ⊂ "+JSON.stringify(sets.right) );
+	
+});
