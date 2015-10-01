@@ -1,14 +1,7 @@
 var h = require("./helpers");
+var clause = require("./clause");
 
-function makeComparator(fn) {
-	return function() {
-		var result = {};
-		h.each(arguments, function(propertyName){
-			result[propertyName] = fn;
-		});
-		return result;
-	};
-}
+
 
 
 var within = function(value, range){
@@ -126,8 +119,8 @@ var cleanUp = function(value, enumData) {
 };
 
 module.exports = {
-	"enum": function(prop, enumData){
-		var compares = {};
+	'enum': function(prop, enumData){
+		var compares = new compare.Where({});
 		compares[prop] = function(vA, vB, A, B){
 			vA = cleanUp(vA, enumData);
 			vB = cleanUp(vB, enumData);
@@ -240,29 +233,33 @@ module.exports = {
 
 			return res;
 		};
-		return compares;
+		return new compare.Paginate( compares);
 	},
 	/**
 	 * @function
 	 * Makes boolean
 	 */
-	"boolean": makeComparator(function(propA, propB) {
-		// prop a is probably true
-		var notA = !propA,
-			notB = !propB;
-		if( propA === notB && propB === notA ) {
-			return {
-				difference: !propB,
-				union: undefined
-			};
-		} else if(propA === undefined) {
-			return {
-				difference: !propB,
-				intersection: propB,
-				union: undefined
-			};
-		}
-	}),
+	"boolean": function(propertyName) {
+		var clause = new clause.Where({});
+		clause[propertyName] = function(propA, propB) {
+			// prop a is probably true
+			var notA = !propA,
+				notB = !propB;
+			if( propA === notB && propB === notA ) {
+				return {
+					difference: !propB,
+					union: undefined
+				};
+			} else if(propA === undefined) {
+				return {
+					difference: !propB,
+					intersection: propB,
+					union: undefined
+				};
+			}
+		};
+		return clause;
+	},
 	"sort": function(prop, sortFunc){
 		if(!sortFunc) {
 			sortFunc = defaultSort;
@@ -275,7 +272,7 @@ module.exports = {
 				union: h.ignoreType
 			};
 		};
-		return compares;
+		return new clause.Sort(compares);
 	}
 };
 

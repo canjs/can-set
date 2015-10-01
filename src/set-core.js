@@ -1,14 +1,19 @@
 var h = require("./helpers"),
 	compare = require("./compare");
 
+// set.subset({foo: "bar"},{}) //-> true
+
+// algebra = new Alegbra()
+// algebra.getSubset()
+
 
 var Algebra = function(){
-	var compare = {};
-	h.each(arguments, function(arg){
-		h.extend(compare,arg);
+	this.clauses = {where: {}, sort: {}, paginate: {} };
+	h.each( arguments, function(arg){
+		h.extend( clauses[arg.constructor.type || "where"], arg);
 	});
-	this.compare = compare;
 };
+
 Algebra.make = function(compare, count){
 	if(compare instanceof Algebra) {
 		return compare;
@@ -18,8 +23,38 @@ Algebra.make = function(compare, count){
 };
 
 h.extend(Algebra.prototype, {
+	getClauseProperties: function(set){
+		var setClone = h.extend({},set);
+		var clauseProps = {};
+		var self = this;
+		["sort","paginate"].forEach(function(clauseName){
+			var valuesForClause = clauseProps[clauseName] = {};
+			for( var prop in this.clauses[clauseName] ) {
+				if(prop in setClone) {
+					valuesForClause[prop] = setClone[prop];
+					delete setClone[prop];
+				}
+			}
+		});
+		clauseProps.where = setClone;
+	},
 	equal: function(a, b){
-		return compare.equal(a, b, undefined, undefined, undefined, this.compare, {});
+		var aClauseProps = this.getClauseProperties(a),
+			bClauseProps = this.getClauseProperties(b);
+			
+		var result = compare.equal(aClauseProps.where, bClauseProps.where, undefined, undefined, undefined, this.clauses.where, {});
+		if(result) {
+			if(h.isEmptyObject(aClauseProps.paginate) && h.isEmptyObject(bClauseProps.paginate)) {
+				return result;
+			} else {
+				result = compare.equal(aClauseProps.sort, bClauseProps.sort, undefined, undefined, undefined, this.clauses.sort, {});
+				if(result) {
+					return compare.equal(aClauseProps.paginate, bClauseProps.paginate, undefined, undefined, undefined, this.clauses.paginate, {});
+				}
+			}
+		}
+		
+		return result;
 	},
 	subset: function(a, b){
 		// A is a subset of B if A has every property in B
