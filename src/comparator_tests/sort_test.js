@@ -23,8 +23,9 @@ test('set.difference', function(){
 });
 
 test('set.difference({ function })', function() {
-	var comparator = comparators.sort('sort');
+	var comparator = {};
 
+	comparator.sort = comparators.sort('sort').sort;
 	comparator.colors = function() {
 		return {
 			difference: ['red' ],
@@ -111,29 +112,29 @@ test('set.intersection Array', function(){
 
 test('set.subset', function(){
 	var ignoreProp = function(){ return true; };
-	
+
 	var algebra = new set.Algebra(comparators.sort('sort'),{
 		foo: ignoreProp,
 		bar: ignoreProp,
 		kind: ignoreProp,
 		count: ignoreProp
 	});
-	
+
 	ok( algebra.subset(
 		{ type : 'FOLDER', sort: "thing" },
 		{ type : 'FOLDER' } ), 'equal sets with sort on the left');
-	
+
 	ok( algebra.subset(
 		{ type : 'FOLDER' },
 		{ type : 'FOLDER', sort: "thing" } ), 'equal sets with sort on the right');
-		
+
 	ok( algebra.subset(
 		{ type : 'FOLDER', parentId : 5, sort: 'thing' },
-		{ type : 'FOLDER'} ), 'sub set with sort on the left'); 
+		{ type : 'FOLDER'} ), 'sub set with sort on the left');
 
 	ok( algebra.subset(
 		{ type : 'FOLDER', parentId : 5 },
-		{ type : 'FOLDER', sort: 'thing'} ), 'sub set with sort on the right'); 
+		{ type : 'FOLDER', sort: 'thing'} ), 'sub set with sort on the right');
 
 	ok(!algebra.subset(
 		{ type: 'FOLDER', sort: 'thing' },
@@ -142,22 +143,22 @@ test('set.subset', function(){
 	ok(!algebra.subset(
 		{ type: 'FOLDER' },
 		{ type: 'FOLDER', parentId: 5, sort: 'thing' }), 'wrong way with sort on the right');
-	
+
 	ok(!algebra.subset(
 		{ type: 'FOLDER', parentId: 7, sort: 'thing' },
 		{ type: 'FOLDER', parentId: 5 }), 'different values with sort on the left');
-		
+
 	ok(!algebra.subset(
 		{ type: 'FOLDER', parentId: 7 },
 		{ type: 'FOLDER', parentId: 5, sort: 'thing' }), 'different values with sort on the right');
-	
+
 });
 
 test('set.subset with range', function(){
 	var ignoreProp = function(){ return true; };
-	
+
 	var algebra = new set.Algebra(comparators.sort('sort'),comparators.rangeInclusive('start','end'));
-	
+
 	// add sort .. same .. different
 	// add range .. same ... more ... less
 	// same
@@ -166,7 +167,7 @@ test('set.subset with range', function(){
 	var addSort = function(set, value){
 		set.sort = value;
 	};
-	
+
 	var sort = {
 		left: function(setA, setB) {
 			addSort(setA, "prop");
@@ -208,7 +209,7 @@ test('set.subset with range', function(){
 			addRange(setA, 3,7);
 		}
 	};
-	
+
 	var sets = {
 		same: function(setA, setB){ },
 		superLeft: function(setA, setB){
@@ -222,8 +223,8 @@ test('set.subset with range', function(){
 			setB.color = "blue";
 		}
 	};
-	
-	
+
+
 	var make = function(){
 		var setA = {},
 			setB = {};
@@ -236,11 +237,11 @@ test('set.subset with range', function(){
 		var sets = make.apply(null, methods);
 		equal( algebra.subset(sets.left, sets.right), result, JSON.stringify(sets.left)+" ⊂ "+JSON.stringify(sets.right)+" = "+result );
 	};
-	
+
 	//assertSubset([sets.superRight, range.right, sort.right], false);
 	assertSubset([sets.same, range.same, sort.different], false);
 	/*assertSubset([sets.same, range.same, sort.same], true);
-	
+
 	assertSubset([sets.same, range.superRight, sort.left], false);
 	assertSubset([sets.same, range.superRight, sort.same], true);*/
 });

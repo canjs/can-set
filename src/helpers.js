@@ -155,6 +155,17 @@ module.exports = helpers = {
 			}
 		}
 		return out;
+  },
+	isEmptyObject: function(obj) {
+		var prop;
+
+		for(prop in obj) {
+			if(obj.hasOwnProperty(prop)) {
+				break;
+			}
+		}
+
+		return prop === undefined;
 	},
 	// This is a dummy object that can signal to be ignored
 	ignoreType: new IgnoreType()

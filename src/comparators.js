@@ -1,9 +1,6 @@
 var h = require("./helpers");
 var clause = require("./clause");
 
-
-
-
 var within = function(value, range){
 	return value >= range[0] && value <= range[1];
 };
@@ -233,15 +230,15 @@ module.exports = {
 
 			return res;
 		};
-		return new compare.Paginate( compares);
+		return new clause.Paginate(compares);
 	},
 	/**
 	 * @function
 	 * Makes boolean
 	 */
 	"boolean": function(propertyName) {
-		var clause = new clause.Where({});
-		clause[propertyName] = function(propA, propB) {
+		var compares = new clause.Where({});
+		compares[propertyName] = function(propA, propB) {
 			// prop a is probably true
 			var notA = !propA,
 				notB = !propB;
@@ -258,28 +255,32 @@ module.exports = {
 				};
 			}
 		};
-		return clause;
+		return compares;
 	},
 	"sort": function(prop, sortFunc){
 		if(!sortFunc) {
 			sortFunc = defaultSort;
 		}
-		var compares = {};
+		var compares = new clause.Order({});
 		compares[prop] = function(vA, vB, A, B, prop, options, algebra){
+			if(vA !== vB) {
+				return undefined;
+			}
+
 			return {
 				intersection: undefined,
 				difference: h.ignoreType,
 				union: h.ignoreType
 			};
 		};
-		return new clause.Sort(compares);
+		return new clause.Order(compares);
 	}
 };
 
 
 
 function defaultSort(sortPropValue, item1, item2) {
-	var parts = sortValue.split(" "),
+	var parts = sortPropValue.split(" "),
 		sortProp = parts[0],
 		asc = parts[1] === "asc", 
 		item1Value = item1[sortProp],

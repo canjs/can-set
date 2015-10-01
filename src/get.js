@@ -2,37 +2,53 @@ var compare = require("./compare");
 var set = require("./set-core");
 var h = require("./helpers");
 
-// want A and B, but A w/o the range
-var defaultGetSubset = function(a, b, bItems, algebra, options){
-	return h.filter.call(bItems, function(item){
-		return set.subset(item, a, algebra);
+var filterData = function(data, clause, comparators) {
+	// reduce response to items in data that meet clause criteria
+	return data.filter(function(item) {
+	return h.filter.call(data.filter, function(item) {
+		var inSubset = compare.subset(item, clause, undefined, undefined,
+			undefined, comparators, {});
+
+		return inSubset;
 	});
 };
 
-
 module.exports = {
-	getSubset: function(a, b, bItems, algebra){
-		var options = {};
+	getSubset: function(a, b, bData, algebra) {
+		// make sure passed in algebra is Algebra and not comparators
+		algebra = set.Algebra.make(algebra);
 
-		var isSubset = compare.subset(a, b, undefined, undefined, undefined, algebra, options);
+		var aClauseProps = algebra.getClauseProperties(a);
+		var bClauseProps = algebra.getClauseProperties(b);
 
-		if(isSubset) {
-			var aItems = bItems.slice(0);
+		var options = {}; // options.getSubsets mutated by compare.subset
+		var subsetFilters = [];
 
-			var aCopy = h.extend({}, a);
+		// reduce response to items in data that meet where criteria
+		var aData = filterData(bData, aClauseProps.where, algebra.clauses.where);
 
-			// remove properties that are going to do their own filtering.
-			h.each(options.removeProps, function(prop){
-				delete aCopy[prop];
+		// if data requires further processing, get filters from optons.getSubsets
+		if(aData.length) {
+			h.each(['order', 'paginate'], function(clauseType) {
+				if(aClauseProps.enabled[clauseType]) {
+					options = {};
+
+					compare.subset(aClauseProps[clauseType], bClauseProps[clauseType],
+						undefined, undefined, undefined, algebra.clauses[clauseType],
+						options);
+
+					if(options.getSubsets.length) {
+						subsetFilters = subsetFilters.concat(options.getSubsets);
+					}
+				}
 			});
-			aItems = defaultGetSubset(aCopy, b, aItems, algebra, options);
-			h.each(options.getSubsets, function(filter){
-				aItems = filter(a,b, aItems, algebra, options);
-			});
+		};
 
-			return aItems;
-		}
-
+		h.each(subsetFilters, function(filter) {
+			aData = filter(a, b, aData, algebra, options);
+		});
+		
+		return aData;
 	},
 	getUnion: function(a,b,aItems, bItems, algebra){
 		var options = {};
