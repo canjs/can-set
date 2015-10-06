@@ -48,15 +48,15 @@ var diff = function(setA, setB, property1, property2){
 			count: count,
 			meta: "equal"
 		};
-	} 
+	}
 	// A starts at B but A ends later
 	else if( sAv1 === sBv1 && sBv2 < sAv2 ) {
 		return after;
-	} 
+	}
 	// A end at B but A starts earlier
 	else if( sAv2 === sBv2 && sBv1 > sAv1 ) {
 		return before;
-	} 
+	}
 	// B contains A
 	else if( within(sAv1, [sBv1, sBv2]) && within(sAv2, [sBv1, sBv2]) ) {
 		return {
@@ -84,7 +84,7 @@ var diff = function(setA, setB, property1, property2){
 	// setB starts earlier and overlaps setA
 	else if(sBv1 < sAv1 && within(sBv2, [sAv1, sAv2]) ) {
 		return after;
-	} 
+	}
 	// side by side ... nothing intersection
 	else if(sAv2 === sBv1-1) {
 		return {
@@ -93,8 +93,8 @@ var diff = function(setA, setB, property1, property2){
 			count: count,
 			meta: "disjoint-before"
 		};
-	} 
-	
+	}
+
 	else if(sBv2 === sAv1 - 1) {
 		return {
 			difference: [sAv1,sAv2],
@@ -109,7 +109,7 @@ var diff = function(setA, setB, property1, property2){
 			meta: "disjoint"
 		};
 	}
-	
+
 };
 
 var cleanUp = function(value, enumData) {
@@ -126,18 +126,18 @@ var cleanUp = function(value, enumData) {
 };
 
 module.exports = {
-	enum: function(prop, enumData){
+	"enum": function(prop, enumData){
 		var compares = {};
 		compares[prop] = function(vA, vB, A, B){
 			vA = cleanUp(vA, enumData);
 			vB = cleanUp(vB, enumData);
-			
+
 			var data = h.arrayUnionIntersectionDifference(vA, vB);
 			// if the difference is empty ... there is no difference
 			if( !data.difference.length ) {
 				delete data.difference;
 			}
-			
+
 			// if any of them have everything, return undefined
 			h.each(data, function(value, prop){
 				if(h.isArrayLike(value)) {
@@ -148,7 +148,7 @@ module.exports = {
 					}
 				}
 			});
-			
+
 			return data;
 		};
 		return compares;
@@ -157,14 +157,14 @@ module.exports = {
 	 * Makes a comparator for two ranged properties that specify a range of items
 	 * that includes both the startIndex and endIndex.  For example, a range of
 	 * [0,20] loads 21 items.
-	 * 
+	 *
 	 * @param {String} startIndexProperty
 	 * @param {String} endIndexProperty
-	 * 
+	 *
 	 * @body
-	 * 
+	 *
 	 * ## Use
-	 * 
+	 *
 	 * ```
 	 * new set.Algebra( extend({}, comparators.rangeInclusive("start","end") ) )
 	 * ```
@@ -187,14 +187,14 @@ module.exports = {
 			}
 			return res;
 		};
-		
+
 		compares[startIndexProperty] = function(vA, vB, A, B){
 			if(vA === undefined) {
 				return;
 			}
 			var res = diff(A, B, startIndexProperty, endIndexProperty);
-			
-			
+
+
 			var result = makeResult(res, 0);
 			result.getSubset = function(a, b, bItems, algebra, options){
 				return bItems;
@@ -214,9 +214,9 @@ module.exports = {
 			res.getSubset = function(a, b, bItems, algebra, options){
 				var aStartValue = a[startIndexProperty],
 					aEndValue = a[endIndexProperty];
-					
+
 				var bStartValue = b[startIndexProperty];
-				
+
 				if(  ! (endIndexProperty in b) || ! (endIndexProperty in a)  ) {
 					return bItems.slice(aStartValue, aEndValue+1);
 				}
@@ -237,14 +237,14 @@ module.exports = {
 				}
 				return [aItems,bItems];
 			};
-			
+
 			return res;
 		};
 		return compares;
 	},
 	/**
 	 * @function
-	 * Makes boolean 
+	 * Makes boolean
 	 */
 	"boolean": makeComparator(function(propA, propB) {
 		// prop a is probably true
