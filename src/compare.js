@@ -32,7 +32,7 @@ var addIntersectedPropertyToResult = function(a, b, aParent, bParent, prop, comp
 };
 
 var addToResult = function(fn, name){
-	
+
 	return function(a, b, aParent, bParent, prop, compares, options){
 		var res = fn.apply(this, arguments);
 		if(res === true) {
@@ -44,7 +44,7 @@ var addToResult = function(fn, name){
 			return res;
 		}
 	};
-	
+
 };
 
 module.exports = compareHelpers = {
@@ -56,7 +56,7 @@ module.exports = compareHelpers = {
 			compareHelpers.equalObject
 		];
 		options["default"] = false;
-		
+
 		return loop(a, b, aParent, bParent, prop, compares, options);
 	},
 	equalComparesType: function(a, b, aParent, bParent, prop, compares, options){
@@ -113,7 +113,7 @@ module.exports = compareHelpers = {
 			if(options.deep === false) {
 				options.deep = -1;
 			}
-			
+
 			for (var prop in a) {
 				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 				if (! loop(a[prop], b[prop], a, b, prop, compare, options ) ) {
@@ -129,7 +129,7 @@ module.exports = compareHelpers = {
 			}
 			return true;
 		}
-		
+
 	},
 	subset: function(a, b, aParent, bParent, prop, compares, options) {
 		options.checks = [
@@ -140,32 +140,32 @@ module.exports = compareHelpers = {
 		];
 		options.getSubsets = [];
 		options.removeProps = [];
-		
+
 		options["default"] = false;
-		
+
 		return loop(a, b, aParent, bParent, prop, compares, options);
 	},
 	subsetObject: function( a, b, aParent, bParent, parentProp, compares, options ){
 		var aType = typeof a;
 		if(aType === 'object' || aType === 'function') {
-			
-			return h.eachInUnique(a, 
+
+			return h.eachInUnique(a,
 				function(a, b, aParent, bParent, prop){
 					var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 					if ( ! loop(a, b, aParent, bParent, prop, compare, options ) && (prop in bParent) ) {
 						return false;
 					}
-				}, 
-				b, 
+				},
+				b,
 				function(a, b, aParent, bParent, prop){
 					var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 					if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
 						return false;
 					}
-				}, 
+				},
 				true);
 		}
-		
+
 	},
 	/**
 	 * Checks if A is a subset of B.  If A is a subset of B if:
@@ -179,16 +179,16 @@ module.exports = compareHelpers = {
 			if(typeof compareResult === "boolean") {
 				return compareResult;
 			} else if(compareResult && typeof compareResult === "object"){
-				
+
 				if( compareResult.getSubset ) {
 					options.removeProps.push(prop);
-					if(options.getSubsets.indexOf(compareResult.getSubset) === -1) {
+					if(h.indexOf.call(options.getSubsets, compareResult.getSubset) === -1) {
 						options.getSubsets.push(compareResult.getSubset);
 					}
 				}
-				
+
 				// A \ B subset intersects in both directions
-				// but does not diff from 
+				// but does not diff from
 				if( ("intersection" in compareResult) && !("difference" in compareResult)) {
 					var reverseResult =  compares(b, a,bParent, aParent, prop, options);
 					return ("intersection" in reverseResult);
@@ -208,7 +208,7 @@ module.exports = compareHelpers = {
 			if(options.deep === false) {
 				options.deep = -1;
 			}
-			
+
 			for (var prop in b) {
 				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 				// run the comparison no matter what
@@ -229,7 +229,7 @@ module.exports = compareHelpers = {
 			}
 			return hasAdditionalProp;
 		}
-		
+
 	},
 	/**
 	 * Checks if A is a subset of B.  If A is a subset of B, A \ B will be undefined. But B \ A will be defined.
@@ -241,7 +241,7 @@ module.exports = compareHelpers = {
 				return compareResult;
 			} else if(compareResult && typeof compareResult === "object"){
 				// A \ B subset intersects in both directions
-				// but does not diff from 
+				// but does not diff from
 				if( ("intersection" in compareResult) && !("difference" in compareResult)) {
 					var reverseResult =  compares(b, a,bParent, aParent, prop, options);
 					return ("intersection" in reverseResult) && ("difference" in reverseResult);
@@ -266,9 +266,9 @@ module.exports = compareHelpers = {
 			addToResult(compareHelpers.equalArrayLike,"equalArrayLike"),
 			addToResult(compareHelpers.properSupersetObject, "properSubsetObject")
 		];
-		
+
 		options["default"] = true;
-		
+
 		var res = loop(a, b, aParent, bParent, prop, compares, options);
 		if(res === true && options.performedDifference) {
 			return options.result;
@@ -315,7 +315,7 @@ module.exports = compareHelpers = {
 			if(options.deep === false) {
 				options.deep = -1;
 			}
-			
+
 			for (var prop in a) {
 				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 				if (! loop(a[prop], b[prop], a, b, prop, compare, options ) ) {
@@ -345,9 +345,9 @@ module.exports = compareHelpers = {
 			addToResult(compareHelpers.unionObject, "unionObject")
 		];
 		options.getUnions = [];
-		
+
 		options["default"] = false;
-		
+
 		var res = loop(a, b, aParent, bParent, prop, compares, options);
 		if(res === true) {
 			return options.result;
@@ -367,12 +367,12 @@ module.exports = compareHelpers = {
 			} else if(compareResult && typeof compareResult === "object"){
 				if( compareResult.getUnion ) {
 					//options.removeProps.push(prop);
-					if(options.getUnions.indexOf(compareResult.getUnion) === -1) {
+					if(h.indexOf.call(options.getUnions, compareResult.getUnion) === -1) {
 						options.getUnions.push(compareResult.getUnion);
 					}
 				}
-				
-				
+
+
 				// is there a difference?
 				if("union" in compareResult) {
 					if(compareResult.union !== undefined) {
@@ -389,7 +389,7 @@ module.exports = compareHelpers = {
 		var subsetCompare = function(a, b, aParent, bParent, prop){
 
 			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
-			
+
 			if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
 				var subsetCheck;
 				if( !(prop in aParent)) {
@@ -404,18 +404,18 @@ module.exports = compareHelpers = {
 					}
 					return options.subset === subsetCheck ? undefined: false;
 				}
-				
+
 				return false;
 			}
 		};
-		
-		
+
+
 		var aType = typeof a;
 		if(aType === 'object' || aType === 'function') {
-			return h.eachInUnique(a, 
-				subsetCompare, 
-				b, 
-				subsetCompare, 
+			return h.eachInUnique(a,
+				subsetCompare,
+				b,
+				subsetCompare,
 				true);
 		}
 	},
@@ -440,11 +440,11 @@ module.exports = compareHelpers = {
 			compareHelpers.equalArrayLike,
 			compareHelpers.loopObject
 		];
-		
+
 		options["default"] = false;
-		
+
 		loop(a, b, aParent, bParent, prop, compares, options);
-		
+
 		if( typeof options.count === "number") {
 			return options.count;
 		}
@@ -458,7 +458,7 @@ module.exports = compareHelpers = {
 			} else if(compareResult && typeof compareResult === "object"){
 				// is there a difference?
 				if(typeof compareResult.count === "number") {
-					
+
 					if(!("count" in options) || compareResult.count === options.count) {
 						options.count = compareResult.count;
 					} else {
@@ -490,9 +490,9 @@ module.exports = compareHelpers = {
 			addToResult(compareHelpers.intersectionArrayLike,"intersectionArrayLike"),
 			compareHelpers.intersectionObject,
 		];
-		
+
 		options["default"] = false;
-		
+
 		var res = loop(a, b, aParent, bParent, prop, compares, options);
 		if(res === true) {
 			return options.result;
@@ -515,7 +515,7 @@ module.exports = compareHelpers = {
 					if(compareResult.intersection !== undefined) {
 						options.result[prop] = compareResult.intersection;
 					}
-					options.performedIntersection++;		
+					options.performedIntersection++;
 					return true;
 				}
 			}
@@ -524,21 +524,21 @@ module.exports = compareHelpers = {
 	intersectionObject: function(a, b, aParent, bParent, prop, compares, options){
 		var subsetCompare = function(a, b, aParent, bParent, prop){
 			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
-			
+
 			// If some property value is not the exact same
 			if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
 				// figure out which set has extra properties, that set is a subset.
 				return addIntersectedPropertyToResult(a, b, aParent, bParent, prop, compares, options);
 			}
 		};
-		
-		
+
+
 		var aType = typeof a;
 		if(aType === 'object' || aType === 'function') {
-			return h.eachInUnique(a, 
-				subsetCompare, 
-				b, 
-				subsetCompare, 
+			return h.eachInUnique(a,
+				subsetCompare,
+				b,
+				subsetCompare,
 				true);
 		}
 	},
