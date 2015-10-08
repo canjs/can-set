@@ -62,7 +62,7 @@ module.exports = helpers = {
 			if(callbacks.start) {
 				callbacks.start(arr[i]);
 			}
-			
+
 			var j = i+1;
 			while( j < arr.length ) {
 				if(callbacks.iterate(arr[j], j, arr[i], i) === false) {
@@ -86,29 +86,29 @@ module.exports = helpers = {
 	},
 	arrayUnionIntersectionDifference: function(arr1, arr2){
 		var map = {};
-		
+
 		var intersection = [];
 		var union = [];
 		var difference = arr1.slice(0);
-		
+
 		helpers.each(arr1, function(value){
 			map[value] = true;
 			union.push(value);
 		});
-		
+
 		helpers.each(arr2, function(value){
 			if(map[value]) {
 				intersection.push(value);
-				var index = difference.indexOf(value);
+				var index = helpers.indexOf.call(difference, value);
 				if(index !== -1) {
 					difference.splice(index, 1);
 				}
-				
+
 			} else {
 				union.push(value);
 			}
 		});
-		
+
 		return {
 			intersection: intersection,
 			union: union,
@@ -131,5 +131,29 @@ module.exports = helpers = {
 			}
 		}
 		return true;
+	},
+	indexOf: Array.prototype.indexOf || function(item) {
+		for (var i = 0, thisLen = this.length; i < thisLen; i++) {
+			if (this[i] === item) {
+				return i;
+			}
+		}
+		return -1;
+	},
+	map: Array.prototype.map || function(cb){
+		var out = [];
+		for(var i = 0, len = this.length; i < len; i++) {
+			out.push(cb(this[i], i, this));
+		}
+		return out;
+	},
+	filter: Array.prototype.filter || function(cb){
+		var out = [];
+		for(var i = 0, len = this.length; i < len; i++) {
+			if(cb(this[i], i, this)) {
+				out.push(this[i]);
+			}
+		}
+		return out;
 	}
 };

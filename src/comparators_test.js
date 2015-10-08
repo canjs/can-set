@@ -1,5 +1,5 @@
 var QUnit = require("steal-qunit");
-	
+
 QUnit.module("comparators");
 
 require('./comparator_tests/rangeInclusive_test');

@@ -11,44 +11,43 @@ test('rangeInclusive set.equal', function(){
 	 * X = [A0, ..., An]
 	 * Y = [A0, ..., An]
 	 */
-	ok( 
-		set.equal( 
+	ok(
+		set.equal(
 			{start: 0, end: 100},
 			{start: 0, end: 100},
 			comparators.rangeInclusive("start", "end")),
 		"they are equal" );
-		
+
 	/*
 	 * X = [A0, ..., An]
 	 * Y = [A0, ..., A(n+1)]
 	 */
-	ok( 
-		!set.equal( 
+	ok(
+		!set.equal(
 			{start: 0, end: 100},
 			{start: 0, end: 101},
 			comparators.rangeInclusive("start", "end")),
-		"they are not equal" );	
-	
+		"they are not equal" );
+
 	/*
 	 * X = [A0, ..., An]
 	 * Y = [A1, ..., An]
 	 */
-	ok( 
-		!set.equal( 
+	ok(
+		!set.equal(
 			{start: 0, end: 100},
 			{start: 1, end: 100},
 			comparators.rangeInclusive("start", "end")),
-		"they are not equal" );	
+		"they are not equal" );
 });
 
 test('rangeInclusive set.subset', function(){
-	
-	/* 
+	/*
 	 * X = [A0, ..., An]
 	 * Y = [A0, ..., An]
 	 */
-	ok( 
-		set.subset( 
+	ok(
+		set.subset(
 			{start: 0, end: 100},
 			{start: 0, end: 100},
 			comparators.rangeInclusive("start", "end")),
@@ -58,8 +57,8 @@ test('rangeInclusive set.subset', function(){
 	 * X = [A0, ..., An]
 	 * Y = [A0, ..., A(n+1)]
 	 */
-	ok( 
-		set.subset( 
+	ok(
+		set.subset(
 			{start: 0, end: 100},
 			{start: 0, end: 101},
 			comparators.rangeInclusive("start", "end")),
@@ -69,8 +68,8 @@ test('rangeInclusive set.subset', function(){
 	 * X = [A0, ..., An]
 	 * Y = [A0, ..., A(n+1)]
 	 */
-	ok( 
-		!set.subset( 
+	ok(
+		!set.subset(
 			{start: 0, end: 101},
 			{start: 0, end: 100},
 			comparators.rangeInclusive("start", "end")),
@@ -79,24 +78,24 @@ test('rangeInclusive set.subset', function(){
 	/*
 	 * X = [A1, ..., An]
 	 * Y = [A0, ..., An]
-	 */	
-	ok( 
-		set.subset( 
+	 */
+	ok(
+		set.subset(
 			{start: 1, end: 100},
 			{start: 0, end: 100},
 			comparators.rangeInclusive("start", "end")),
-		"start extends before subset" );	
+		"start extends before subset" );
 
 	/*
 	 * X = [A1, ..., An]
 	 * Y = [A0, ..., An]
-	 */	
-	ok( 
-		!set.subset( 
+	 */
+	ok(
+		!set.subset(
 			{start: 0, end: 100},
 			{start: 1, end: 100},
 			comparators.rangeInclusive("start", "end")),
-		"non-subset extends before start" );	
+		"non-subset extends before start" );
 });
 
 
@@ -111,14 +110,14 @@ test('rangeInclusive set.difference', function() {
 	 */
 	var res = set.difference({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
 	deepEqual(res, { start: 0, end: 49 }, "got a diff");
-	
+
 	/*
 	 * let:
 	 *   i be the start of set Y
 	 *   k be the end of set Y
 	 *   0 be the first possible element in X (-infinity)
 	 *   n be the last possible element in X (infinity)
-	 * 
+	 *
 	 * X => universal set
 	 * Y = [Ai, ..., Ak]
 	 *
@@ -128,7 +127,7 @@ test('rangeInclusive set.difference', function() {
 	 */
 	res = set.difference({}, { start: 0, end: 10 }, comparator);
 	equal(res, true);
-	
+
 	/*
 	 * X = [A0, ..., A49]
 	 * Y = [A50, ..., A101]
@@ -137,7 +136,7 @@ test('rangeInclusive set.difference', function() {
 	 */
 	res = set.difference({ start: 0, end: 49 }, { start: 50, end: 101 }, comparator);
 	deepEqual(res, { start: 0, end: 49 }, "side by side");
-	
+
 	/*
 	 * X = [A0, ..., A49]
 	 * Y = [A0, ..., A20]
@@ -146,13 +145,13 @@ test('rangeInclusive set.difference', function() {
 	 */
 	res = set.difference({ start: 0, end: 49 }, { start: 0, end: 20 }, comparator);
 	deepEqual(res, { start: 21, end: 49 }, "first set extends past second");
-	
+
 	/*
 	 * X = [A0, ..., A49]
 	 * Y = [A20, ..., A49]
 	 *
 	 * X / Y = [A0, ..., A19]
-	 */	
+	 */
 	res = set.difference({ start: 0, end: 49 }, { start: 20, end: 49 }, comparator);
 	deepEqual(res, { start: 0, end: 19 }, "first set starts before second");
 });
@@ -166,43 +165,43 @@ test('rangeInclusive set.union', function() {
 	 * Y = [A50, ..., A101]
 	 *
 	 * X U Y = [A0, ..., A101]
-	 */	
+	 */
 	var res = set.union({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
 	deepEqual(res, { start: 0, end: 101 }, "got a union");
-	
+
 	/*
 	 * X = universal set
 	 * Y = [A0, ..., A10]
 	 *
 	 * X U Y = X
-	 */		
+	 */
 	res = set.union({}, { start: 0, end: 10 }, comparator);
 	deepEqual(res, {}, "universal set");
-	
+
 	/*
 	 * X = [A100, ..., A199]
 	 * Y = [A200, ..., A299]
 	 *
 	 * X U Y = [A100, ..., A299]
-	 */		
+	 */
 	res = set.union({start: 100, end: 199}, {start: 200, end: 299}, comparator);
 	deepEqual(res, {start:100, end:299}, "no intersection");
-	
+
 	/*
 	 * X = [A200, ..., A299]
 	 * Y = [A100, ..., A199]
 	 *
 	 * X U Y = [A100, ..., A299]
-	 */			
+	 */
 	res = set.union({start: 200, end: 299}, {start: 100, end: 199}, comparator);
 	deepEqual(res, {start:100, end:299}, "no intersection with either argument order");
-	
+
 	/*
 	 * X = [A200, ..., A299]
 	 * Y = [A100, ..., A209]
 	 *
 	 * X U Y = [A100, ..., A299]
-	 */			
+	 */
 	res = set.union({start: 200, end: 299}, {start: 100, end: 209}, comparator);
 	deepEqual(res, {start:100, end:299}, "sets can intersect");
 
@@ -213,8 +212,8 @@ test('rangeInclusive set.union', function() {
 	 * X U Y = [A100, ..., A299]
 	 */
 	res = set.union({start: 100, end: 209}, {start: 200, end: 299}, comparator);
-	deepEqual(res, {start:100, end:299}, "sets can intersect with either argument order");	
-	
+	deepEqual(res, {start:100, end:299}, "sets can intersect with either argument order");
+
 	/*
 	 * X = [A100, ..., A299]
 	 * Y = [A103, ..., A209]
@@ -223,7 +222,7 @@ test('rangeInclusive set.union', function() {
 	 */
 	res = set.union({start: 100, end: 299}, {start: 103, end: 209}, comparator);
 	deepEqual(res, {start:100, end:299}, "first set contains second");
-	
+
 	/*
 	 * X = [A103, ..., A209]
 	 * Y = [A100, ..., A299]
