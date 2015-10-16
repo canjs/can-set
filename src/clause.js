@@ -1,16 +1,22 @@
 var h = require("./helpers");
 
 var clause = {};
-var addClause = function(typeName, type) {
-	clause[typeName] = function(compare) {
+
+clause.TYPES = [
+	'where',
+	'order',
+	'paginate'
+];
+
+// define clause type classes
+h.each(clause.TYPES, function(type) {
+	var className = type.replace(/^./, type[0].toUpperCase());
+
+	clause[className] = function(compare) {
 		h.extend(this, compare);
 	};
 
-	clause[typeName].type = type;
-};
-
-addClause("Order", "order");
-addClause("Where", "where");
-addClause("Paginate", "paginate");
+	clause[className].type = type;
+});
 
 module.exports = clause;
