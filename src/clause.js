@@ -2,6 +2,16 @@ var h = require("./helpers");
 
 var clause = {};
 
+
+/**
+ * Exports a clause constructor functions like:
+ * 
+ * new clause.Where()
+ * 
+ * This is so we can tell what type of clause some properties are for.
+ */
+module.exports = clause;
+
 clause.TYPES = [
 	'where',
 	'order',
@@ -10,7 +20,7 @@ clause.TYPES = [
 
 // define clause type classes
 h.each(clause.TYPES, function(type) {
-	var className = type.replace(/^./, type[0].toUpperCase());
+	var className = type.charAt(0).toUpperCase()+type.substr(1);
 
 	clause[className] = function(compare) {
 		h.extend(this, compare);
@@ -18,5 +28,3 @@ h.each(clause.TYPES, function(type) {
 
 	clause[className].type = type;
 });
-
-module.exports = clause;

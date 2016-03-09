@@ -188,3 +188,46 @@ test('set.intersection Array', function(){
 	deepEqual(res , {foo: ["a"]}, "intersection");
 
 });
+
+
+test('set.has', function(){
+	var res;
+
+	res = set.subset({ type: 'FOLDER' }, { type: 'FOLDER' });
+	ok(res, 'equal sets');
+
+	res = set.subset({ type: 'FOLDER', parentId: 5 }, { type: 'FOLDER' });
+	ok(res, 'sub set');
+
+	res = set.subset({ type: 'FOLDER' }, { type: 'FOLDER', parentId: 5 });
+	ok(!res, 'wrong way');
+
+	res = set.subset(
+		{ type: 'FOLDER', parentId: 7 },
+		{ type: 'FOLDER', parentId: 5 }
+	);
+	ok(!res, 'different values');
+
+	res = set.subset(
+		{ type: 'FOLDER', count: 5 },
+		{ type: 'FOLDER' },
+		{ count: ignoreProp }
+	);
+	ok(res, 'count ignored');
+
+	res = set.subset(
+		{ type: 'FOLDER', kind: 'tree' },
+		{ type: 'FOLDER', foo: true, bar: true },
+		{ foo: ignoreProp, bar: ignoreProp }
+	);
+	ok(res, 'understands a subset');
+
+	res = set.subset(
+		{ type: 'FOLDER', foo: true, bar: true },
+		{ type: 'FOLDER', kind: 'tree' },
+		{ foo: ignoreProp, bar: ignoreProp, kind: ignoreProp }
+	);
+	ok(res,	'ignores nulls');
+});
+
+
