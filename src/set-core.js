@@ -277,12 +277,12 @@ h.extend(Algebra.prototype, {
 	count: function(a){
 		return this.evaluateOperator(compare.count, a, {});
 	},
-	has: function(a, props){
+	has: function(set, props){
 		// there is a `this.where`, `this.paginate`, etc clause on this object
 		// if where is shifted ... we need to restore it later.
 		
 		// the rest is subset code
-		var aClauseProps = this.getClauseProperties(a);
+		var aClauseProps = this.getClauseProperties(set);
 		var propsClauseProps = this.getClauseProperties(props,{isProperties: true});
 		var compatibleSort = true;
 		var result;
@@ -299,7 +299,7 @@ h.extend(Algebra.prototype, {
 			result = false;
 		}
 		else {
-			result = this.evaluateOperator(compare.subset, props, a, {isProperties: true}, undefined);
+			result = this.evaluateOperator(compare.subset, props, set, {isProperties: true}, undefined);
 		}
 
 		return result;
@@ -333,7 +333,7 @@ module.exports = {
 	count: function(a, config){
 		return Algebra.make(config).count(a);
 	},
-	has: function(){
-		
+	has: function(set, props, config){
+		return Algebra.make(config).has(set, props);
 	}
 };
