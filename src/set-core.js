@@ -2,6 +2,23 @@ var h = require("./helpers");
 var clause = require("./clause");
 var compare = require("./compare");
 
+
+function Translate(clause, options){
+	if(typeof options === "string") {
+		var path = options;
+		options = {
+			fromSet: function(set, setRemainder){
+				return set[path] || {};
+			},
+			toSet: function(set, wheres){
+				set[path] = wheres;
+				return set;
+			}
+		};
+	}
+	this.clause = clause;
+	h.extend(this, options);
+}
 /**
  * An `Algebra` internally keeps different properties organized by clause type.
  * If an object comes in that isn't a clause type, it's assuemd to be a where.
@@ -38,22 +55,7 @@ var Algebra = function(){
 	});
 };
 
-var Translate = function(clause, options){
-	if(typeof options === "string") {
-		var path = options;
-		options = {
-			fromSet: function(set, setRemainder){
-				return set[path] || {};
-			},
-			toSet: function(set, wheres){
-				set[path] = wheres;
-				return set;
-			}
-		};
-	}
-	this.clause = clause;
-	h.extend(this, options);
-};
+
 
 
 Algebra.make = function(compare, count){
