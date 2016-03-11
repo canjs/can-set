@@ -157,7 +157,7 @@ module.exports = helpers = {
 			}
 		}
 		return out;
-  },
+	},
 	isEmptyObject: function(obj) {
 		var prop;
 
@@ -170,5 +170,64 @@ module.exports = helpers = {
 		return prop === undefined;
 	},
 	// This is a dummy object that can signal to be ignored
-	ignoreType: new IgnoreType()
+	ignoreType: new IgnoreType(),
+	firstProp: function(set){
+		for(var prop in set) {
+			return prop;
+		}
+	},
+	last: function(arr){
+		return arr[arr.length -1];
+	},
+	index: function(compare, items, props){
+		// check the start and the end
+		if( compare(props, items[0]) === -1 ) {
+			return 0;
+		}
+		else if(compare(props, helpers.last(items) ) === 1 ) {
+			return items.length;
+		}
+		var low = 0,
+			high = items.length;
+
+		// From lodash lodash 4.6.1 <https://lodash.com/>
+		// Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+		while (low < high) {
+			var mid = (low + high) >>> 1,
+				item = items[mid],
+				computed = compare(props, item);
+			if ( computed === -1 ) {
+				high = mid;
+			} else {
+				low = mid + 1;
+			}
+		}
+		return high;
+		// bisect by calling sortFunc
+	},
+	defaultSort: function(sortPropValue, item1, item2) {
+		var parts = sortPropValue.split(' ');
+		var sortProp = parts[0];
+		var item1Value = item1[sortProp];
+		var item2Value = item2[sortProp];
+		var temp;
+		var desc = parts[1] || '';
+		desc = desc.toLowerCase()	=== 'desc';
+
+		if(desc) {
+			temp = item1Value;
+			item1Value = item2Value;
+			item2Value = temp;
+		}
+
+		if(item1Value < item2Value) {
+			return -1;
+		}
+
+		if(item1Value > item2Value) {
+			return 1;
+		}
+
+		return 0;
+	}
 };

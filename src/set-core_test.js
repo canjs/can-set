@@ -230,4 +230,20 @@ test('set.has', function(){
 	ok(res,	'ignores nulls');
 });
 
+test('set.index', function(){
+	var index = set.index(
+		{sort: "name"},
+		[{id: 1, name:"g"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"s"}],
+		{name: "k"});
 
+	equal(index, 4);
+
+	var algebra = new set.Algebra(set.comparators.id("id"));
+
+	index = algebra.index(
+		{sort: "name"},
+		[{id: 1, name:"g"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"s"}],
+		{id: 0, name: "k"});
+
+	equal(index, 0);
+});

@@ -115,32 +115,6 @@ var cleanUp = function(value, enumData) {
 	return value;
 };
 
-var defaultSort = function(sortPropValue, item1, item2) {
-	var parts = sortPropValue.split(' ');
-	var sortProp = parts[0];
-	var item1Value = item1[sortProp];
-	var item2Value = item2[sortProp];
-	var temp;
-	var desc = parts[1] || '';
-	desc = desc.toLowerCase()	=== 'desc';
-
-	if(desc) {
-		temp = item1Value;
-		item1Value = item2Value;
-		item2Value = temp;
-	}
-
-	if(item1Value < item2Value) {
-		return -1;
-	}
-
-	if(item1Value > item2Value) {
-		return 1;
-	}
-
-	return 0;
-};
-
 module.exports = {
 	'enum': function(prop, enumData){
 		var compares = new clause.Where({});
@@ -285,24 +259,15 @@ module.exports = {
 	},
 	"sort": function(prop, sortFunc) {
 		if(!sortFunc) {
-			sortFunc = defaultSort;
+			sortFunc = h.defaultSort;
 		}
-		var compares = new clause.Order({});
-		compares[prop] = function(vA, vB, A, B, prop, options, algebra){
-			var result;
-
-			result = {
-				intersection: undefined,
-				difference: h.ignoreType,
-				union: h.ignoreType
-			};
-
-			result.getSubset = function(item1, item2) {
-				return sortFunc(vA, item1, item2);
-			};
-
-			return result;
-		};
+		var compares = {};
+		compares[prop] = sortFunc;
 		return new clause.Order(compares);
+	},
+	"id": function(prop){
+		var compares = {};
+		compares[prop] = prop;
+		return new clause.Id(compares);
 	}
 };

@@ -22,15 +22,16 @@ function Translate(clause, options){
 /**
  * An `Algebra` internally keeps different properties organized by clause type.
  * If an object comes in that isn't a clause type, it's assuemd to be a where.
- * 
+ *
  * new set.Algebra(Where(),Paginate(),Sort())
- * 
+ *
  */
 var Algebra = function(){
-	var clauses = this.clauses = { 
-		where: {}, 
-		order: {}, 
-		paginate: {} 
+	var clauses = this.clauses = {
+		where: {},
+		order: {},
+		paginate: {},
+		id: {}
 	};
 	this.translators = {
 		where: new Translate("where", {
@@ -44,7 +45,7 @@ var Algebra = function(){
 	};
 	var self = this;
 	h.each(arguments, function(arg) {
-		
+
 		if(arg) {
 			if(arg instanceof Translate) {
 				self.translators[arg.clause] = arg;
@@ -67,30 +68,31 @@ Algebra.make = function(compare, count){
 };
 
 h.extend(Algebra.prototype, {
-	
+
 	// Breakup `set`'s properties by clauses in the algebra.
 	// options:
 	//  - omitCluases - clauses that should not be pulled out
-	// 
+	//
 	// returns:
 	//   - enabled - an object of which clauses are actually being used by this set. Where is true no matter what.
 	//   - [clauseType] -  each clause type has the sets for that object
 	getClauseProperties: function(set, options) {
-		
+
 		// Go through non-where clauses in algebra, remove those properties from a set clone.
-		
+
 		options = options || {};
-		
+
 		var setClone = h.extend({}, set);
-		
+
 		var clauses = this.clauses;
-		var checkClauses = ['order', 'paginate'];
-		
+		var checkClauses = ['order', 'paginate','id'];
+
 		var clauseProps = {
 			enabled: {
 				where: true,
 				order: false,
-				paginate: false
+				paginate: false,
+				id: false
 			}
 		};
 
@@ -112,7 +114,7 @@ h.extend(Algebra.prototype, {
 			}
 
 			clauseProps[clauseName] = valuesForClause;
-			
+
 			// if there are properties set for this clause
 			clauseProps.enabled[clauseName] = !h.isEmptyObject(valuesForClause);
 		});
@@ -144,10 +146,10 @@ h.extend(Algebra.prototype, {
 				set = h.extend(set, result);
 			}
 			return true;
-		} 
+		}
 		else if(result) {
 			return useSet === undefined ? undefined : false;
-		} 
+		}
 		else {
 			return false;
 		}
@@ -156,7 +158,7 @@ h.extend(Algebra.prototype, {
 	evaluateOperator: function(operator, a, b, aOptions, bOptions) {
 		aOptions = aOptions || {};
 		bOptions = bOptions || {};
-		
+
 		var aClauseProps = this.getClauseProperties(a, aOptions),
 			bClauseProps = this.getClauseProperties(b, bOptions),
 			set = {},
@@ -164,17 +166,17 @@ h.extend(Algebra.prototype, {
 
 		var result = operator(aClauseProps.where, bClauseProps.where,
 			undefined, undefined, undefined, this.clauses.where, {});
-			
+
 		useSet = this.updateSet(set, "where", result, useSet);
-		
+
 		// if success, and either has paginate props
 		if(result && (aClauseProps.enabled.paginate || bClauseProps.enabled.paginate)) {
-			
+
 			// if they have an order, it has to be true for paginate to be valid
 			if(aClauseProps.enabled.order || bClauseProps.enabled.order) {
 				result = operator(aClauseProps.order, bClauseProps.order, undefined,
-					undefined, undefined, this.clauses.order, {});
-				
+					undefined, undefined, {}, {});
+
 				useSet = this.updateSet(set, "order", result, useSet);
 			}
 
@@ -225,7 +227,7 @@ h.extend(Algebra.prototype, {
 	 *
 	 * // A has all of B, but we can't figure out how to create a set object
 	 * set.difference( {} , {completed: true} ) //-> undefined
-	 * 
+	 *
 	 * // Same sets
 	 * set.difference( {} , {} ) //-> false
 	 *
@@ -237,9 +239,9 @@ h.extend(Algebra.prototype, {
 	difference: function(a, b) {
 		var aClauseProps = this.getClauseProperties(a);
 		var bClauseProps = this.getClauseProperties(b);
-		
+
 		var differentClauses = this.getDifferentClauseTypes(aClauseProps, bClauseProps);
-		
+
 		var result; // if too many clauses are different, then we won't be able
 					// to determine the difference
 
@@ -256,14 +258,14 @@ h.extend(Algebra.prototype, {
 				result = compare.difference(aClauseProps[clause],
 					bClauseProps[clause], undefined, undefined, undefined,
 					this.clauses[clause], {});
-				
+
 				if(this.translators[clause] && typeof result === "object") {
 					result = this.translators[clause].toSet({}, result);
 				}
 				break;
 			}
 		}
-		
+
 		return result;
 	},
 	union: function(a, b){
@@ -280,7 +282,7 @@ h.extend(Algebra.prototype, {
 	has: function(set, props){
 		// there is a `this.where`, `this.paginate`, etc clause on this object
 		// if where is shifted ... we need to restore it later.
-		
+
 		// the rest is subset code
 		var aClauseProps = this.getClauseProperties(set);
 		var propsClauseProps = this.getClauseProperties(props,{isProperties: true});
@@ -304,9 +306,33 @@ h.extend(Algebra.prototype, {
 
 		return result;
 	},
+	index: function(set, items, item){
+		var aClauseProps = this.getClauseProperties(set);
+		var propName = h.firstProp(aClauseProps.order),
+			compare,
+			orderValue;
+		if(propName) {
+			compare = this.clauses.order[propName];
+			orderValue = set[propName];
+
+			return h.index(function(itemA, itemB){
+				return compare(orderValue, itemA, itemB);
+			},items, item);
+		}
+		propName = h.firstProp(this.clauses.id);
+		if(propName) {
+			compare = h.defaultSort;
+			orderValue = propName;
+			return h.index(function(itemA, itemB){
+				return compare(orderValue, itemA, itemB);
+			},items, item);
+		}
+		// goes at the end
+		return items.length;
+	}
 	// getSubset(a, b, bData,)
 	// getUnion(a,b,aItems, bItems, bData)
-	// 
+	//
 });
 
 module.exports = {
@@ -335,5 +361,8 @@ module.exports = {
 	},
 	has: function(set, props, config){
 		return Algebra.make(config).has(set, props);
+	},
+	index: function(set, items, item, config) {
+		return Algebra.make(config).index(set, items, item);
 	}
 };

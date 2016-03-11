@@ -23,18 +23,21 @@ test('set.difference', function(){
 });
 
 test('set.difference({ function })', function() {
-	var comparator = {};
+	var algebra = new set.Algebra(
+		comparators.sort('sort'),
+		{
+			colors: function() {
+				return {
+					difference: ['red' ],
+					intersection: ['blue']
+				};
+			}
+		});
 
-	comparator.sort = comparators.sort('sort').sort;
-	comparator.colors = function() {
-		return {
-			difference: ['red' ],
-			intersection: ['blue']
-		};
-	};
 
-	var res = set.difference({ colors: ['red','blue'], sort: 'colors' },
-		{ colors: ['blue'] }, comparator);
+
+	var res = algebra.difference({ colors: ['red','blue'], sort: 'colors' },
+		{ colors: ['blue'] });
 
 	deepEqual(res, { colors: [ 'red' ] });
 });
@@ -238,4 +241,14 @@ test('set.subset with range', function(){
 
 	assertSubset([sets.same, range.superRight, sort.left], false);
 	assertSubset([sets.same, range.superRight, sort.same], true);
+});
+
+test("set.index", function(){
+	var algebra = new set.Algebra(comparators.sort('sort'));
+
+	var index = algebra.index(
+		{sort: "name"},
+		[{id: 1, name:"g"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"s"}],
+		{name: "k"});
+	equal(index, 2);
 });

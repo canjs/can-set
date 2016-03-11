@@ -5,9 +5,9 @@ var clause = {};
 
 /**
  * Exports a clause constructor functions like:
- * 
+ *
  * new clause.Where()
- * 
+ *
  * This is so we can tell what type of clause some properties are for.
  */
 module.exports = clause;
@@ -15,7 +15,8 @@ module.exports = clause;
 clause.TYPES = [
 	'where',
 	'order',
-	'paginate'
+	'paginate',
+	'id'
 ];
 
 // define clause type classes

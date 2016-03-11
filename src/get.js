@@ -12,6 +12,8 @@ var filterData = function(data, clause, comparators) {
 	});
 };
 
+
+
 var getAData = function(a, b, bData, algebra) {
 	var aClauseProps = algebra.getClauseProperties(a);
 	var bClauseProps = algebra.getClauseProperties(b);
@@ -26,12 +28,10 @@ var getAData = function(a, b, bData, algebra) {
 		// if results require sorting, get comparator from options.getSubsets
 		if(aClauseProps.enabled.order || bClauseProps.enabled.order) {
 			options = {};
-
-			compare.subset(aClauseProps.order, bClauseProps.order, undefined,
-				undefined, undefined, algebra.clauses.order, options);
-
-			h.each(options.getSubsets, function(comparator) {
-				aData = aData.sort(comparator);
+			var propName = h.firstProp(aClauseProps.order),
+				compareOrder = algebra.clauses.order[propName];
+			aData = aData.sort(function(aItem, bItem){
+				return compareOrder(a[propName], aItem, bItem);
 			});
 		}
 
