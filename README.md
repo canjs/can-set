@@ -2,17 +2,17 @@
 
 [![Build Status](https://travis-ci.org/canjs/can-set.svg?branch=master)](https://travis-ci.org/canjs/can-set)
 
-__can-set__ is a utility for comparing [sets](http://en.wikipedia.org/wiki/Set_theory#Basic_concepts_and_notation) that 
-are represented by the parameters commonly passed to service requests. 
+__can-set__ is a utility for comparing [sets](http://en.wikipedia.org/wiki/Set_theory#Basic_concepts_and_notation) that
+are represented by the parameters commonly passed to service requests.
 
-For example, the set `{type: "critical"}` might represent all 
-critical todos.  It is a superset of the set `{type: "critical", due: "today"}` 
+For example, the set `{type: "critical"}` might represent all
+critical todos.  It is a superset of the set `{type: "critical", due: "today"}`
 which might represent all critical todos due today.
 
 __can-set__ is useful for building caching and other data-layer
 optimizations.  It can be used in client or server
 environments. [can-connect](http://connect.canjs.com) uses can-set to create data modeling
-utilities and middleware for the client. 
+utilities and middleware for the client.
 
 [Play around in this JSBin!](https://justinbmeyer.jsbin.com/faveda/3/edit?html,js,console)
 
@@ -35,7 +35,7 @@ utilities and middleware for the client.
 >     - [enum](#setcomparatorsenum)
 >     - [rangeInclusive](#setcomparatorsrangeinclusive)
 > - [Contributing](#contributing)
- 
+
 ## Install
 
 Use npm to install `can-set`:
@@ -63,7 +63,7 @@ defines a `getTodos` function that gets todo data from a memory cache or from th
 var cache = [];
 
 var getTodos = function(params, cb) {
-  
+
   // check cache
   for(var i = 0 ; i < cache.length; i++) {
     var cacheEntry = cache[i];
@@ -74,7 +74,7 @@ var getTodos = function(params, cb) {
       return cb(matchingTodos);
     }
   }
-  
+
   // not in cache, get and save in cache
   $.get("/todos",params, function(todos){
     cache.push({
@@ -89,8 +89,8 @@ var getTodos = function(params, cb) {
 
 ## API
 
-In __can-set__ a set is a plain JavaScript object 
-like `{start: 0, end: 100, filter: "top"}`.  Often, these are the 
+In __can-set__ a set is a plain JavaScript object
+like `{start: 0, end: 100, filter: "top"}`.  Often, these are the
 parameters you pass to the server to retrieve some list of data.
 
 Unlike [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)), these
@@ -98,8 +98,8 @@ set objects don't contain the items of the set, instead they represent the items
 
 ### Special Sets
 
-Unlike in common [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)) the set `{}` represents the 
-superset of all sets.  For instance if you load all items represented by set `{}`, you have loaded 
+Unlike in common [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)) the set `{}` represents the
+superset of all sets.  For instance if you load all items represented by set `{}`, you have loaded
 every item in that "universe".
 
 ## set.equal
@@ -142,8 +142,8 @@ set.properSubset({}, {}) //-> false
 Returns a set that represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
 
 ```js
-set.intersection( 
-  {completed: true, due: "tomorrow"}, 
+set.intersection(
+  {completed: true, due: "tomorrow"},
   {completed: true, type: "critical"},
   {...} ) //-> {completed: true, due: "tomorrow", type: "critical"}
 ```
@@ -179,8 +179,8 @@ set.difference( {completed: true}, {} )  //-> false
 Returns a set that represents the union of _A_ and _B_ (_A_ ∪ _B_).
 
 ```js
-set.union( 
-  {start: 0, end: 99}, 
+set.union(
+  {start: 0, end: 99},
   {start: 100, end: 199},
   {...} ) //-> {start: 0, end: 199}
 ```
@@ -236,10 +236,10 @@ An `AlgebraResult` object has the following values:
 
 - [union] - A value the represents the union of A and B.
 - [intersection] - A value that represents the intersection of A and B.
-- [difference] - A value that represents all items in A that are not in B. 
+- [difference] - A value that represents all items in A that are not in B.
 - [count] - The count of the items in A.
 
-For example, if you had a `colors` property and A is `["Red","Blue"]` and B is `["Green","Yellow","Blue"]`, the 
+For example, if you had a `colors` property and A is `["Red","Blue"]` and B is `["Green","Yellow","Blue"]`, the
 AlgebraResult object might look like:
 
 ```js
@@ -251,12 +251,12 @@ AlgebraResult object might look like:
 }
 ```
 
-The count is `2000` because there might be 2000 items represented by colors "Red" and "Blue".  Often 
+The count is `2000` because there might be 2000 items represented by colors "Red" and "Blue".  Often
 the real number can not be known.
 
 ## set.comparators
 
-The following functions create `compares` objects that can be mixed together to create a set `Algebra`. 
+The following functions create `compares` objects that can be mixed together to create a set `Algebra`.
 
 For example, the following uses jQuery's extend to mixin two comparator behaviors into a compares object:
 
@@ -265,10 +265,10 @@ var compares = $.extend(
   {
     // ignore this property in set algebra
     sessionId:  function(){ return true }
-  }, 
+  },
   set.comparators.boolean("completed"),
   set.comparators.range("start","end") );
-  
+
 var algebra = new set.Algebra( compares )
 ```
 
@@ -321,6 +321,11 @@ Gets A set's items given a super set B and its items.
 
 Unifies items from set A and setB into a single array of items.
 
+## set.index
+
+`set.index(setItems, items, item, algebra)`
+
+Returns where `item` should be inserted into `items` which is represented by `setItems`.
 
 ## Contributing
 

@@ -236,7 +236,7 @@ test('set.index', function(){
 		[{id: 1, name:"g"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"s"}],
 		{name: "k"});
 
-	equal(index, 4);
+	equal(index, undefined, "no value if nothing is set");
 
 	var algebra = new set.Algebra(set.comparators.id("id"));
 

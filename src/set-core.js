@@ -327,8 +327,8 @@ h.extend(Algebra.prototype, {
 				return compare(orderValue, itemA, itemB);
 			},items, item);
 		}
-		// goes at the end
-		return items.length;
+		// undefined so the behavior can be figured out by the behavior
+		return;
 	}
 	// getSubset(a, b, bData,)
 	// getUnion(a,b,aItems, bItems, bData)
