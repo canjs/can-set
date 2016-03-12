@@ -180,6 +180,9 @@ module.exports = helpers = {
 		return arr[arr.length -1];
 	},
 	index: function(compare, items, props){
+		if(!items || !items.length) {
+			return undefined;
+		}
 		// check the start and the end
 		if( compare(props, items[0]) === -1 ) {
 			return 0;
