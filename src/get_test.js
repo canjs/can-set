@@ -165,3 +165,10 @@ test("getUnion against overlapping ranged sets", function(){
 
 	deepEqual(union, items);
 });
+
+test("getSubset passed same object works (#3)", function(){
+	var algebra = new set.Algebra(comparators.rangeInclusive("start","end"));
+	var setObj = {start: 1, end: 2};
+	var items = algebra.getSubset(setObj, setObj, [{id: 1}]);
+	deepEqual(items, [{id: 1}]);
+});
