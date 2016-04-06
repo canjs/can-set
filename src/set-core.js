@@ -1,6 +1,7 @@
 var h = require("./helpers");
 var clause = require("./clause");
 var compare = require("./compare");
+var get = require("./get");
 
 
 function Translate(clause, options){
@@ -138,6 +139,11 @@ h.extend(Algebra.prototype, {
 
 		return differentTypes;
 	},
+	// updates the set data with a result.
+	// - `set` - the current set
+	// - `clause` - which clause this is on
+	// - `result` - a boolean or set data
+	// - `useSet` - indicates to use the set or a boolean response
 	updateSet: function(set, clause, result, useSet) {
 		if(result && typeof result === "object" && useSet !== false) {
 			if( this.translators[clause] ) {
@@ -187,6 +193,15 @@ h.extend(Algebra.prototype, {
 				useSet = this.updateSet(set, "paginate", result, useSet);
 			}
 		}
+		// if orders are the same keep order!
+		else if( result && aClauseProps.enabled.order && compare.equal(aClauseProps.order, bClauseProps.order, undefined, undefined, undefined,{},{}) ) {
+
+			result = operator(aClauseProps.order, bClauseProps.order, undefined,
+				undefined, undefined, {}, {});
+
+			useSet = this.updateSet(set, "order", result, useSet);
+		}
+
 		// not checking order here makes it mean that different orders represent the same set?
 
 		return result && useSet ? set : result;
@@ -329,40 +344,93 @@ h.extend(Algebra.prototype, {
 		}
 		// undefined so the behavior can be figured out by the behavior
 		return;
+	},
+	getSubset: function(a, b, bData) {
+
+		var aClauseProps = this.getClauseProperties(a);
+		var bClauseProps = this.getClauseProperties(b);
+
+		// ignoring ordering, can we reduce set b into set a?
+		var isSubset = this.subset(
+			h.extend({}, aClauseProps.where, aClauseProps.paginate),
+			h.extend({}, bClauseProps.where, bClauseProps.paginate)
+		);
+
+		if(isSubset) {
+			return get.subsetData(a, b, bData, this);
+		}
+	},
+	// given two sets and their data, make a union of their data
+	getUnion: function(a,b,aItems, bItems){
+
+		var aClauseProps = this.getClauseProperties(a);
+		var bClauseProps = this.getClauseProperties(b);
+		var algebra = this;
+		var options;
+
+		if(this.subset(a, b)) {
+			return bItems;
+		} else if(this.subset(b, a)) {
+			return aItems;
+		}
+		// neither is a subset of the other
+		var combined;
+		// if either has paginate available, try that
+		if(aClauseProps.enabled.paginate || bClauseProps.enabled.paginate) {
+			options = {};
+			var isUnion = compare.union(aClauseProps.paginate, bClauseProps.paginate, undefined, undefined, undefined,
+				this.clauses.paginate, options);
+
+			// If there isn't a union, return `undefined`.
+			if(!isUnion) {
+				return;
+			}
+			else {
+				h.each(options.getUnions, function(filter){
+					var items = filter(a,b, aItems, bItems, algebra, options);
+					aItems = items[0];
+					bItems = items[1];
+				});
+				combined = aItems.concat(bItems);
+			}
+		} else {
+			combined = aItems.concat(bItems);
+		}
+
+		// If sorting is the same, sort the result.
+		if( combined.length && aClauseProps.enabled.order && compare.equal(aClauseProps.order, bClauseProps.order, undefined, undefined, undefined,{},{}) ) {
+			options = {};
+			var propName = h.firstProp(aClauseProps.order),
+				compareOrder = algebra.clauses.order[propName];
+			combined = combined.sort(function(aItem, bItem){
+				return compareOrder(a[propName], aItem, bItem);
+			});
+		}
+
+		return combined;
 	}
-	// getSubset(a, b, bData,)
-	// getUnion(a,b,aItems, bItems, bData)
-	//
 });
+
+var callOnAlgebra = function(methodName, algebraArgNumber) {
+	return function(){
+		var args = h.makeArray(arguments).slice(0, algebraArgNumber);
+		var algebra = Algebra.make(arguments[algebraArgNumber]);
+		return algebra[methodName].apply(algebra, args);
+	};
+};
 
 module.exports = {
 	Algebra : Algebra,
 	Translate: Translate,
-	difference: function(a, b, config) {
-		return Algebra.make(config).difference(a, b);
-	},
-	equal: function(a, b, config) {
-		return Algebra.make(config).equal(a, b);
-	},
-	subset: function(a, b, config) {
-		return Algebra.make(config).subset(a, b);
-	},
-	properSubset: function(a, b, config) {
-		return Algebra.make(config).properSubset(a, b);
-	},
-	union: function(a, b, config) {
-		return Algebra.make(config).union(a, b);
-	},
-	intersection: function(a, b, config){
-		return Algebra.make(config).intersection(a, b);
-	},
-	count: function(a, config){
-		return Algebra.make(config).count(a);
-	},
-	has: function(set, props, config){
-		return Algebra.make(config).has(set, props);
-	},
-	index: function(set, items, item, config) {
-		return Algebra.make(config).index(set, items, item);
-	}
+	difference: callOnAlgebra("difference",2),
+	equal: callOnAlgebra("equal",2),
+	subset: callOnAlgebra("subset",2),
+	properSubset: callOnAlgebra("properSubset",2),
+	union: callOnAlgebra("union",2),
+	intersection: callOnAlgebra("intersection",2),
+	count: callOnAlgebra("count",1),
+	has: callOnAlgebra("has",2),
+	index: callOnAlgebra("index",3),
+	getSubset: callOnAlgebra("getSubset",3),
+	getUnion: callOnAlgebra("getUnion",4)
 };

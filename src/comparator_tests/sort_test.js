@@ -93,10 +93,10 @@ test('set.intersection', function(){
 	var comparator = comparators.sort('sort');
 
 	var res = set.intersection({} , { sort: 'name' }, comparator);
-	deepEqual(res, {}, "");
+	deepEqual(res, {}, "no sort if only one is sorted");
 
 	res = set.intersection({ sort: 'name' } , { sort: 'name' }, comparator);
-	deepEqual(res, {}, "");
+	deepEqual(res, {sort: 'name'}, "");
 
 	res = set.intersection({type: 'new'} , { sort: 'name', userId: 5 }, comparator);
 	deepEqual(res, {type: 'new', userId: 5 }, "");
@@ -251,4 +251,45 @@ test("set.index", function(){
 		[{id: 1, name:"g"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"s"}],
 		{name: "k"});
 	equal(index, 2);
+});
+
+
+test("set.getSubset (#14)", function(){
+	var algebra = new set.Algebra(comparators.sort('sort'));
+	var subset = algebra.getSubset({sort: "name"},{},[{id: 1, name:"s"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"g"}]);
+	deepEqual(subset, [ {id: 4, name:"g"},{id: 2, name:"j"}, {id: 3, name:"m"},{id: 1, name:"s"}]);
+});
+
+
+test("set.getUnion", function(){
+	var algebra = new set.Algebra(
+		comparators.sort('sort'),
+		comparators.boolean('complete')
+	);
+
+	// a,b,aItems, bItems
+	var union = algebra.getUnion(
+		{sort: "name", complete: true},
+		{sort: "name", complete: false},
+		[{id: 4, name:"g", complete: true}, {id: 3, name:"m", complete: true}],
+		[{id: 2, name:"j", complete: false},{id: 1, name:"s", complete: false} ]);
+
+	deepEqual(union, [
+		{id: 4, name:"g", complete: true},
+		{id: 2, name:"j", complete: false},
+		{id: 3, name:"m", complete: true},
+		{id: 1, name:"s",complete: false}]);
+});
+
+test("set.union keeps sort", function(){
+	var algebra = new set.Algebra(
+		comparators.sort('sort'),
+		comparators.boolean('complete')
+	);
+
+	var union = algebra.union(
+		{sort: "name", complete: true},
+		{sort: "name", complete: false});
+
+	deepEqual(union, {sort: "name"});
 });
