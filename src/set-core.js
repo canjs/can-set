@@ -161,40 +161,54 @@ h.extend(Algebra.prototype, {
 		}
 	},
 	// calls the operator method on different parts of the set.
-	evaluateOperator: function(operator, a, b, aOptions, bOptions) {
+	evaluateOperator: function(operator, a, b, aOptions, bOptions, evaluateOptions) {
 		aOptions = aOptions || {};
 		bOptions = bOptions || {};
+		evaluateOptions = h.extend({
+			evaluateWhere: operator,
+			evaluatePaginate: operator,
+			evaluateOrder: operator,
+
+			shouldEvaluatePaginate: function(aClauseProps, bClauseProps) {
+				return aClauseProps.enabled.paginate || bClauseProps.enabled.paginate;
+			},
+			shouldEvaluateOrder: function(aClauseProps, bClauseProps) {
+				return aClauseProps.enabled.order && compare.equal(aClauseProps.order, bClauseProps.order, undefined, undefined, undefined,{},{});
+			}
+			/* aClauseProps.enabled.order || bClauseProps.enabled.order */
+		}, evaluateOptions||{});
 
 		var aClauseProps = this.getClauseProperties(a, aOptions),
 			bClauseProps = this.getClauseProperties(b, bOptions),
 			set = {},
 			useSet;
 
-		var result = operator(aClauseProps.where, bClauseProps.where,
+		var result = evaluateOptions.evaluateWhere(aClauseProps.where, bClauseProps.where,
 			undefined, undefined, undefined, this.clauses.where, {});
 
 		useSet = this.updateSet(set, "where", result, useSet);
 
 		// if success, and either has paginate props
-		if(result && (aClauseProps.enabled.paginate || bClauseProps.enabled.paginate)) {
+		if(result && evaluateOptions.shouldEvaluatePaginate(aClauseProps,bClauseProps) ) {
 
 			// if they have an order, it has to be true for paginate to be valid
-			if(aClauseProps.enabled.order || bClauseProps.enabled.order) {
-				result = operator(aClauseProps.order, bClauseProps.order, undefined,
+			// this isn't true if a < b, a is paginated, and b is not.
+			if( evaluateOptions.shouldEvaluateOrder(aClauseProps,bClauseProps)) {
+				result = evaluateOptions.evaluateOrder(aClauseProps.order, bClauseProps.order, undefined,
 					undefined, undefined, {}, {});
 
 				useSet = this.updateSet(set, "order", result, useSet);
 			}
 
 			if(result) {
-				result = operator(aClauseProps.paginate, bClauseProps.paginate,
+				result = evaluateOptions.evaluatePaginate(aClauseProps.paginate, bClauseProps.paginate,
 					undefined, undefined, undefined, this.clauses.paginate, {});
 
 				useSet = this.updateSet(set, "paginate", result, useSet);
 			}
 		}
 		// if orders are the same keep order!
-		else if( result && aClauseProps.enabled.order && compare.equal(aClauseProps.order, bClauseProps.order, undefined, undefined, undefined,{},{}) ) {
+		else if( result && evaluateOptions.shouldEvaluateOrder(aClauseProps,bClauseProps) ) {
 
 			result = operator(aClauseProps.order, bClauseProps.order, undefined,
 				undefined, undefined, {}, {});
@@ -216,7 +230,7 @@ h.extend(Algebra.prototype, {
 		var result;
 
 		// if both have a paginate, make sure order is the same.
-		if((aClauseProps.enabled.paginate && bClauseProps.enabled.paginate) &&
+		if( bClauseProps.enabled.paginate &&
 			(aClauseProps.enabled.order || bClauseProps.enabled.order)) {
 			// compare order clauses without any special comparators
 			compatibleSort = compare.equal(aClauseProps.order, bClauseProps.order,
