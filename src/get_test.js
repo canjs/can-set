@@ -3,7 +3,7 @@ var QUnit = require("steal-qunit");
 var comparators = require("./comparators");
 var h = require("./helpers");
 
-QUnit.module("set/src/get");
+QUnit.module("set/src/set-core get methods");
 
 var getId = function(d){ return d.id; };
 
@@ -165,5 +165,3 @@ test("getUnion against overlapping ranged sets", function(){
 
 	deepEqual(union, items);
 });
-
-
