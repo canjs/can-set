@@ -215,8 +215,8 @@ h.extend(Algebra.prototype, {
 		var compatibleSort = true;
 		var result;
 
-		// if there is a paginate and an order, order has to be the same first.
-		if((aClauseProps.enabled.paginate || bClauseProps.enabled.paginate) &&
+		// if both have a paginate, make sure order is the same.
+		if((aClauseProps.enabled.paginate && bClauseProps.enabled.paginate) &&
 			(aClauseProps.enabled.order || bClauseProps.enabled.order)) {
 			// compare order clauses without any special comparators
 			compatibleSort = compare.equal(aClauseProps.order, bClauseProps.order,

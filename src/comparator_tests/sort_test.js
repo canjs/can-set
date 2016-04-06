@@ -293,3 +293,12 @@ test("set.union keeps sort", function(){
 
 	deepEqual(union, {sort: "name"});
 });
+
+test("paginated and sorted is subset (#17)", function(){
+	var algebra = new set.Algebra(
+		comparators.sort('sort'),
+		comparators.rangeInclusive('start','end')
+	);
+	var res = algebra.subset({start: 0, end: 100, sort: "name"},{}); //-> true
+	equal(res, true, "works against universal set");
+});
