@@ -267,3 +267,26 @@ test('rangeInclusive set.intersection', function(){
 	var res = set.intersection({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
 	deepEqual(res, { start: 50, end: 99 }, "got a intersection");
 });
+
+test('rangeInclusive with string numbers (#17)', function(){
+	var algebra = new set.Algebra(
+		comparators.rangeInclusive('start','end')
+	);
+	ok(
+		algebra.subset(
+			{start: "1", end: "100"},
+			{start: "0", end: "100"}
+		),
+		".subset" );
+
+	var res = algebra.getSubset({start: "2",end: "3"},{start: "1",end: "4"},[{id: 1},{id: 2},{id: 3},{id: 4}]);
+	deepEqual(res, [{id: 2},{id: 3}], ".getSubset");
+
+	res = algebra.getUnion(
+		{start: "2",end: "3"},
+		{start: "1",end: "4"},
+		[{id: 2},{id: 3}],
+		[{id: 1},{id: 2},{id: 3},{id: 4}]);
+	deepEqual(res, [{id: 1},{id: 2},{id: 3},{id: 4}], ".getUnion");
+
+});
