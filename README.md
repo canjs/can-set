@@ -265,7 +265,7 @@ algebra.subset({type: "critical"}, {}) //-> true
 algebra.subset({}, {}) //-> true
 ```
 
-## set.properSubset
+## algebra.properSubset
 
 Returns true if _A_ is a strict subset of _B_ (_A_ ⊂ _B_).
 
