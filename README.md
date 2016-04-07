@@ -14,26 +14,27 @@ optimizations.  It can be used in client or server
 environments. [can-connect](http://connect.canjs.com) uses can-set to create data modeling
 utilities and middleware for the client.
 
-[Play around in this JSBin!](https://justinbmeyer.jsbin.com/faveda/3/edit?html,js,console)
+[Play around in this JSBin!](https://justinbmeyer.jsbin.com/faveda/4/edit?js,console)
 
 
 > - Install
 > - Use
 > - API
->   - [equal](#setequal)
->   - [subset](#setsubset)
->   - [properSubset](#setpropersubset)
->   - [intersection](#setintersection)
->   - [difference](#setdifference)
->   - [union](#setunion)
->   - [count](#setcount)
->   - [getUnion](#setgetunion)
->   - [getSubset](#setgetsubset)
 >   - [Algebra](#setalgebra)
 >   - [comparators](#setcomparators)
 >     - [boolean](#setcomparatorsboolean)
 >     - [enum](#setcomparatorsenum)
 >     - [rangeInclusive](#setcomparatorsrangeinclusive)
+>   - [equal](#algebraequal)
+>   - [subset](#algebrasubset)
+>   - [properSubset](#algebrapropersubset)
+>   - [intersection](#algebraintersection)
+>   - [difference](#algebradifference)
+>   - [union](#algebraunion)
+>   - [count](#algebracount)
+>   - [getUnion](#algebragetunion)
+>   - [getSubset](#algebragetsubset)
+
 > - [Contributing](#contributing)
 
 ## Install
@@ -56,29 +57,60 @@ Use `define`, `require` or `import` in [StealJS](http://stealjs.com)  workflows 
 import set from 'can-set'
 ```
 
-Once you've imported `set` into your project, use it to compare sets.  The following example
-defines a `getTodos` function that gets todo data from a memory cache or from the server.
+Once you've imported `set` into your project, use it to create a `set.Algebra` and then
+use that to compare and perform operations on sets.  
 
 ```js
+// create an algebra
+var algebra = new set.Algebra(
+    // specify the unique identifier on data
+    set.comparators.id("_id"),  
+    // specify that completed can be true, false or undefined
+    set.comparators.boolean("completed"),
+    // specify properties that define pagination
+    set.comparators.rangeInclusive("start","end"),
+    // specify the property that controls sorting
+    set.comparators.sort("orderBy"),
+)
+
+// compare two sets
+algebra.subset({start: 2, end: 3}, {start: 1, end: 4}) //-> true
+algebra.difference({} , {completed: true}) //-> {completed: false}
+
+// perform operations on sets
+algebra.getSubset({start: 2,end: 3},{start: 1,end: 4},
+            [{id: 1},{id: 2},{id: 3},{id: 4}])
+//-> [{id: 2},{id: 3}]
+```
+
+Once you have the basics, you can use set algebra to all sorts of intelligent caching
+and performance optimizations.  The following example
+defines a `getTodos` function that gets todo data from a memory cache or from the server.
+
+```
+var algebra = new set.Algebra(
+    set.comparators.boolean("completed")
+);
 var cache = [];
 
-var getTodos = function(params, cb) {
+// `params` might look like `{complete: true}`
+var getTodos = function(set, cb) {
 
-  // check cache
+  // Check cache for a superset of what we are looking for.
   for(var i = 0 ; i < cache.length; i++) {
     var cacheEntry = cache[i];
-    if(set.subset( cacheEntry.params, params ) ) {
-      var matchingTodos = cacheEntry.items.filter(function(item){
-        return set.subset(item, params);
-      })
+    if(algebra.subset( set, cacheEntry.set ) ) {
+
+      // If a match is found get those items.
+      var matchingTodos = algebra.getSubset(set, cacheEntry.set, cacheEntry.items)
       return cb(matchingTodos);
     }
   }
 
   // not in cache, get and save in cache
-  $.get("/todos",params, function(todos){
+  $.get("/todos",set, function(todos){
     cache.push({
-      params: params,
+      set: set,
       items: todos
     });
     cb(todos);
@@ -101,98 +133,6 @@ set objects don't contain the items of the set, instead they represent the items
 Unlike in common [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)) the set `{}` represents the
 superset of all sets.  For instance if you load all items represented by set `{}`, you have loaded
 every item in that "universe".
-
-## set.equal
-
-`set.equal(a, b, algebra) -> Boolean`
-
-Returns true if the two sets the exact same.
-
-```js
-set.equal({type: "critical"}, {type: "critical"}) //-> true
-```
-
-## set.subset
-
-Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_ (_A_ ⊆ _B_).
-
-`set.subset(a, b, algebra) -> Boolean`
-
-```js
-set.subset({type: "critical"}, {}) //-> true
-set.subset({}, {}) //-> true
-```
-
-## set.properSubset
-
-Returns true if _A_ is a strict subset of _B_ (_A_ ⊂ _B_).
-
-`set.properSubset(a, b, algebra)`
-
-
-```js
-set.properSubset({type: "critical"}, {}) //-> true
-set.properSubset({}, {}) //-> false
-```
-
-## set.intersection
-
-`set.intersection(a, b, algebra) -> set`
-
-Returns a set that represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
-
-```js
-set.intersection(
-  {completed: true, due: "tomorrow"},
-  {completed: true, type: "critical"},
-  {...} ) //-> {completed: true, due: "tomorrow", type: "critical"}
-```
-
-
-## set.difference
-
-`set.difference(a, b, algebra) -> set|true|false`
-
-Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_), or
-returns if a difference exists.
-
-If `true` is returned, that means that _B_ is a subset of _A_, but no set object
-can be returned that represents that set.
-
-If `false` is returned, that means there is no difference or the sets are not comparable.
-
-```js
-// A has all of B
-set.difference( {} , {completed: true}, set.boolean("completed") ) //-> {completed: false}
-
-// A has all of B, but we can't figure out how to create a set object
-set.difference( {} , {completed: true} ) //-> true
-
-// A is totally inside B
-set.difference( {completed: true}, {} )  //-> false
-```
-
-## set.union
-
-`set.union(a, b, algebra) -> set | undefined`
-
-Returns a set that represents the union of _A_ and _B_ (_A_ ∪ _B_).
-
-```js
-set.union(
-  {start: 0, end: 99},
-  {start: 100, end: 199},
-  {...} ) //-> {start: 0, end: 199}
-```
-
-
-## set.count
-
-`set.count(a, algebra) -> Number`
-
-Returns the number of items that might be loaded by set _A_. This makes use of set.Algebra's
-By default, this returns Infinity.
-
 
 ## set.Algebra
 
@@ -258,18 +198,15 @@ the real number can not be known.
 
 The following functions create `compares` objects that can be mixed together to create a set `Algebra`.
 
-For example, the following uses jQuery's extend to mixin two comparator behaviors into a compares object:
-
 ```js
-var compares = $.extend(
+var algebra = new set.Algebra(
   {
     // ignore this property in set algebra
     sessionId:  function(){ return true }
   },
   set.comparators.boolean("completed"),
-  set.comparators.range("start","end") );
-
-var algebra = new set.Algebra( compares )
+  set.comparators.rangeInclusive("start","end")
+);
 ```
 
 ### set.comparators.boolean
@@ -307,25 +244,156 @@ Makes a comparator for a set of values.
 var compare = set.comparators.enum("type", ["new","accepted","pending","resolved"])
 ```
 
+## algebra.equal
 
-## set.getSubset
+`algebra.equal(a, b) -> Boolean`
 
-`set.get.subset(a, b, bItems, algebra) //-> aItems`
+Returns true if the two sets the exact same.
+
+```js
+algebra.equal({type: "critical"}, {type: "critical"}) //-> true
+```
+
+## algebra.subset
+
+Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_ (_A_ ⊆ _B_).
+
+`algebra.subset(a, b) -> Boolean`
+
+```js
+algebra.subset({type: "critical"}, {}) //-> true
+algebra.subset({}, {}) //-> true
+```
+
+## set.properSubset
+
+Returns true if _A_ is a strict subset of _B_ (_A_ ⊂ _B_).
+
+`algebra.properSubset(a, b)`
+
+
+```js
+algebra.properSubset({type: "critical"}, {}) //-> true
+algebra.properSubset({}, {}) //-> false
+```
+
+## algebra.intersection
+
+`algebra.intersection(a, b, algebra) -> set`
+
+Returns a set that represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
+
+```js
+algebra.intersection(
+  {completed: true, due: "tomorrow"},
+  {completed: true, type: "critical"},
+) //-> {completed: true, due: "tomorrow", type: "critical"}
+```
+
+
+## algebra.difference
+
+`algebra.difference(a, b) -> set|true|false`
+
+Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_), or
+returns if a difference exists.
+
+If `true` is returned, that means that _B_ is a subset of _A_, but no set object
+can be returned that represents that set.
+
+If `false` is returned, that means there is no difference or the sets are not comparable.
+
+```js
+algebra1 = new set.Algebra(set.comparators.boolean("completed"));
+algebra2 = new set.Algebra();
+
+// A has all of B
+algebra1.difference( {} , {completed: true} ) //-> {completed: false}
+
+// A has all of B, but we can't figure out how to create a set object
+algebra2.difference( {} , {completed: true} ) //-> true
+
+// A is totally inside B
+algebra2.difference( {completed: true}, {} )  //-> false
+```
+
+## algebra.union
+
+`algebra.union(a, b) -> set | undefined`
+
+Returns a set that represents the union of _A_ and _B_ (_A_ ∪ _B_).
+
+```js
+algebra.union(
+  {start: 0, end: 99},
+  {start: 100, end: 199},
+) //-> {start: 0, end: 199}
+```
+
+
+## algebra.count
+
+`algebra.count(a, algebra) -> Number`
+
+Returns the number of items that might be loaded by set _A_. This makes use of set.Algebra's
+By default, this returns Infinity.
+
+
+## algebra.getSubset
+
+`algebra.getSubset(a, b, bItems) //-> aItems`
 
 Gets A set's items given a super set B and its items.
 
+```
+algebra.getSubset({type: "dog"},{},
+  [{id: 1, type:"cat"},
+   {id: 2, type: "dog"},
+   {id: 3, type: "dog"},
+   {id: 4, type: "zebra"}])
+//-> [{id: 2, type: "dog"},{id: 3, type: "dog"}]
+```
 
-## set.getUnion
+## algebra.getUnion
 
-`set.getUnion(a, b, aItems, bItems, algebra) //-> unionItems`
+`algebra.getUnion(a, b, aItems, bItems) //-> unionItems`
 
 Unifies items from set A and setB into a single array of items.
 
-## set.index
+```
+algebra = new set.Algebra(
+    set.comparators.rangeInclusive("start","end")
+);
+algebra.getUnion(
+    {start: 1,end: 2},
+    {start: 2,end: 4},
+    [{id: 1},{id: 2}],
+    [{id: 2},{id: 3},{id: 4}]);
+//-> [{id: 1},{id: 2},{id: 3},{id: 4}]
+```
 
-`set.index(setItems, items, item, algebra)`
+## algebra.index
 
-Returns where `item` should be inserted into `items` which is represented by `setItems`.
+`algebra.index(setA, aItems, item)`
+
+Returns where `item` should be inserted into `aItems` which is represented by `setA`.
+
+```
+algebra = new set.Algebra(
+    set.comparators.sort("orderBy")
+);
+algebra.index(
+    {orderBy: "age"},
+    [{id: 1, age: 3},{id: 2, age: 5},{id: 3, age: 8},{id: 4, age: 10}],
+    {id: 6, age: 3})
+    //-> 2
+```
+
+The default sort property is what is specified by
+`set.comparators.id`. This means if that if the sort property
+is not specified, it will assume the set is sorted by the specified
+id property.
+
 
 ## Contributing
 
