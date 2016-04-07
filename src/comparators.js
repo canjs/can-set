@@ -4,15 +4,24 @@ var clause = require("./clause");
 var within = function(value, range){
 	return value >= range[0] && value <= range[1];
 };
+var numericProperties = function(setA, setB, property1, property2){
+	return {
+		sAv1: +setA[property1],
+		sAv2: +setA[property2],
+		sBv1: +setB[property1],
+		sBv2: +setB[property2],
+	};
+};
 
 // diff from setA's perspective
 var diff = function(setA, setB, property1, property2){
 	// p for param
 	// v for value
-	var sAv1 = setA[property1],
-		sAv2 = setA[property2],
-		sBv1 = setB[property1],
-		sBv2 = setB[property2],
+	var numProps = numericProperties(setA, setB, property1, property2);
+	var sAv1 = numProps.sAv1,
+		sAv2 = numProps.sAv2,
+		sBv1 = numProps.sBv1,
+		sBv2 = numProps.sBv2,
 		count = sAv2 - sAv1 + 1;
 
 	var after = {
@@ -163,27 +172,24 @@ module.exports = {
 		var compares = {};
 		var makeResult = function(result, index) {
 			var res = {};
-			if(result.intersection) {
-				res.intersection = result.intersection[index];
-			}
-			if(result.difference){
-				res.difference = result.difference[index];
-			}
-			if(result.union) {
-				res.union = result.union[index];
-			}
+			h.each(["intersection","difference","union"], function(prop){
+				if(result[prop]) {
+					res[prop] = result[prop][index];
+				}
+			});
 			if(result.count) {
 				res.count = result.count;
 			}
 			return res;
 		};
 
+		// returns the `start` properties values for different algebra methods and a
+		// getSubset+getUnion that really dont do anything.
 		compares[startIndexProperty] = function(vA, vB, A, B){
 			if(vA === undefined) {
 				return;
 			}
 			var res = diff(A, B, startIndexProperty, endIndexProperty);
-
 
 			var result = makeResult(res, 0);
 			result.getSubset = function(a, b, bItems, algebra, options){
@@ -194,6 +200,8 @@ module.exports = {
 			};
 			return result;
 		};
+		// returns the `end` property values for different algebra methods and
+		// a getSubset+getUnion that actually perform a mution on the items.
 		compares[endIndexProperty] = function(vA, vB, A, B){
 			if(vA === undefined) {
 				return;
@@ -202,10 +210,11 @@ module.exports = {
 			var res = makeResult( data, 1);
 			// if getSubset ... remove from the .get
 			res.getSubset = function(a, b, bItems, algebra, options){
-				var aStartValue = a[startIndexProperty],
-					aEndValue = a[endIndexProperty];
+				var numProps = numericProperties(a, b, startIndexProperty, endIndexProperty);
+				var aStartValue = numProps.sAv1,
+					aEndValue = numProps.sAv2;
 
-				var bStartValue = b[startIndexProperty];
+				var bStartValue = numProps.sBv1;
 
 				if(  ! (endIndexProperty in b) || ! (endIndexProperty in a)  ) {
 					return bItems.slice(aStartValue, aEndValue+1);
@@ -217,13 +226,13 @@ module.exports = {
 				if(data.meta.indexOf("after") >= 0) {
 					// if they overlap ... shave some off
 					if(data.intersection) {
-						bItems = bItems.slice( 0, data.intersection[0]-b[startIndexProperty]  );
+						bItems = bItems.slice( 0, data.intersection[0]- (+b[startIndexProperty])  );
 					}
 					return [bItems, aItems];
 				}
 
 				if(data.intersection) {
-					aItems = aItems.slice( 0, data.intersection[0]-a[startIndexProperty]  );
+					aItems = aItems.slice( 0, data.intersection[0]- (+a[startIndexProperty])  );
 				}
 				return [aItems,bItems];
 			};
