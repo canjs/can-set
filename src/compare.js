@@ -1,4 +1,8 @@
 var h = require("./helpers");
+var assign = require("can-util/js/assign/assign");
+var each = require("can-util/js/each/each");
+var makeArray = require("can-util/js/make-array/make-array");
+
 
 var compareHelpers;
 
@@ -86,7 +90,7 @@ module.exports = compareHelpers = {
 		if (options.deep === -1) {
 			return typeof a === 'object' || a === b;
 		}
-		if (typeof a !== typeof b || h.isArrayLike(a) !== h.isArrayLike(b)) {
+		if (typeof a !== typeof b || Array.isArray(a) !== Array.isArray(b)) {
 			return false;
 		}
 		if (a === b) {
@@ -94,7 +98,7 @@ module.exports = compareHelpers = {
 		}
 	},
 	equalArrayLike: function( a, b, aParent, bParent, prop, compares, options ) {
-		if(h.isArrayLike(a) && h.isArrayLike(b) ) {
+		if(Array.isArray(a) && Array.isArray(b) ) {
 			if (a.length !== b.length) {
 				return false;
 			}
@@ -110,7 +114,7 @@ module.exports = compareHelpers = {
 	equalObject: function( a, b, aParent, bParent, parentProp, compares, options ){
 		var aType = typeof a;
 		if(aType === 'object' || aType === 'function') {
-			var bCopy = h.extend({}, b);
+			var bCopy = assign({}, b);
 			if(options.deep === false) {
 				options.deep = -1;
 			}
@@ -202,7 +206,7 @@ module.exports = compareHelpers = {
 		var bType = typeof b;
 		var hasAdditionalProp = false;
 		if(bType === 'object' || bType === 'function') {
-			var aCopy = h.extend({}, a);
+			var aCopy = assign({}, a);
 			if(options.deep === false) {
 				options.deep = -1;
 			}
@@ -399,8 +403,8 @@ module.exports = compareHelpers = {
 	},
 	// this might be expensive, but work that out later
 	unionArrayLike: function( a, b, aParent, bParent, prop, compares, options ) {
-		if(h.isArrayLike(a) && h.isArrayLike(b) ) {
-			var combined = h.makeArray(a).concat(h.makeArray(b));
+		if(Array.isArray(a) && Array.isArray(b) ) {
+			var combined = makeArray(a).concat(makeArray(b));
 			// unique's the combination
 			h.doubleLoop(combined, function(item, j, cur, i){
 				var res = !compareHelpers.equal(cur, item, aParent, bParent, undefined, compares['*'], {"default": false});
@@ -449,7 +453,7 @@ module.exports = compareHelpers = {
 	loopObject: function(a, b, aParent, bParent, prop, compares, options){
 		var aType = typeof a;
 		if(aType === 'object' || aType === 'function') {
-			h.each(a, function(aValue, prop){
+			each(a, function(aValue, prop){
 				var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 				loop( aValue, b[prop], a, b, prop, compare, options );
 			});
@@ -520,9 +524,9 @@ module.exports = compareHelpers = {
 	},
 	// this might be expensive, but work that out later
 	intersectionArrayLike: function( a, b, aParent, bParent, prop, compares, options ) {
-		if(h.isArrayLike(a) && h.isArrayLike(b) ) {
+		if(Array.isArray(a) && Array.isArray(b) ) {
 			var intersection = [];
-			h.each(h.makeArray(a), function(cur){
+			each(makeArray(a), function(cur){
 				for(var i = 0; i < b.length; i++) {
 					if( compareHelpers.equal(cur, b[i], aParent, bParent, undefined, compares['*'], {"default": false}) ) {
 						intersection.push(cur);

@@ -1,5 +1,6 @@
 var compare = require("./compare");
 var h = require("./helpers");
+var each = require("can-util/js/each/each");
 
 var filterData = function(data, clause, comparators) {
 	// reduce response to items in data that meet clause criteria
@@ -39,7 +40,7 @@ module.exports = {
 			compare.subset(aClauseProps.paginate, bClauseProps.paginate, undefined,
 				undefined, undefined, algebra.clauses.paginate, options);
 
-			h.each(options.getSubsets, function(filter) {
+			each(options.getSubsets, function(filter) {
 				aData = filter(a, b, aData, algebra, options);
 			});
 		}

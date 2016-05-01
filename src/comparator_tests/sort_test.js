@@ -1,8 +1,9 @@
 var QUnit = require("steal-qunit");
 
 var set = require('src/set-core'),
-	comparators = require("src/comparators"),
-	h = require("src/helpers");
+	comparators = require("src/comparators");
+
+var each = require("can-util/js/each/each");
 
 QUnit.module("comparators.sort");
 
@@ -225,7 +226,7 @@ test('set.subset with range', function(){
 	var make = function(){
 		var setA = {},
 			setB = {};
-		h.each(arguments, function(method){
+		each(arguments, function(method){
 			method(setA, setB);
 		});
 		return {left: setA, right: setB};
