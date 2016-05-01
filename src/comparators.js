@@ -1,5 +1,6 @@
 var h = require("./helpers");
 var clause = require("./clause");
+var each = require("can-util/js/each/each");
 
 var within = function(value, range){
 	return value >= range[0] && value <= range[1];
@@ -115,7 +116,7 @@ var cleanUp = function(value, enumData) {
 	if(!value) {
 		return enumData;
 	}
-	if(!h.isArrayLike(value)) {
+	if(!Array.isArray(value)) {
 		value = [value];
 	}
 	if(!value.length) {
@@ -138,8 +139,8 @@ module.exports = {
 			}
 
 			// if any of them have everything, return undefined
-			h.each(data, function(value, prop){
-				if(h.isArrayLike(value)) {
+			each(data, function(value, prop){
+				if(Array.isArray(value)) {
 					if(h.arraySame(enumData, value)) {
 						data[prop] = undefined;
 					} else if(value.length === 1) {
@@ -165,14 +166,14 @@ module.exports = {
 	 * ## Use
 	 *
 	 * ```
-	 * new set.Algebra( extend({}, comparators.rangeInclusive("start","end") ) )
+	 * new set.Algebra( assign({}, comparators.rangeInclusive("start","end") ) )
 	 * ```
 	 */
 	rangeInclusive: function(startIndexProperty, endIndexProperty){
 		var compares = {};
 		var makeResult = function(result, index) {
 			var res = {};
-			h.each(["intersection","difference","union"], function(prop){
+			each(["intersection","difference","union"], function(prop){
 				if(result[prop]) {
 					res[prop] = result[prop][index];
 				}

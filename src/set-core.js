@@ -2,7 +2,10 @@ var h = require("./helpers");
 var clause = require("./clause");
 var compare = require("./compare");
 var get = require("./get");
-
+var assign = require("can-util/js/assign/assign");
+var each = require("can-util/js/each/each");
+var makeArray = require("can-util/js/make-array/make-array");
+var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 
 function Translate(clause, options){
 	if(typeof options === "string") {
@@ -18,7 +21,7 @@ function Translate(clause, options){
 		};
 	}
 	this.clause = clause;
-	h.extend(this, options);
+	assign(this, options);
 }
 /**
  * An `Algebra` internally keeps different properties organized by clause type.
@@ -40,18 +43,18 @@ var Algebra = function(){
 				return setRemainder;
 			},
 			toSet: function(set, wheres){
-				return h.extend(set, wheres);
+				return assign(set, wheres);
 			}
 		})
 	};
 	var self = this;
-	h.each(arguments, function(arg) {
+	each(arguments, function(arg) {
 
 		if(arg) {
 			if(arg instanceof Translate) {
 				self.translators[arg.clause] = arg;
 			} else {
-				h.extend(clauses[arg.constructor.type || 'where'], arg);
+				assign(clauses[arg.constructor.type || 'where'], arg);
 			}
 		}
 	});
@@ -68,7 +71,7 @@ Algebra.make = function(compare, count){
 	}
 };
 
-h.extend(Algebra.prototype, {
+assign(Algebra.prototype, {
 
 	// Breakup `set`'s properties by clauses in the algebra.
 	// options:
@@ -83,7 +86,7 @@ h.extend(Algebra.prototype, {
 
 		options = options || {};
 
-		var setClone = h.extend({}, set);
+		var setClone = assign({}, set);
 
 		var clauses = this.clauses;
 		var checkClauses = ['order', 'paginate','id'];
@@ -101,7 +104,7 @@ h.extend(Algebra.prototype, {
 			checkClauses = h.arrayUnionIntersectionDifference(checkClauses, options.omitClauses).difference;
 		}
 
-		h.each(checkClauses, function(clauseName) {
+		each(checkClauses, function(clauseName) {
 			var valuesForClause = {};
 			var prop;
 
@@ -117,7 +120,7 @@ h.extend(Algebra.prototype, {
 			clauseProps[clauseName] = valuesForClause;
 
 			// if there are properties set for this clause
-			clauseProps.enabled[clauseName] = !h.isEmptyObject(valuesForClause);
+			clauseProps.enabled[clauseName] = !isEmptyObject(valuesForClause);
 		});
 
 		// everything left is where
@@ -131,7 +134,7 @@ h.extend(Algebra.prototype, {
 		var self = this;
 		var differentTypes = [];
 
-		h.each(clause.TYPES, function(type) {
+		each(clause.TYPES, function(type) {
 			if( !self.evaluateOperator(compare.equal, aClauses[type], bClauses[type], {isProperties: true},{isProperties:true}) ) {
 				differentTypes.push(type);
 			}
@@ -149,7 +152,7 @@ h.extend(Algebra.prototype, {
 			if( this.translators[clause] ) {
 				set = this.translators.where.toSet(set, result);
 			} else {
-				set = h.extend(set, result);
+				set = assign(set, result);
 			}
 			return true;
 		}
@@ -164,7 +167,7 @@ h.extend(Algebra.prototype, {
 	evaluateOperator: function(operator, a, b, aOptions, bOptions, evaluateOptions) {
 		aOptions = aOptions || {};
 		bOptions = bOptions || {};
-		evaluateOptions = h.extend({
+		evaluateOptions = assign({
 			evaluateWhere: operator,
 			evaluatePaginate: operator,
 			evaluateOrder: operator,
@@ -366,8 +369,8 @@ h.extend(Algebra.prototype, {
 
 		// ignoring ordering, can we reduce set b into set a?
 		var isSubset = this.subset(
-			h.extend({}, aClauseProps.where, aClauseProps.paginate),
-			h.extend({}, bClauseProps.where, bClauseProps.paginate)
+			assign({}, aClauseProps.where, aClauseProps.paginate),
+			assign({}, bClauseProps.where, bClauseProps.paginate)
 		);
 
 		if(isSubset) {
@@ -400,7 +403,7 @@ h.extend(Algebra.prototype, {
 				return;
 			}
 			else {
-				h.each(options.getUnions, function(filter){
+				each(options.getUnions, function(filter){
 					var items = filter(a,b, aItems, bItems, algebra, options);
 					aItems = items[0];
 					bItems = items[1];
@@ -427,7 +430,7 @@ h.extend(Algebra.prototype, {
 
 var callOnAlgebra = function(methodName, algebraArgNumber) {
 	return function(){
-		var args = h.makeArray(arguments).slice(0, algebraArgNumber);
+		var args = makeArray(arguments).slice(0, algebraArgNumber);
 		var algebra = Algebra.make(arguments[algebraArgNumber]);
 		return algebra[methodName].apply(algebra, args);
 	};
