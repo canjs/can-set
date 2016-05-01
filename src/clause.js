@@ -1,5 +1,5 @@
-var h = require("./helpers");
-
+var assign = require("can-util/js/assign/assign");
+var each = require("can-util/js/each/each");
 var clause = {};
 
 
@@ -20,11 +20,11 @@ clause.TYPES = [
 ];
 
 // define clause type classes
-h.each(clause.TYPES, function(type) {
+each(clause.TYPES, function(type) {
 	var className = type.charAt(0).toUpperCase()+type.substr(1);
 
 	clause[className] = function(compare) {
-		h.extend(this, compare);
+		assign(this, compare);
 	};
 
 	clause[className].type = type;

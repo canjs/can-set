@@ -37,8 +37,9 @@
   "devDependencies": {
     "jshint": "^2.7.0",
     "steal-tools": "^0.15.7",
-    "steal-qunit": "0.1.1",
-    "testee": "^0.2.0"
+    "testee": "^0.2.0",
+    "steal": "^0.15.3",
+    "steal-qunit": "0.1.1"
   },
   "dependencies": {
     "can-util": "^3.0.0-pre.11"
