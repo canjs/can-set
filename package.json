@@ -1,6 +1,6 @@
 {
   "name": "can-set",
-  "version": "0.6.0-pre.0",
+  "version": "0.6.0-pre.1",
   "description": "Set logic for CanJS",
   "main": "src/set.js",
   "scripts": {
@@ -36,10 +36,9 @@
   "homepage": "https://github.com/canjs/can-set",
   "devDependencies": {
     "jshint": "^2.7.0",
-    "steal-tools": "^0.15.3",
+    "steal-tools": "^0.15.7",
     "steal-qunit": "0.1.1",
-    "testee": "^0.2.0",
-    "steal-tools": "^0.15.7"
+    "testee": "^0.2.0"
   },
   "dependencies": {
     "can-util": "^3.0.0-pre.11"
