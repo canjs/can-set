@@ -124,6 +124,14 @@ var cleanUp = function(value, enumData) {
 	}
 	return value;
 };
+var stringConvert = {"0": false, "false": false, "null": undefined, "undefined": undefined};
+var convertToBoolean = function(value){
+	if(typeof value === "string") {
+		return value.toLowerCase() in stringConvert ? stringConvert[value.toLowerCase()] : true
+	}
+
+	return value;
+}
 
 module.exports = {
 	'enum': function(prop, enumData){
@@ -250,6 +258,8 @@ module.exports = {
 		var compares = new clause.Where({});
 		compares[propertyName] = function(propA, propB) {
 			// prop a is probably true
+			propA = convertToBoolean(propA);
+			propB = convertToBoolean(propB);
 			var notA = !propA,
 				notB = !propB;
 			if( propA === notB && propB === notA ) {
@@ -263,6 +273,8 @@ module.exports = {
 					intersection: propB,
 					union: undefined
 				};
+			} else  if(propA === propB) {
+				return true;
 			}
 		};
 		return compares;

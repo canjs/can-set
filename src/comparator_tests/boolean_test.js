@@ -8,16 +8,16 @@ QUnit.module("comparators.boolean");
 /*
  * For the boolean comparator, we define sets like so:
  *
- * For a property p, 
+ * For a property p,
  * x ∈ {} | x.p = true
  * 				 x.p = false
  *
- * 
+ *
  */
 test('boolean set.difference', function() {
 
 	var comparator = comparators.boolean('completed');
-	
+
 	/*
 	 * x ∈ {} | x.completed = true OR x.completed = false
 	 * y ∈ Y | y.completed = true
@@ -73,4 +73,25 @@ test('boolean set.intersection', function(){
 	var comparator = comparators.boolean('completed');
 	var res = set.intersection({foo: "bar"} , { completed: true }, comparator);
 	deepEqual(res, {foo: "bar", completed: true}, "intersection is false (#4)");
+});
+
+
+test('strings false and true are treated as booleans', function(){
+	var comparator = comparators.boolean('completed');
+	var res = set.subset({} , { completed: "true" }, comparator);
+	ok(!res, "{} and 'true' not a subset");
+	res = set.subset({} , { completed: "false" }, comparator);
+	ok(!res, "{} and 'false' not a subset");
+
+	res = set.subset({ completed: "true" }, {}, comparator);
+	ok(res, "subset");
+
+	res = set.subset({ completed: "false" }, {}, comparator);
+	ok(res, "subset");
+
+	res = set.union({completed: 'false'} , { completed: 'true' }, comparator);
+	deepEqual(res, {}, "union of true and false is entire boolean set");
+
+	res = set.equal({completed: false} , { completed: "false" }, comparator);
+	ok(res, "false and 'false'");
 });
