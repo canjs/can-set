@@ -127,11 +127,11 @@ var cleanUp = function(value, enumData) {
 var stringConvert = {"0": false, "false": false, "null": undefined, "undefined": undefined};
 var convertToBoolean = function(value){
 	if(typeof value === "string") {
-		return value.toLowerCase() in stringConvert ? stringConvert[value.toLowerCase()] : true
+		return value.toLowerCase() in stringConvert ? stringConvert[value.toLowerCase()] : true;
 	}
 
 	return value;
-}
+};
 
 module.exports = {
 	'enum': function(prop, enumData){
