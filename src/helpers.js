@@ -210,11 +210,11 @@ module.exports = helpers = {
 	},
 
 	// Gives back the value of an object at a provided dot-separated path string.
-	getValueFromPath(obj, path){
+	getValueFromPath: function(obj, path){
 		path = path.split('.');
 		for (var i = 0; i < path.length; i++){
 			obj = obj[path[i]];
-		};
+		}
 		return obj;
 	},
 
@@ -229,6 +229,7 @@ module.exports = helpers = {
 			desc = parts[1] || '';
 			desc = desc.toLowerCase()	=== 'desc';
 
+		// Support mongodb-style syntax: {$sort: {name: 1}}
 		} else {
 			var path = Object.keys(sortPropValue)[0];
 			var sortDir = sortPropValue[Object.keys(sortPropValue)[0]];
