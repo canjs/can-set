@@ -1,14 +1,37 @@
-var assign = require("can-util/js/assign/assign");
-var each = require("can-util/js/each/each");
-var last = require("can-util/js/last/last");
-
 var IgnoreType = function(){};
 
 var helpers;
 module.exports = helpers = {
+	extend: function(d, s){
+		for(var prop in s) {
+			d[prop] = s[prop];
+		}
+		return d;
+	},
+	isArrayLike: function(arr){
+		return arr && (typeof arr === "object") && (typeof arr.length === "number") && (arr.length >= 0) && (arr.length === 0 || ( (arr.length-1) in arr) );
+	},
+	each: function(obj, cb){
+		if(helpers.isArrayLike(obj)) {
+			for(var i = 0 ; i < obj.length; i++) {
+				if( cb( obj[i], i ) === false ) {
+					break;
+				}
+			}
+		} else {
+			for(var prop in obj) {
+				if( obj.hasOwnProperty(prop) ) {
+					if( cb( obj[prop], prop ) === false ) {
+						break;
+					}
+				}
+			}
+		}
+		return obj;
+	},
 	// loops through all unique props in a and then in b
 	eachInUnique: function(a, acb, b, bcb, defaultReturn){
-		var bCopy = assign({}, b),
+		var bCopy = helpers.extend({}, b),
 			res;
 		for (var prop in a) {
 			res = acb(a[prop], b[prop], a, b, prop );
@@ -24,6 +47,13 @@ module.exports = helpers = {
 			}
 		}
 		return defaultReturn;
+	},
+	makeArray: function(arr){
+		var array = [];
+		helpers.each(arr, function(item){
+			array.push(item);
+		});
+		return array;
 	},
 	doubleLoop: function(arr, callbacks){
 		if(typeof callbacks === "function") {
@@ -51,7 +81,7 @@ module.exports = helpers = {
 	},
 	identityMap: function(arr){
 		var map = {};
-		each(arr, function(value){
+		helpers.each(arr, function(value){
 			map[value] = 1;
 		});
 		return map;
@@ -63,12 +93,12 @@ module.exports = helpers = {
 		var union = [];
 		var difference = arr1.slice(0);
 
-		each(arr1, function(value){
+		helpers.each(arr1, function(value){
 			map[value] = true;
 			union.push(value);
 		});
 
-		each(arr2, function(value){
+		helpers.each(arr2, function(value){
 			if(map[value]) {
 				intersection.push(value);
 				var index = helpers.indexOf.call(difference, value);
@@ -128,12 +158,26 @@ module.exports = helpers = {
 		}
 		return out;
 	},
+	isEmptyObject: function(obj) {
+		var prop;
+
+		for(prop in obj) {
+			if(obj.hasOwnProperty(prop)) {
+				break;
+			}
+		}
+
+		return prop === undefined;
+	},
 	// This is a dummy object that can signal to be ignored
 	ignoreType: new IgnoreType(),
 	firstProp: function(set){
 		for(var prop in set) {
 			return prop;
 		}
+	},
+	last: function(arr){
+		return arr[arr.length -1];
 	},
 	index: function(compare, items, props){
 		if(!items || !items.length) {
@@ -143,7 +187,7 @@ module.exports = helpers = {
 		if( compare(props, items[0]) === -1 ) {
 			return 0;
 		}
-		else if(compare(props, last(items) ) === 1 ) {
+		else if(compare(props, helpers.last(items) ) === 1 ) {
 			return items.length;
 		}
 		var low = 0,
@@ -164,16 +208,40 @@ module.exports = helpers = {
 		return high;
 		// bisect by calling sortFunc
 	},
+
+	// Gives back the value of an object at a provided dot-separated path string.
+	getValueFromPath(obj, path){
+		path = path.split('.');
+		for (var i = 0; i < path.length; i++){
+			obj = obj[path[i]];
+		};
+		return obj;
+	},
+
 	defaultSort: function(sortPropValue, item1, item2) {
-		var parts = sortPropValue.split(' ');
-		var sortProp = parts[0];
-		var item1Value = item1[sortProp];
-		var item2Value = item2[sortProp];
-		var temp;
-		var desc = parts[1] || '';
-		desc = desc.toLowerCase()	=== 'desc';
+		var parts = [], sortProp, item1Value, item2Value, desc;
+
+		if (typeof sortPropValue === 'string') {
+			parts = sortPropValue.split(' ');
+			sortProp = parts[0];
+			item1Value = item1[sortProp];
+			item2Value = item2[sortProp];
+			desc = parts[1] || '';
+			desc = desc.toLowerCase()	=== 'desc';
+
+		} else {
+			var path = Object.keys(sortPropValue)[0];
+			var sortDir = sortPropValue[Object.keys(sortPropValue)[0]];
+			if (sortDir === -1) {
+				desc = true;
+			}
+
+			item1Value = helpers.getValueFromPath(item1, path);
+			item2Value = helpers.getValueFromPath(item2, path);
+		}
 
 		if(desc) {
+			var temp;
 			temp = item1Value;
 			item1Value = item2Value;
 			item2Value = temp;
