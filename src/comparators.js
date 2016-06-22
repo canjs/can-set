@@ -134,6 +134,18 @@ var convertToBoolean = function(value){
 };
 
 module.exports = {
+	/**
+	 * @function can-set.comparators.enum
+	 * @parent can-set.comparators
+	 *
+	 * @signature `set.comparators.enum(property, propertyValues)`
+	 *
+	 * Makes a comparator for a set of values.
+	 *
+	 * ```
+	 * var compare = set.comparators.enum("type", ["new","accepted","pending","resolved"])
+	 * ```
+	 */
 	'enum': function(prop, enumData){
 		var compares = new clause.Where({});
 		compares[prop] = function(vA, vB, A, B){
@@ -162,20 +174,20 @@ module.exports = {
 		return compares;
 	},
 	/**
+	 * @function can-set.comparators.rangeInclusive
+	 * @parent can-set.comparators
+	 *
+	 * @description Supports ranged properties.
+	 *
+	 * @signature `set.comparators.rangeInclusive(startIndexProperty, endIndexProperty)`
+	 *
 	 * Makes a comparator for two ranged properties that specify a range of items
 	 * that includes both the startIndex and endIndex.  For example, a range of
 	 * [0,20] loads 21 items.
 	 *
-	 * @param {String} startIndexProperty
-	 * @param {String} endIndexProperty
-	 *
-	 * @body
-	 *
-	 * ## Use
-	 *
-	 * ```
-	 * new set.Algebra( assign({}, comparators.rangeInclusive("start","end") ) )
-	 * ```
+	 *   @param  {String} startIndexProperty The starting property name
+	 *   @param  {String} endIndexProperty The ending property name
+	 *   @return {can-set.compares} Returns a comparator
 	 */
 	rangeInclusive: function(startIndexProperty, endIndexProperty){
 		var compares = {};
@@ -251,8 +263,24 @@ module.exports = {
 		return new clause.Paginate(compares);
 	},
 	/**
-	 * @function
-	 * Makes boolean
+	 * @function can-set.comparators.boolean
+	 * @parent can-set.comparators
+	 *
+	 * @description Supports boolean properties.
+	 *
+	 * @signature `set.comparators.boolean(property)`
+	 *
+	 * Makes a compare object with a `property` function that has the following logic:
+	 *
+	 * ```js
+	 * A(true) ∪ B(false) = undefined
+	 *
+	 * A(undefined) \ B(true) = false
+	 * A(undefined) \ B(false) = true
+	 * ```
+	 *
+	 * It understands that `true` and `false` are complementary sets that combined to `undefined`. Another way to think of this is that if you load `{complete: false}` and `{complete: true}` you've loaded `{}`.
+	 *
 	 */
 	"boolean": function(propertyName) {
 		var compares = new clause.Where({});
@@ -279,6 +307,36 @@ module.exports = {
 		};
 		return compares;
 	},
+	/**
+	 * @function can-set.comparators.sort
+	 * @parent can-set.comparators
+	 *
+	 * @description Defines the sortable property and behavior.
+	 *
+	 * @signature `set.comparators.sort(prop, [sortFunc])`
+	 *
+	 * Defines the sortable property and behavior.
+	 *
+	 * ```js
+	 * var algebra = new set.Algebra(set.comparators.sort("sortBy"));
+	 * algebra.index(
+	 *   {sortBy: "name desc"},
+	 *   [{name: "Meyer"}],
+	 *   {name: "Adams"}) //-> 1
+	 *
+	 * algebra.index(
+	 *   {sortBy: "name"},
+	 *   [{name: "Meyer"}],
+	 *   {name: "Adams"}) //-> 0
+	 * ```
+	 *
+	 *   @param  {String} prop The sortable property.
+	 *   @param  {function(sortPropValue, item1, item2)} [sortFunc] The
+	 *   sortable behavior. The default behavior assumes the sort property value
+	 *   looks like `PROPERTY DIRECTION` (ex: `name desc`).
+	 *   @return {can-set.compares} Returns a compares that can be used to create
+	 *   a `set.Algebra`.
+	 */
 	"sort": function(prop, sortFunc) {
 		if(!sortFunc) {
 			sortFunc = h.defaultSort;
@@ -287,6 +345,35 @@ module.exports = {
 		compares[prop] = sortFunc;
 		return new clause.Order(compares);
 	},
+	/**
+	 * @function can-set.comparators.id
+	 * @parent can-set.comparators
+	 *
+	 * @description Defines the identify property.
+	 *
+	 * @signature `set.comparators.id(prop)`
+	 *
+	 * Defines the property name on items that uniquely
+	 * identifies them. This is the default sorted property if no
+	 * [can-set.comparators.sort] is provided.
+	 *
+	 * ```js
+	 * var algebra = new set.Algebra(set.comparators.id("_id"));
+	 * algebra.index(
+	 *   {sortBy: "name desc"},
+	 *   [{name: "Meyer"}],
+	 *   {name: "Adams"}) //-> 1
+	 *
+	 * algebra.index(
+	 *   {sortBy: "name"},
+	 *   [{name: "Meyer"}],
+	 *   {name: "Adams"}) //-> 0
+	 * ```
+	 *
+	 *   @param  {String} prop The property name that defines the unique property id.
+	 *   @return {can-set.compares} Returns a compares that can be used to create
+	 *   a `set.Algebra`.
+	 */
 	"id": function(prop){
 		var compares = {};
 		compares[prop] = prop;

@@ -39,9 +39,26 @@
     "steal-tools": "^0.15.7",
     "testee": "^0.2.0",
     "steal": "^0.15.3",
-    "steal-qunit": "0.1.1"
+    "steal-qunit": "0.1.1",
+    "bit-docs": "^0.0.7"
   },
   "dependencies": {
     "can-util": "^3.0.0-pre.11"
+  },
+  "bit-docs": {
+    "dependencies": {
+      "bit-docs-glob-finder": "^0.0.5",
+      "bit-docs-dev": "^0.0.3",
+      "bit-docs-js": "^0.0.4",
+      "bit-docs-generate-readme": "^0.0.10"
+    },
+    "glob": {
+      "pattern": "**/*.{js,md}",
+      "ignore": "node_modules/**/*"
+    },
+    "parent": "can-set",
+    "readme": {
+      "apis": "./docs/apis.json"
+    }
   }
 }
