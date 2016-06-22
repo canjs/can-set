@@ -1,0 +1,24 @@
+[
+    {"can-set.Algebra": [
+        "can-set.compares",
+        "can-set.comparator",
+        "can-set.Algebra.prototype.difference",
+        "can-set.Algebra.prototype.equal",
+        "can-set.Algebra.prototype.getSubset",
+        "can-set.Algebra.prototype.getUnion",
+        "can-set.Algebra.prototype.index",
+        "can-set.Algebra.prototype.intersection",
+        "can-set.Algebra.prototype.has",
+        "can-set.Algebra.prototype.properSubset",
+        "can-set.Algebra.prototype.subset",
+        "can-set.Algebra.prototype.union"
+    ]},
+    {"can-set.comparators": [
+        "can-set.comparators.boolean",
+        "can-set.comparators.rangeInclusive",
+        "can-set.comparators.enum",
+        "can-set.comparators.sort",
+        "can-set.comparators.id"
+    ]},
+    "can-set.Translate"
+]
