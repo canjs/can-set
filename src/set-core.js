@@ -7,6 +7,30 @@ var each = require("can-util/js/each/each");
 var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 
+/**
+ * @function can-set.Translate
+ * @parent can-set
+ * @signature `new set.Translate(clauseType, propertyName)`
+ *
+ * Localizes a clause's properties within another nested property.
+ *
+ * ```js
+ * var algebra = new set.Algebra(
+ *   new set.Translate("where","$where")
+ * );
+ * algebra.has(
+ *   {$where: {complete: true}},
+ *   {id: 5, complete: true}
+ * ) //-> true
+ * ```
+ *
+ * This is useful when filters (which are `where` clauses) are
+ * within a nested object.
+ *
+ *   @param {String} clause A clause type.  One of `'where'`, `'order'`, `'paginate'`, `'id'`.
+ *   @param {String|Object} propertyName The property name which contains the clauses's properties.
+ *   @return {set.compares} A set compares object that can do the translation.
+ */
 function Translate(clause, options){
 	if(typeof options === "string") {
 		var path = options;
@@ -223,9 +247,42 @@ assign(Algebra.prototype, {
 
 		return result && useSet ? set : result;
 	},
+	/**
+	 * @function can-set.Algebra.prototype.equal
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.equal(a, b)`
+	 *
+	 *   Returns true if the two sets the exact same.
+	 *
+	 *   ```js
+	 *   algebra.equal({type: "critical"}, {type: "critical"}) //-> true
+	 *   ```
+	 *
+	 * @param  {can-set.set} a A set.
+	 * @param  {can-set.set} b A set.
+	 * @return {Boolean} True if the two sets are equal.
+	 */
 	equal: function(a, b) {
 		return this.evaluateOperator(compare.equal, a, b);
 	},
+	/**
+	 * @function can-set.Algebra.prototype.subset
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.subset(a, b)`
+	 *
+	 * Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_ (_A_ ⊆ _B_).
+	 *
+	 * ```js
+	 * algebra.subset({type: "critical"}, {}) //-> true
+	 * algebra.subset({}, {}) //-> true
+	 * ```
+	 *
+	 * @param  {can-set.set} a A set.
+	 * @param  {can-set.set} b A set.
+	 * @return {Boolean} `true` if `a` is a subset of `b`.
+	 */
 	subset: function(a, b) {
 		var aClauseProps = this.getClauseProperties(a);
 		var bClauseProps = this.getClauseProperties(b);
@@ -249,24 +306,57 @@ assign(Algebra.prototype, {
 
 		return result;
 	},
+	/**
+	 * @function can-set.Algebra.prototype.properSubset
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.properSubset(a, b)`
+	 *
+	 * Returns true if _A_ is a strict subset of _B_ (_A_ ⊂ _B_).
+	 *
+	 * ```js
+	 * algebra.properSubset({type: "critical"}, {}) //-> true
+	 * algebra.properSubset({}, {}) //-> false
+	 * ```
+	 *
+	 *   @param  {can-set.set} a A set.
+	 *   @param  {can-set.set} b A set.
+	 *   @return {Boolean} `true` if `a` is a subset of `b` and not equal to `b`.
+	 */
 	properSubset: function(a, b){
 		return this.subset(a, b) && !this.equal(a, b);
 	},
-	// what a has that b doesn't
 	/**
+	 * @function can-set.Algebra.prototype.difference
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.difference(a, b)`
+	 *
+	 * Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_), or
+	 * returns if a difference exists.
+	 *
+	 * ```js
+	 * algebra1 = new set.Algebra(set.comparators.boolean("completed"));
+	 * algebra2 = new set.Algebra();
+	 *
 	 * // A has all of B
-	 * set.difference( {} , {completed: true}, set.boolean("completed") ) //-> {completed: false}
+	 * algebra1.difference( {} , {completed: true} ) //-> {completed: false}
 	 *
 	 * // A has all of B, but we can't figure out how to create a set object
-	 * set.difference( {} , {completed: true} ) //-> undefined
-	 *
-	 * // Same sets
-	 * set.difference( {} , {} ) //-> false
+	 * algebra2.difference( {} , {completed: true} ) //-> true
 	 *
 	 * // A is totally inside B
-	 * set.difference( {completed: true}, {} ) //-> undefined
-	 * @param {Object} a
-	 * @param {Object} b
+	 * algebra2.difference( {completed: true}, {} )  //-> false
+	 * ```
+	 *
+	 *   @param  {can-set.set} a A set.
+	 *   @param  {can-set.set} b A set.
+	 *   @return {can-set.set|Boolean} If an object is returned, it is difference of sets _A_ and _B_ (_A_ \ _B_).
+	 *
+	 *   If `true` is returned, that means that _B_ is a subset of _A_, but no set object
+	 *   can be returned that represents that set.
+	 *
+	 *   If `false` is returned, that means there is no difference or the sets are not comparable.
 	 */
 	difference: function(a, b) {
 		var aClauseProps = this.getClauseProperties(a);
@@ -300,17 +390,107 @@ assign(Algebra.prototype, {
 
 		return result;
 	},
+	/**
+	 * @function can-set.Algebra.prototype.union
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.union(a, b)`
+	 *
+	 * Returns a set that represents the union of _A_ and _B_ (_A_ ∪ _B_).
+	 *
+	 * ```js
+	 * algebra.union(
+	 *   {start: 0, end: 99},
+	 *   {start: 100, end: 199},
+	 * ) //-> {start: 0, end: 199}
+	 * ```
+	 *
+	 *   @param  {can-set.set} a A set.
+	 *   @param  {can-set.set} b A set.
+	 *   @return {can-set.set|undefined} If an object is returned, it is the union of _A_ and _B_ (_A_ ∪ _B_).
+	 *
+	 *   If `undefined` is returned, it means a union can't be created.
+	 */
 	union: function(a, b){
 		// if everything is equal or has a difference
 		return this.evaluateOperator(compare.union, a, b);
 	},
+	/**
+	 * @function can-set.Algebra.prototype.intersection
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.intersection(a, b)`
+	 *
+	 * Returns a set that represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
+	 *
+	 * ```js
+	 * algebra.intersection(
+	 *   {completed: true, due: "tomorrow"},
+	 *   {completed: true, type: "critical"},
+	 * ) //-> {completed: true, due: "tomorrow", type: "critical"}
+	 * ```
+	 *
+	 *   @param  {[type]} a A set.
+	 *   @param  {[type]} b A set.
+	 *   @return {can-set.set|Boolean} If an object is returned, it
+	 *   represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
+	 *
+	 *   If `true` is returned, that means that an intersection exists, but no set object
+	 *   can be returned that represents that set.
+	 *
+	 *   If `false` is returned, that means there is intersection.
+	 */
 	intersection: function(a, b){
 		// if everything is equal or has a difference
 		return this.evaluateOperator(compare.intersection, a, b);
 	},
-	count: function(a){
-		return this.evaluateOperator(compare.count, a, {});
+	/**
+	 * @function can-set.Algebra.prototype.intersection
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.count(set)`
+	 *
+	 * Returns the number of items that might be loaded by the `set`. This makes use of set.Algebra's
+	 * By default, this returns Infinity.
+	 *
+	 * ```js
+	 * var algebra =  new set.Algebra({
+	 *   set.comparators.rangeInclusive("start", "end")
+	 * });
+	 * algebra.count({start: 10, end: 19}) //-> 10
+	 * algebra.count({}) //-> Infinity
+	 * ```
+	 *
+	 *   @param  {can-set.set} set [description]
+	 *   @return {Number} The number of items in the set if known, `Infinity`
+	 *   if unknown.
+	 */
+	count: function(set){
+		return this.evaluateOperator(compare.count, set, {});
 	},
+	/**
+	 * @function can-set.Algebra.prototype.has
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.has(set, props)`
+	 *
+	 * Used to tell if the `set` contains the instance object `props`.
+	 *
+	 * ```
+	 * var algebra = new set.Algebra(
+	 *   new set.Translate("where","$where")
+	 * );
+	 * algebra.has(
+	 *   {"$where": {playerId: 5}},
+	 *   {id: 5, type: "3pt", playerId: 5, gameId: 7}
+	 * ) //-> true
+	 * ```
+	 *
+	 *   @param  {can-set.set} set A set.
+	 *   @param  {Object} props An instance's raw data.
+	 *   @return {Boolean} Returns `true` if `props` belongs in `set` and
+	 *   `false` it not.
+	 */
 	has: function(set, props){
 		// there is a `this.where`, `this.paginate`, etc clause on this object
 		// if where is shifted ... we need to restore it later.
@@ -338,6 +518,35 @@ assign(Algebra.prototype, {
 
 		return result;
 	},
+	/**
+	 * @function can-set.Algebra.prototype.index
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.index(set, items, item)`
+	 *
+	 * Returns where `item` should be inserted into `items` which is represented by `set`.
+	 *
+	 * ```js
+	 * algebra = new set.Algebra(
+	 *   set.comparators.sort("orderBy")
+	 * );
+	 * algebra.index(
+	 *   {orderBy: "age"},
+	 *   [{id: 1, age: 3},{id: 2, age: 5},{id: 3, age: 8},{id: 4, age: 10}],
+	 *   {id: 6, age: 3}
+	 * )  //-> 2
+	 * ```
+	 *
+	 * The default sort property is what is specified by
+	 * [can-set.comparators.id]. This means if that if the sort property
+	 * is not specified, it will assume the set is sorted by the specified
+	 * id property.
+	 *
+	 *   @param  {can-set.set} set The `set` that describes `items`.
+	 *   @param  {Array<Object>} items An array of data objects.
+	 *   @param  {Object} item The data object to be inserted.
+	 *   @return {Number} The position to insert `item`.
+	 */
 	index: function(set, items, item){
 		var aClauseProps = this.getClauseProperties(set);
 		var propName = h.firstProp(aClauseProps.order),
@@ -362,6 +571,30 @@ assign(Algebra.prototype, {
 		// undefined so the behavior can be figured out by the behavior
 		return;
 	},
+	/**
+	 * @function can-set.Algebra.prototype.getSubset
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.getSubset(a, b, bData)`
+	 *
+	 * Gets `a` set's items given a super set `b` and its items.
+	 *
+	 * ```js
+	 * algebra.getSubset(
+	 *   {type: "dog"},
+	 *   {},
+	 *   [{id: 1, type:"cat"},
+	 *    {id: 2, type: "dog"},
+	 *    {id: 3, type: "dog"},
+	 *    {id: 4, type: "zebra"}]
+	 * ) //-> [{id: 2, type: "dog"},{id: 3, type: "dog"}]
+	 * ```
+	 *
+	 *   @param  {can-set.set} a The set whose data will be returned.
+	 *   @param  {can-set.set} b A superset of set `a`.
+	 *   @param  {Array<Object>} bData The data in set `b`.
+	 *   @return {Array<Object>} The data in set `a`.
+	 */
 	getSubset: function(a, b, bData) {
 
 		var aClauseProps = this.getClauseProperties(a);
@@ -378,6 +611,32 @@ assign(Algebra.prototype, {
 		}
 	},
 	// given two sets and their data, make a union of their data
+	/**
+	 * @function can-set.Algebra.prototype.getUnion
+	 * @parent can-set.Algebra.prototype
+	 *
+	 * @signature `algebra.getUnion(a, b, aItems, bItems)`
+	 *
+	 * Unifies items from set A and setB into a single array of items.
+	 *
+	 * ```js
+	 * algebra = new set.Algebra(
+	 *   set.comparators.rangeInclusive("start","end")
+	 * );
+	 * algebra.getUnion(
+	 *   {start: 1,end: 2},
+	 *   {start: 2,end: 4},
+	 *   [{id: 1},{id: 2}],
+	 *   [{id: 2},{id: 3},{id: 4}]);
+	 *   //-> [{id: 1},{id: 2},{id: 3},{id: 4}]
+	 * ```
+	 *
+	 *   @param  {can-set.set} a A set.
+	 *   @param  {can-set.set} b A set.
+	 *   @param  {Array<Object>} aItems Set `a`'s items.
+	 *   @param  {Array<Object>} bItems Set `b`'s items.
+	 *   @return {Array<Object>} Returns items in both set `a` and set `b`.
+	 */
 	getUnion: function(a,b,aItems, bItems){
 
 		var aClauseProps = this.getClauseProperties(a);

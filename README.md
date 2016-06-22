@@ -16,26 +16,31 @@ utilities and middleware for the client.
 
 [Play around in this JSBin!](https://justinbmeyer.jsbin.com/faveda/4/edit?js,console)
 
+- [Install](#install)
+- [Use](#use)
+- [API](#api)
+- <code>[new set.Algebra(compares...)](#new-setalgebracompares)</code>
+  - <code>[compares Object\<String,comparator()\>](#compares-objectstringcomparator)</code>
+  - <code>[comparator(aValue, bValue, a, b, prop, algebra)](#comparatoravalue-bvalue-a-b-prop-algebra)</code>
+  - <code>[algebra.difference(a, b)](#algebradifferencea-b)</code>
+  - <code>[algebra.equal(a, b)](#algebraequala-b)</code>
+  - <code>[algebra.getSubset(a, b, bData)](#algebragetsubseta-b-bdata)</code>
+  - <code>[algebra.getUnion(a, b, aItems, bItems)](#algebragetuniona-b-aitems-bitems)</code>
+  - <code>[algebra.index(set, items, item)](#algebraindexset-items-item)</code>
+  - <code>[algebra.count(set)](#algebracountset)</code>
+  - <code>[algebra.has(set, props)](#algebrahasset-props)</code>
+  - <code>[algebra.properSubset(a, b)](#algebrapropersubseta-b)</code>
+  - <code>[algebra.subset(a, b)](#algebrasubseta-b)</code>
+  - <code>[algebra.union(a, b)](#algebrauniona-b)</code>
+- <code>[can-set.comparators Object](#can-setcomparators-object)</code>
+  - <code>[set.comparators.boolean(property)](#setcomparatorsbooleanproperty)</code>
+  - <code>[set.comparators.rangeInclusive(startIndexProperty, endIndexProperty)](#setcomparatorsrangeinclusivestartindexproperty-endindexproperty)</code>
+  - <code>[set.comparators.enum(property, propertyValues)](#setcomparatorsenumproperty-propertyvalues)</code>
+  - <code>[set.comparators.sort(prop, [sortFunc])](#setcomparatorssortprop-sortfunc)</code>
+  - <code>[set.comparators.id(prop)](#setcomparatorsidprop)</code>
+- <code>[new set.Translate(clauseType, propertyName)](#new-settranslateclausetype-propertyname)</code>
+- [Contributing](#contributing)
 
-> - Install
-> - Use
-> - API
->   - [Algebra](#setalgebra)
->   - [comparators](#setcomparators)
->     - [boolean](#setcomparatorsboolean)
->     - [enum](#setcomparatorsenum)
->     - [rangeInclusive](#setcomparatorsrangeinclusive)
->   - [equal](#algebraequal)
->   - [subset](#algebrasubset)
->   - [properSubset](#algebrapropersubset)
->   - [intersection](#algebraintersection)
->   - [difference](#algebradifference)
->   - [union](#algebraunion)
->   - [count](#algebracount)
->   - [getUnion](#algebragetunion)
->   - [getSubset](#algebragetsubset)
-
-> - [Contributing](#contributing)
 
 ## Install
 
@@ -121,30 +126,34 @@ var getTodos = function(set, cb) {
 
 ## API
 
-In __can-set__ a set is a plain JavaScript object
-like `{start: 0, end: 100, filter: "top"}`.  Often, these are the
-parameters you pass to the server to retrieve some list of data.
 
-Unlike [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)), these
-set objects don't contain the items of the set, instead they represent the items within the set.
+## <code>new set.Algebra(compares...)</code>
 
-### Special Sets
 
-Unlike in common [set mathmatics](http://en.wikipedia.org/wiki/Set_(mathematics)) the set `{}` represents the
-superset of all sets.  For instance if you load all items represented by set `{}`, you have loaded
-every item in that "universe".
+Creates an object that can perform binary operations on sets with
+an awareness of how certain properties represent the set.
 
-## set.Algebra
+```js
+var set = require("can-set");
+var algebra = new set.Algebra(
+  set.comparators.boolean("completed"),
+  set.comparators.id("_id")
+);
+```
 
-`new set.Algebra(compares...)`
 
-Creates an object that can perform binary operations on sets with an awareness of
-how certain properties represent the set.
+1. __compares__ <code>{[compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra)}</code>:
+  Each argument is a compares. These
+  are returned by the functions on [can-set.comparators](#-object) or can be created
+  manually.
 
-### compares `Object<String: comparator>`
+
+- __returns__ <code>{[can-set.Algebra](#new-setalgebracompares)([compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra))}</code>:
+  Returns an instance of an algebra.
+
+### compares `{Object\<String,comparator()\>}`
 
 An object of property names and `comparator` functions.
-
 ```js
 {
   // return `true` if the values should be considered the same:
@@ -154,154 +163,57 @@ An object of property names and `comparator` functions.
 }
 ```
 
-### comparator(aValue, bValue, a, b, prop, algebra)
+
+
+
+
+### <code>comparator(aValue, bValue, a, b, prop, algebra)</code>
+
 
 A comparator function returns algebra values for two values for a given property.
 
 
-#### params
+1. __aValue__ <code>{*}</code>:
+  The value of A's property in a set difference A and B (A  B).
+1. __bValue__ <code>{*}</code>:
+  The value of A's property in a set difference A and B (A  B).
+1. __a__ <code>{*}</code>:
+  The A set in a set difference A and B (A  B).
+1. __b__ <code>{*}</code>:
+  The B set in a set difference A and B (A  B).
 
-- `aValue` - the value of A's property in a set difference A and B (A \ B).
-- `bValue` - the value of A's property in a set difference A and B (A \ B).
-- `a` - the A set in a set difference A and B (A \ B).
-- `a` - the B set in a set difference A and B (A \ B).
+- __returns__ <code>{Object|Boolean}</code>:
+  A comparator function should either return a Boolean which indicates if `aValue` and `bValue` are
+  equal or an `AlgebraResult` object that details information about the union, intersection, and difference of `aValue` and `bValue`.
 
-#### returns
+  An `AlgebraResult` object has the following values:
 
-A comparator function should either return a Boolean which indicates if `aValue` and `bValue` are
-equal or an `AlgebraResult` object that details information about the union, intersection, and
-difference of `aValue` and `bValue`.
+  - `union` - A value the represents the union of A and B.
+  - `intersection` - A value that represents the intersection of A and B.
+  - `difference` - A value that represents all items in A that are not in B.
+  - `count` - The count of the items in A.
 
-An `AlgebraResult` object has the following values:
+  For example, if you had a `colors` property and A is `["Red","Blue"]` and B is `["Green","Yellow","Blue"]`, the
+  AlgebraResult object might look like:
 
-- [union] - A value the represents the union of A and B.
-- [intersection] - A value that represents the intersection of A and B.
-- [difference] - A value that represents all items in A that are not in B.
-- [count] - The count of the items in A.
-
-For example, if you had a `colors` property and A is `["Red","Blue"]` and B is `["Green","Yellow","Blue"]`, the
-AlgebraResult object might look like:
-
-```js
-{
-  union: ["Red","Blue","Green","Yellow"],
-  intersection: ["Blue"],
-  difference: ["Red"],
-  count: 2000
-}
-```
-
-The count is `2000` because there might be 2000 items represented by colors "Red" and "Blue".  Often
-the real number can not be known.
-
-## set.comparators
-
-The following functions create `compares` objects that can be mixed together to create a set `Algebra`.
-
-```js
-var algebra = new set.Algebra(
+  ```js
   {
-    // ignore this property in set algebra
-    sessionId:  function(){ return true }
-  },
-  set.comparators.boolean("completed"),
-  set.comparators.rangeInclusive("start","end")
-);
-```
+    union: ["Red","Blue","Green","Yellow"],
+    intersection: ["Blue"],
+    difference: ["Red"],
+    count: 2000
+  }
+  ```
 
-### set.comparators.boolean
-
-`set.comparators.boolean(property) -> compare`
-
-Makes a compare object with a `property` function that has the following logic:
-
-```
-A(true) ∪ B(false) = undefined
-
-A(undefined) \ B(true) = false
-A(undefined) \ B(false) = true
-```
-
-It understands that `true` and `false` are complementary sets that
-combined to `undefined`.  Another way to think of this is that if you
-load `{complete: false}` and `{complete: true}` you've loaded `{}`.
-
-### set.comparators.rangeInclusive
-
-`set.comparators.rangeInclusive(startIndexProperty, endIndexProperty) -> compare`
-
-Makes a comparator for two ranged properties that specify a range of items
-that includes both the startIndex and endIndex.  For example, a range of
-[0,20] loads 21 items.
-
-### set.comparators.enum
-
-`set.comparators.enum(property, propertyValues) -> compare`
-
-Makes a comparator for a set of values.
-
-```
-var compare = set.comparators.enum("type", ["new","accepted","pending","resolved"])
-```
-
-## algebra.equal
-
-`algebra.equal(a, b) -> Boolean`
-
-Returns true if the two sets the exact same.
-
-```js
-algebra.equal({type: "critical"}, {type: "critical"}) //-> true
-```
-
-## algebra.subset
-
-Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_ (_A_ ⊆ _B_).
-
-`algebra.subset(a, b) -> Boolean`
-
-```js
-algebra.subset({type: "critical"}, {}) //-> true
-algebra.subset({}, {}) //-> true
-```
-
-## algebra.properSubset
-
-Returns true if _A_ is a strict subset of _B_ (_A_ ⊂ _B_).
-
-`algebra.properSubset(a, b)`
+  The count is `2000` because there might be 2000 items represented by colors "Red" and "Blue".  Often
+  the real number can not be known.
 
 
-```js
-algebra.properSubset({type: "critical"}, {}) //-> true
-algebra.properSubset({}, {}) //-> false
-```
+### <code>algebra.difference(a, b)</code>
 
-## algebra.intersection
-
-`algebra.intersection(a, b, algebra) -> set`
-
-Returns a set that represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
-
-```js
-algebra.intersection(
-  {completed: true, due: "tomorrow"},
-  {completed: true, type: "critical"},
-) //-> {completed: true, due: "tomorrow", type: "critical"}
-```
-
-
-## algebra.difference
-
-`algebra.difference(a, b) -> set|true|false`
 
 Returns a set that represents the difference of sets _A_ and _B_ (_A_ \ _B_), or
 returns if a difference exists.
-
-If `true` is returned, that means that _B_ is a subset of _A_, but no set object
-can be returned that represents that set.
-
-If `false` is returned, that means there is no difference or the sets are not comparable.
 
 ```js
 algebra1 = new set.Algebra(set.comparators.boolean("completed"));
@@ -317,9 +229,223 @@ algebra2.difference( {} , {completed: true} ) //-> true
 algebra2.difference( {completed: true}, {} )  //-> false
 ```
 
-## algebra.union
 
-`algebra.union(a, b) -> set | undefined`
+1. __a__ <code>{can-set.set}</code>:
+  A set.
+1. __b__ <code>{can-set.set}</code>:
+  A set.
+
+- __returns__ <code>{can-set.set|Boolean}</code>:
+  If an object is returned, it is difference of sets _A_ and _B_ (_A_ \ _B_).
+
+  If `true` is returned, that means that _B_ is a subset of _A_, but no set object
+  can be returned that represents that set.
+
+  If `false` is returned, that means there is no difference or the sets are not comparable.
+
+
+### <code>algebra.equal(a, b)</code>
+
+
+  Returns true if the two sets the exact same.
+
+  ```js
+  algebra.equal({type: "critical"}, {type: "critical"}) //-> true
+  ```
+
+
+1. __a__ <code>{can-set.set}</code>:
+  A set.
+1. __b__ <code>{can-set.set}</code>:
+  A set.
+
+- __returns__ <code>{Boolean}</code>:
+  True if the two sets are equal.
+
+
+### <code>algebra.getSubset(a, b, bData)</code>
+
+
+Gets `a` set's items given a super set `b` and its items.
+
+```js
+algebra.getSubset(
+  {type: "dog"},
+  {},
+  [{id: 1, type:"cat"},
+   {id: 2, type: "dog"},
+   {id: 3, type: "dog"},
+   {id: 4, type: "zebra"}]
+) //-> [{id: 2, type: "dog"},{id: 3, type: "dog"}]
+```
+
+
+1. __a__ <code>{can-set.set}</code>:
+  The set whose data will be returned.
+1. __b__ <code>{can-set.set}</code>:
+  A superset of set `a`.
+1. __bData__ <code>{Array\<Object\>}</code>:
+  The data in set `b`.
+
+- __returns__ <code>{Array\<Object\>}</code>:
+  The data in set `a`.
+
+
+### <code>algebra.getUnion(a, b, aItems, bItems)</code>
+
+
+Unifies items from set A and setB into a single array of items.
+
+```js
+algebra = new set.Algebra(
+  set.comparators.rangeInclusive("start","end")
+);
+algebra.getUnion(
+  {start: 1,end: 2},
+  {start: 2,end: 4},
+  [{id: 1},{id: 2}],
+  [{id: 2},{id: 3},{id: 4}]);
+  //-> [{id: 1},{id: 2},{id: 3},{id: 4}]
+```
+
+
+1. __a__ <code>{can-set.set}</code>:
+  A set.
+1. __b__ <code>{can-set.set}</code>:
+  A set.
+1. __aItems__ <code>{Array\<Object\>}</code>:
+  Set `a`'s items.
+1. __bItems__ <code>{Array\<Object\>}</code>:
+  Set `b`'s items.
+
+- __returns__ <code>{Array\<Object\>}</code>:
+  Returns items in both set `a` and set `b`.
+
+
+### <code>algebra.index(set, items, item)</code>
+
+
+Returns where `item` should be inserted into `items` which is represented by `set`.
+
+```js
+algebra = new set.Algebra(
+  set.comparators.sort("orderBy")
+);
+algebra.index(
+  {orderBy: "age"},
+  [{id: 1, age: 3},{id: 2, age: 5},{id: 3, age: 8},{id: 4, age: 10}],
+  {id: 6, age: 3}
+)  //-> 2
+```
+
+The default sort property is what is specified by
+[can-set.comparators.id](#setcomparatorsidprop). This means if that if the sort property
+is not specified, it will assume the set is sorted by the specified
+id property.
+
+
+1. __set__ <code>{can-set.set}</code>:
+  The `set` that describes `items`.
+1. __items__ <code>{Array\<Object\>}</code>:
+  An array of data objects.
+1. __item__ <code>{Object}</code>:
+  The data object to be inserted.
+
+- __returns__ <code>{Number}</code>:
+  The position to insert `item`.
+
+
+### <code>algebra.count(set)</code>
+
+
+Returns the number of items that might be loaded by the `set`. This makes use of set.Algebra's
+By default, this returns Infinity.
+
+```js
+var algebra =  new set.Algebra({
+  set.comparators.rangeInclusive("start", "end")
+});
+algebra.count({start: 10, end: 19}) //-> 10
+algebra.count({}) //-> Infinity
+```
+
+
+1. __set__ <code>{can-set.set}</code>:
+  [description]
+
+- __returns__ <code>{Number}</code>:
+  The number of items in the set if known, `Infinity`
+  if unknown.
+
+
+### <code>algebra.has(set, props)</code>
+
+
+Used to tell if the `set` contains the instance object `props`.
+
+```
+var algebra = new set.Algebra(
+  new set.Translate("where","$where")
+);
+algebra.has(
+  {"$where": {playerId: 5}},
+  {id: 5, type: "3pt", playerId: 5, gameId: 7}
+) //-> true
+```
+
+
+1. __set__ <code>{can-set.set}</code>:
+  A set.
+1. __props__ <code>{Object}</code>:
+  An instance's raw data.
+
+- __returns__ <code>{Boolean}</code>:
+  Returns `true` if `props` belongs in `set` and
+  `false` it not.
+
+
+### <code>algebra.properSubset(a, b)</code>
+
+
+Returns true if _A_ is a strict subset of _B_ (_A_ ⊂ _B_).
+
+```js
+algebra.properSubset({type: "critical"}, {}) //-> true
+algebra.properSubset({}, {}) //-> false
+```
+
+
+1. __a__ <code>{can-set.set}</code>:
+  A set.
+1. __b__ <code>{can-set.set}</code>:
+  A set.
+
+- __returns__ <code>{Boolean}</code>:
+  `true` if `a` is a subset of `b` and not equal to `b`.
+
+
+### <code>algebra.subset(a, b)</code>
+
+
+Returns true if _A_ is a subset of _B_ or _A_ is equal to _B_ (_A_ ⊆ _B_).
+
+```js
+algebra.subset({type: "critical"}, {}) //-> true
+algebra.subset({}, {}) //-> true
+```
+
+
+1. __a__ <code>{can-set.set}</code>:
+  A set.
+1. __b__ <code>{can-set.set}</code>:
+  A set.
+
+- __returns__ <code>{Boolean}</code>:
+  `true` if `a` is a subset of `b`.
+
+
+### <code>algebra.union(a, b)</code>
+
 
 Returns a set that represents the union of _A_ and _B_ (_A_ ∪ _B_).
 
@@ -331,68 +457,169 @@ algebra.union(
 ```
 
 
-## algebra.count
+1. __a__ <code>{can-set.set}</code>:
+  A set.
+1. __b__ <code>{can-set.set}</code>:
+  A set.
 
-`algebra.count(a, algebra) -> Number`
+- __returns__ <code>{can-set.set|undefined}</code>:
+  If an object is returned, it is the union of _A_ and _B_ (_A_ ∪ _B_).
 
-Returns the number of items that might be loaded by set _A_. This makes use of set.Algebra's
-By default, this returns Infinity.
+  If `undefined` is returned, it means a union can't be created.
 
+## can-set.comparators `{Object}`
 
-## algebra.getSubset
+Contains a collection of comparator generating functions.
+The following functions create `compares` objects that can be mixed together to create a set `Algebra`.
 
-`algebra.getSubset(a, b, bItems) //-> aItems`
-
-Gets A set's items given a super set B and its items.
-
-```
-algebra.getSubset({type: "dog"},{},
-  [{id: 1, type:"cat"},
-   {id: 2, type: "dog"},
-   {id: 3, type: "dog"},
-   {id: 4, type: "zebra"}])
-//-> [{id: 2, type: "dog"},{id: 3, type: "dog"}]
-```
-
-## algebra.getUnion
-
-`algebra.getUnion(a, b, aItems, bItems) //-> unionItems`
-
-Unifies items from set A and setB into a single array of items.
-
-```
-algebra = new set.Algebra(
-    set.comparators.rangeInclusive("start","end")
+```js
+var algebra = new set.Algebra(
+  {
+    // ignore this property in set algebra
+    sessionId:  function(){ return true }
+  },
+  set.comparators.boolean("completed"),
+  set.comparators.rangeInclusive("start","end")
 );
-algebra.getUnion(
-    {start: 1,end: 2},
-    {start: 2,end: 4},
-    [{id: 1},{id: 2}],
-    [{id: 2},{id: 3},{id: 4}]);
-//-> [{id: 1},{id: 2},{id: 3},{id: 4}]
 ```
 
-## algebra.index
 
-`algebra.index(setA, aItems, item)`
 
-Returns where `item` should be inserted into `aItems` which is represented by `setA`.
+
+### <code>set.comparators.boolean(property)</code>
+
+
+Makes a compare object with a `property` function that has the following logic:
+
+```js
+A(true) ∪ B(false) = undefined
+
+A(undefined) \ B(true) = false
+A(undefined) \ B(false) = true
+```
+
+It understands that `true` and `false` are complementary sets that combined to `undefined`. Another way to think of this is that if you load `{complete: false}` and `{complete: true}` you've loaded `{}`.
+
+
+
+### <code>set.comparators.rangeInclusive(startIndexProperty, endIndexProperty)</code>
+
+
+Makes a comparator for two ranged properties that specify a range of items
+that includes both the startIndex and endIndex.  For example, a range of
+[0,20] loads 21 items.
+
+
+1. __startIndexProperty__ <code>{String}</code>:
+  The starting property name
+1. __endIndexProperty__ <code>{String}</code>:
+  The ending property name
+
+- __returns__ <code>{[compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra)}</code>:
+  Returns a comparator
+
+
+### <code>set.comparators.enum(property, propertyValues)</code>
+
+
+Makes a comparator for a set of values.
 
 ```
-algebra = new set.Algebra(
-    set.comparators.sort("orderBy")
-);
+var compare = set.comparators.enum("type", ["new","accepted","pending","resolved"])
+```
+
+
+### <code>set.comparators.sort(prop, [sortFunc])</code>
+
+
+Defines the sortable property and behavior.
+
+```js
+var algebra = new set.Algebra(set.comparators.sort("sortBy"));
 algebra.index(
-    {orderBy: "age"},
-    [{id: 1, age: 3},{id: 2, age: 5},{id: 3, age: 8},{id: 4, age: 10}],
-    {id: 6, age: 3})
-    //-> 2
+  {sortBy: "name desc"},
+  [{name: "Meyer"}],
+  {name: "Adams"}) //-> 1
+
+algebra.index(
+  {sortBy: "name"},
+  [{name: "Meyer"}],
+  {name: "Adams"}) //-> 0
 ```
 
-The default sort property is what is specified by
-`set.comparators.id`. This means if that if the sort property
-is not specified, it will assume the set is sorted by the specified
-id property.
+
+1. __prop__ <code>{String}</code>:
+  The sortable property.
+1. __sortFunc__ <code>{function(sortPropValue, item1, item2)}</code>:
+  The
+  sortable behavior. The default behavior assumes the sort property value
+  looks like `PROPERTY DIRECTION` (ex: `name desc`).
+
+- __returns__ <code>{[compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra)}</code>:
+  Returns a compares that can be used to create
+  a `set.Algebra`.
+
+
+### <code>set.comparators.id(prop)</code>
+
+
+Defines the property name on items that uniquely
+identifies them. This is the default sorted property if no
+[can-set.comparators.sort](#setcomparatorssortprop-sortfunc) is provided.
+
+```js
+var algebra = new set.Algebra(set.comparators.id("_id"));
+algebra.index(
+  {sortBy: "name desc"},
+  [{name: "Meyer"}],
+  {name: "Adams"}) //-> 1
+
+algebra.index(
+  {sortBy: "name"},
+  [{name: "Meyer"}],
+  {name: "Adams"}) //-> 0
+```
+
+
+1. __prop__ <code>{String}</code>:
+  The property name that defines the unique property id.
+
+- __returns__ <code>{[compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra)}</code>:
+  Returns a compares that can be used to create
+  a `set.Algebra`.
+
+
+## <code>new set.Translate(clauseType, propertyName)</code>
+
+
+Localizes a clause's properties within another nested property.
+
+```js
+var algebra = new set.Algebra(
+  new set.Translate("where","$where")
+);
+algebra.has(
+  {$where: {complete: true}},
+  {id: 5, complete: true}
+) //-> true
+```
+
+This is useful when filters (which are `where` clauses) are
+within a nested object.
+
+
+1. __clause__ <code>{String}</code>:
+  A clause type.  One of `'where'`, `'order'`, `'paginate'`, `'id'`.
+1. __propertyName__ <code>{String|Object}</code>:
+  The property name which contains the clauses's properties.
+
+- __returns__ <code>{set.compares}</code>:
+  A set compares object that can do the translation.
+
+
+
+
+
 
 
 ## Contributing
