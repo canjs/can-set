@@ -52,13 +52,13 @@ Use npm to install `can-set`:
 
 Use `require` in Node/Browserify workflows to import `can-set` like:
 
-```
+```js
 var set = require('can-set');
 ```
 
 Use `define`, `require` or `import` in [StealJS](http://stealjs.com)  workflows to import `can-set` like:
 
-```
+```js
 import set from 'can-set'
 ```
 
@@ -92,7 +92,7 @@ Once you have the basics, you can use set algebra to all sorts of intelligent ca
 and performance optimizations.  The following example
 defines a `getTodos` function that gets todo data from a memory cache or from the server.
 
-```
+```js
 var algebra = new set.Algebra(
     set.comparators.boolean("completed")
 );
