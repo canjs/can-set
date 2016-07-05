@@ -186,7 +186,7 @@ module.exports = compareHelpers = {
 						options.getSubsets.push(compareResult.getSubset);
 					}
 				}
-				if(compareResult.intersection === h.ignoreType || compareResult.difference === h.ignoreType) { // as in the case of a sort comparator
+				if(compareResult.intersection === h.ignoreType || compareResult.difference === h.ignoreType) { // as in the case of a sort props
 					return true;
 				}
 				// A \ B subset intersects in both directions
