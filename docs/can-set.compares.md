@@ -1,7 +1,7 @@
-@typedef {Object<String,can-set.comparator>} can-set.compares compares
+@typedef {Object<String,can-set.prop>} can-set.compares compares
 @parent can-set
 
-@description An object of property names and `comparator` functions.
+@description An object of property names and `prop` functions.
 
 ```js
 {
@@ -13,4 +13,4 @@
 ```
 
 
-@option {Object<String,can-set.comparator>}
+@option {Object<String,can-set.prop>}
