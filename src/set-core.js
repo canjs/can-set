@@ -292,7 +292,7 @@ assign(Algebra.prototype, {
 		// if both have a paginate, make sure order is the same.
 		if( bClauseProps.enabled.paginate &&
 			(aClauseProps.enabled.order || bClauseProps.enabled.order)) {
-			// compare order clauses without any special comparators
+			// compare order clauses without any special props
 			compatibleSort = compare.equal(aClauseProps.order, bClauseProps.order,
 				undefined, undefined, undefined, {}, {});
 		}
@@ -336,7 +336,7 @@ assign(Algebra.prototype, {
 	 * returns if a difference exists.
 	 *
 	 * ```js
-	 * algebra1 = new set.Algebra(set.comparators.boolean("completed"));
+	 * algebra1 = new set.Algebra(set.props.boolean("completed"));
 	 * algebra2 = new set.Algebra();
 	 *
 	 * // A has all of B
@@ -455,7 +455,7 @@ assign(Algebra.prototype, {
 	 *
 	 * ```js
 	 * var algebra =  new set.Algebra({
-	 *   set.comparators.rangeInclusive("start", "end")
+	 *   set.props.rangeInclusive("start", "end")
 	 * });
 	 * algebra.count({start: 10, end: 19}) //-> 10
 	 * algebra.count({}) //-> Infinity
@@ -504,7 +504,7 @@ assign(Algebra.prototype, {
 		// if there is a paginate and an order, order has to be the same first.
 		if((propsClauseProps.enabled.paginate || aClauseProps.enabled.paginate) &&
 			(propsClauseProps.enabled.order || aClauseProps.enabled.order)) {
-			// compare order clauses without any special comparators
+			// compare order clauses without any special props
 			compatibleSort = compare.equal(propsClauseProps.order, aClauseProps.order,
 				undefined, undefined, undefined, {}, {});
 		}
@@ -528,7 +528,7 @@ assign(Algebra.prototype, {
 	 *
 	 * ```js
 	 * algebra = new set.Algebra(
-	 *   set.comparators.sort("orderBy")
+	 *   set.props.sort("orderBy")
 	 * );
 	 * algebra.index(
 	 *   {orderBy: "age"},
@@ -538,7 +538,7 @@ assign(Algebra.prototype, {
 	 * ```
 	 *
 	 * The default sort property is what is specified by
-	 * [can-set.comparators.id]. This means if that if the sort property
+	 * [can-set.props.id]. This means if that if the sort property
 	 * is not specified, it will assume the set is sorted by the specified
 	 * id property.
 	 *
@@ -621,7 +621,7 @@ assign(Algebra.prototype, {
 	 *
 	 * ```js
 	 * algebra = new set.Algebra(
-	 *   set.comparators.rangeInclusive("start","end")
+	 *   set.props.rangeInclusive("start","end")
 	 * );
 	 * algebra.getUnion(
 	 *   {start: 1,end: 2},

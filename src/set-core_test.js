@@ -238,7 +238,7 @@ test('set.index', function(){
 
 	equal(index, undefined, "no value if nothing is set");
 
-	var algebra = new set.Algebra(set.comparators.id("id"));
+	var algebra = new set.Algebra(set.props.id("id"));
 
 	index = algebra.index(
 		{sort: "name"},

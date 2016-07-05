@@ -1,6 +1,6 @@
 var set = require("./set");
 var QUnit = require("steal-qunit");
-var comparators = require("./comparators");
+var props = require("./props");
 var h = require("./helpers");
 
 QUnit.module("set/src/set-core get methods");
@@ -38,7 +38,7 @@ test("getSubset against non ranged set", function(){
 	 *		]
 	 */
 	var res = set.getSubset({ type: 'critical', start: 1, end: 3 }, {}, items,
-		comparators.rangeInclusive("start", "end"));
+		props.rangeInclusive("start", "end"));
 
 	deepEqual(res && h.map.call(res, getId), [2,4,6]);
 });
@@ -64,8 +64,8 @@ test("getSubset ordered ascending and paginated", function() {
 	 *		]
 	 */
 	var algebra = new set.Algebra(
-		comparators.sort('sort'),
-		comparators.rangeInclusive('start','end')
+		props.sort('sort'),
+		props.rangeInclusive('start','end')
 	);
 
 	var res = set.getSubset(
@@ -92,8 +92,8 @@ test("getSubset ordered descending and paginated", function() {
 	 * 3. set a is further reduced to the entities at indices 1 through 3
 	 */
 	var algebra = new set.Algebra(
-		comparators.sort('sort'),
-		comparators.rangeInclusive('start','end')
+		props.sort('sort'),
+		props.rangeInclusive('start','end')
 	);
 
 	var res = set.getSubset(
@@ -109,7 +109,7 @@ test("getSubset against paginated set", function(){
 		{type: 'critical', start: 21, end: 23},
 		{type: 'critical', start: 20, end: 27},
 		items,
-		comparators.rangeInclusive("start","end") );
+		props.rangeInclusive("start","end") );
 
 	deepEqual(res && h.map.call(res, getId), [2,4,6]);
 });
@@ -130,10 +130,10 @@ test("getUnion basics", function(){
 });
 
 test("getUnion against ranged sets", function(){
-	var union = set.getUnion({start: 10, end: 13},{start: 14, end: 17},items.slice(0,4), items.slice(4,8), comparators.rangeInclusive("start","end"));
+	var union = set.getUnion({start: 10, end: 13},{start: 14, end: 17},items.slice(0,4), items.slice(4,8), props.rangeInclusive("start","end"));
 	deepEqual(union, items);
 
-	union = set.getUnion({start: 14, end: 17}, {start: 10, end: 13}, items.slice(4,8),items.slice(0,4), comparators.rangeInclusive("start","end"));
+	union = set.getUnion({start: 14, end: 17}, {start: 10, end: 13}, items.slice(4,8),items.slice(0,4), props.rangeInclusive("start","end"));
 	deepEqual(union, items, "disjoint after");
 });
 
@@ -143,7 +143,7 @@ test("getUnion against overlapping ranged sets", function(){
 		{start: 13, end: 17},
 		items.slice(0,5),
 		items.slice(3,8),
-		comparators.rangeInclusive("start","end"));
+		props.rangeInclusive("start","end"));
 
 	deepEqual(union, items);
 
@@ -152,7 +152,7 @@ test("getUnion against overlapping ranged sets", function(){
 		{start: 11, end: 17},
 		items.slice(0,2),
 		items.slice(1,8),
-		comparators.rangeInclusive("start","end"));
+		props.rangeInclusive("start","end"));
 
 	deepEqual(union, items);
 
@@ -161,13 +161,13 @@ test("getUnion against overlapping ranged sets", function(){
 		{start: 10, end: 11},
 		items.slice(1,8),
 		items.slice(0,2),
-		comparators.rangeInclusive("start","end"));
+		props.rangeInclusive("start","end"));
 
 	deepEqual(union, items);
 });
 
 test("getSubset passed same object works (#3)", function(){
-	var algebra = new set.Algebra(comparators.rangeInclusive("start","end"));
+	var algebra = new set.Algebra(props.rangeInclusive("start","end"));
 	var setObj = {start: 1, end: 2};
 	var items = algebra.getSubset(setObj, setObj, [{id: 1}]);
 	deepEqual(items, [{id: 1}]);
