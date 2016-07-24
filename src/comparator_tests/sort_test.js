@@ -271,6 +271,9 @@ test("set.getSubset (#14)", function(){
 	var algebra = new set.Algebra(comparators.sort('sort'));
 	var subset = algebra.getSubset({sort: "name"},{},[{id: 1, name:"s"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"g"}]);
 	deepEqual(subset, [ {id: 4, name:"g"},{id: 2, name:"j"}, {id: 3, name:"m"},{id: 1, name:"s"}]);
+
+	subset = algebra.getSubset({sort: {name:1}},{},[{id: 1, name:"s"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"g"}]);
+	deepEqual(subset, [ {id: 4, name:"g"},{id: 2, name:"j"}, {id: 3, name:"m"},{id: 1, name:"s"}], 'works with mongo-style syntax.');
 });
 
 
@@ -292,6 +295,19 @@ test("set.getUnion", function(){
 		{id: 2, name:"j", complete: false},
 		{id: 3, name:"m", complete: true},
 		{id: 1, name:"s",complete: false}]);
+
+	// a,b,aItems, bItems
+	union = algebra.getUnion(
+		{sort: {name: 1}, complete: true},
+		{sort: {name: 1}, complete: false},
+		[{id: 4, name:"g", complete: true}, {id: 3, name:"m", complete: true}],
+		[{id: 2, name:"j", complete: false},{id: 1, name:"s", complete: false} ]);
+
+	deepEqual(union, [
+		{id: 4, name:"g", complete: true},
+		{id: 2, name:"j", complete: false},
+		{id: 3, name:"m", complete: true},
+		{id: 1, name:"s",complete: false}]);
 });
 
 test("set.union keeps sort", function(){
@@ -305,6 +321,12 @@ test("set.union keeps sort", function(){
 		{sort: "name", complete: false});
 
 	deepEqual(union, {sort: "name"});
+
+	union = algebra.union(
+		{sort: {name: 1}, complete: true},
+		{sort: {name: 1}, complete: false});
+
+	deepEqual(union, {sort: {name: 1}});
 });
 
 test("paginated and sorted is subset (#17)", function(){
@@ -314,6 +336,9 @@ test("paginated and sorted is subset (#17)", function(){
 	);
 
 	var res = algebra.subset({start: 0, end: 100, sort: "name"},{start: 0, end: 100, sort: "name"});
+	equal(res, true, "parent:paginate+order child:paginate+order (same set)");
+
+	res = algebra.subset({start: 0, end: 100, sort: {name: 1}},{start: 0, end: 100, sort: "name"});
 	equal(res, true, "parent:paginate+order child:paginate+order (same set)");
 
 	res = algebra.subset({start: 0, end: 100, sort: "name"},{start: 0, end: 100, sort: "age"});
