@@ -13,6 +13,9 @@ test('set.difference', function(){
 	var res = set.difference({sort: "foo"}, { completed: true }, comparator);
 	ok(res === true, "diff should be true");
 
+	res = set.difference({sort: {foo: false}}, { completed: true }, comparator);
+	ok(res === true, "diff should be true with MongoDB-style sorting syntax");
+
 	res = set.difference({ completed: true }, { completed: true, sort: "foo" }, comparator);
 	equal(res, false, "the same except for sort");
 
@@ -51,6 +54,9 @@ test('set.union', function(){
 
 	res = set.union({}, { completed: true, sort: "name" }, comparator);
 	deepEqual(res , {}, "set / subset sort right");
+
+	res = set.union({}, { completed: true, sort: {name: 1}}, comparator);
+	deepEqual(res , {}, "set / subset sort right mongo-style");
 
 	res = set.union({ sort: "name" }, { completed: true, sort: "namer" }, comparator);
 	deepEqual(res , {}, "set / subset both sorts");
@@ -252,6 +258,12 @@ test("set.index", function(){
 		[{id: 1, name:"g"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"s"}],
 		{name: "k"});
 	equal(index, 2);
+
+	index = algebra.index(
+		{sort: {name: 1}},
+		[{id: 1, name:"g"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"s"}],
+		{name: "k"});
+	equal(index, 2, 'Support MongoDB sorting syntax.');
 });
 
 
