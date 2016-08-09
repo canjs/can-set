@@ -140,7 +140,7 @@ module.exports = {
 	 *
 	 * @signature `set.props.enum(property, propertyValues)`
 	 *
-	 * Makes a comparator for a set of values.
+	 * Makes a prop for a set of values.
 	 *
 	 * ```
 	 * var compare = set.props.enum("type", ["new","accepted","pending","resolved"])
@@ -181,7 +181,7 @@ module.exports = {
 	 *
 	 * @signature `set.props.rangeInclusive(startIndexProperty, endIndexProperty)`
 	 *
-	 * Makes a comparator for two ranged properties that specify a range of items
+	 * Makes a prop for two ranged properties that specify a range of items
 	 * that includes both the startIndex and endIndex.  For example, a range of
 	 * [0,20] loads 21 items.
 	 *
@@ -191,7 +191,7 @@ module.exports = {
 	 *
 	 *   @param  {String} startIndexProperty The starting property name
 	 *   @param  {String} endIndexProperty The ending property name
-	 *   @return {can-set.compares} Returns a comparator
+	 *   @return {can-set.compares} Returns a prop
 	 */
 	rangeInclusive: function(startIndexProperty, endIndexProperty){
 		var compares = {};
@@ -356,7 +356,7 @@ module.exports = {
 	 * @parent can-set.props
 	 *
 	 * @description Defines the identify property.
-	 *
+	 * 
 	 * @signature `set.props.id(prop)`
 	 *
 	 * Defines the property name on items that uniquely

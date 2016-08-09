@@ -1,15 +1,15 @@
-@typedef {function} can-set.comparator Comparator
+@typedef {function} can-set.prop Prop
 @parent can-set.types
 
-@signature `comparator(aValue, bValue, a, b, prop, algebra)`
+@signature `prop(aValue, bValue, a, b, prop, algebra)`
 
-A comparator function returns algebra values for two values for a given property.
+A prop function returns algebra values for two values for a given property.
 
   @param {*} aValue The value of A's property in a set difference A and B (A \ B).
   @param {*} bValue The value of A's property in a set difference A and B (A \ B).
   @param {*} a The A set in a set difference A and B (A \ B).
   @param {*} b The B set in a set difference A and B (A \ B).
-  @return {Object|Boolean} A comparator function should either return a Boolean which indicates if `aValue` and `bValue` are
+  @return {Object|Boolean} A prop function should either return a Boolean which indicates if `aValue` and `bValue` are
   equal or an `AlgebraResult` object that details information about the union, intersection, and difference of `aValue` and `bValue`.
 
   An `AlgebraResult` object has the following values:

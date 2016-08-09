@@ -292,7 +292,7 @@ assign(Algebra.prototype, {
 		// if both have a paginate, make sure order is the same.
 		if( bClauseProps.enabled.paginate &&
 			(aClauseProps.enabled.order || bClauseProps.enabled.order)) {
-			// compare order clauses without any special comparators
+			// compare order clauses without any special props
 			compatibleSort = compare.equal(aClauseProps.order, bClauseProps.order,
 				undefined, undefined, undefined, {}, {});
 		}
@@ -504,7 +504,7 @@ assign(Algebra.prototype, {
 		// if there is a paginate and an order, order has to be the same first.
 		if((propsClauseProps.enabled.paginate || aClauseProps.enabled.paginate) &&
 			(propsClauseProps.enabled.order || aClauseProps.enabled.order)) {
-			// compare order clauses without any special comparators
+			// compare order clauses without any special props
 			compatibleSort = compare.equal(propsClauseProps.order, aClauseProps.order,
 				undefined, undefined, undefined, {}, {});
 		}

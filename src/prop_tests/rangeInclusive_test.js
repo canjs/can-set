@@ -1,9 +1,9 @@
 var QUnit = require("steal-qunit");
 
 var set = require('src/set-core'),
-	comparators = require("src/comparators");
+	props = require("src/props");
 
-QUnit.module("comparators.rangeInclusive");
+QUnit.module("props.rangeInclusive");
 
 test('rangeInclusive set.equal', function(){
 
@@ -15,7 +15,7 @@ test('rangeInclusive set.equal', function(){
 		set.equal(
 			{start: 0, end: 100},
 			{start: 0, end: 100},
-			comparators.rangeInclusive("start", "end")),
+			props.rangeInclusive("start", "end")),
 		"they are equal" );
 
 	/*
@@ -26,7 +26,7 @@ test('rangeInclusive set.equal', function(){
 		!set.equal(
 			{start: 0, end: 100},
 			{start: 0, end: 101},
-			comparators.rangeInclusive("start", "end")),
+			props.rangeInclusive("start", "end")),
 		"they are not equal" );
 
 	/*
@@ -37,7 +37,7 @@ test('rangeInclusive set.equal', function(){
 		!set.equal(
 			{start: 0, end: 100},
 			{start: 1, end: 100},
-			comparators.rangeInclusive("start", "end")),
+			props.rangeInclusive("start", "end")),
 		"they are not equal" );
 });
 
@@ -50,7 +50,7 @@ test('rangeInclusive set.subset', function(){
 		set.subset(
 			{start: 0, end: 100},
 			{start: 0, end: 100},
-			comparators.rangeInclusive("start", "end")),
+			props.rangeInclusive("start", "end")),
 		"self is a subset" );
 
 	/*
@@ -61,7 +61,7 @@ test('rangeInclusive set.subset', function(){
 		set.subset(
 			{start: 0, end: 100},
 			{start: 0, end: 101},
-			comparators.rangeInclusive("start", "end")),
+			props.rangeInclusive("start", "end")),
 		"end extends past subset" );
 
 	/*
@@ -72,7 +72,7 @@ test('rangeInclusive set.subset', function(){
 		!set.subset(
 			{start: 0, end: 101},
 			{start: 0, end: 100},
-			comparators.rangeInclusive("start", "end")),
+			props.rangeInclusive("start", "end")),
 		"non-subset extends past end" );
 
 	/*
@@ -83,7 +83,7 @@ test('rangeInclusive set.subset', function(){
 		set.subset(
 			{start: 1, end: 100},
 			{start: 0, end: 100},
-			comparators.rangeInclusive("start", "end")),
+			props.rangeInclusive("start", "end")),
 		"start extends before subset" );
 
 	/*
@@ -94,13 +94,13 @@ test('rangeInclusive set.subset', function(){
 		!set.subset(
 			{start: 0, end: 100},
 			{start: 1, end: 100},
-			comparators.rangeInclusive("start", "end")),
+			props.rangeInclusive("start", "end")),
 		"non-subset extends before start" );
 });
 
 
 test('rangeInclusive set.difference', function() {
-	var comparator = comparators.rangeInclusive('start', 'end');
+	var prop = props.rangeInclusive('start', 'end');
 
 	/*
 	 * X = [A0, ..., A99]
@@ -108,7 +108,7 @@ test('rangeInclusive set.difference', function() {
 	 *
 	 * X / Y = [A0, ..., A49]
 	 */
-	var res = set.difference({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
+	var res = set.difference({ start: 0, end: 99 }, { start: 50, end: 101 }, prop);
 	deepEqual(res, { start: 0, end: 49 }, "got a diff");
 
 	/*
@@ -125,7 +125,7 @@ test('rangeInclusive set.difference', function() {
 	 * 	more broadly
 	 * X / Y = the set of all things not in Y
 	 */
-	res = set.difference({}, { start: 0, end: 10 }, comparator);
+	res = set.difference({}, { start: 0, end: 10 }, prop);
 	equal(res, true, 'universal set');
 
 	/*
@@ -134,7 +134,7 @@ test('rangeInclusive set.difference', function() {
 	 *
 	 * X / Y = X
 	 */
-	res = set.difference({ start: 0, end: 49 }, { start: 50, end: 101 }, comparator);
+	res = set.difference({ start: 0, end: 49 }, { start: 50, end: 101 }, prop);
 	deepEqual(res, { start: 0, end: 49 }, "side by side");
 
 	/*
@@ -143,7 +143,7 @@ test('rangeInclusive set.difference', function() {
 	 *
 	 * X / Y = [A21, ..., A49]
 	 */
-	res = set.difference({ start: 0, end: 49 }, { start: 0, end: 20 }, comparator);
+	res = set.difference({ start: 0, end: 49 }, { start: 0, end: 20 }, prop);
 	deepEqual(res, { start: 21, end: 49 }, "first set extends past second");
 
 	/*
@@ -152,12 +152,12 @@ test('rangeInclusive set.difference', function() {
 	 *
 	 * X / Y = [A0, ..., A19]
 	 */
-	res = set.difference({ start: 0, end: 49 }, { start: 20, end: 49 }, comparator);
+	res = set.difference({ start: 0, end: 49 }, { start: 20, end: 49 }, prop);
 	deepEqual(res, { start: 0, end: 19 }, "first set starts before second");
 });
 
 test('rangeInclusive set.union', function() {
-	var comparator = comparators.rangeInclusive('start', 'end');
+	var prop = props.rangeInclusive('start', 'end');
 
 
 	/*
@@ -166,7 +166,7 @@ test('rangeInclusive set.union', function() {
 	 *
 	 * X U Y = [A0, ..., A101]
 	 */
-	var res = set.union({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
+	var res = set.union({ start: 0, end: 99 }, { start: 50, end: 101 }, prop);
 	deepEqual(res, { start: 0, end: 101 }, "got a union");
 
 	/*
@@ -175,7 +175,7 @@ test('rangeInclusive set.union', function() {
 	 *
 	 * X U Y = X
 	 */
-	res = set.union({}, { start: 0, end: 10 }, comparator);
+	res = set.union({}, { start: 0, end: 10 }, prop);
 	deepEqual(res, {}, "universal set");
 
 	/*
@@ -184,7 +184,7 @@ test('rangeInclusive set.union', function() {
 	 *
 	 * X U Y = [A100, ..., A299]
 	 */
-	res = set.union({start: 100, end: 199}, {start: 200, end: 299}, comparator);
+	res = set.union({start: 100, end: 199}, {start: 200, end: 299}, prop);
 	deepEqual(res, {start:100, end:299}, "no intersection");
 
 	/*
@@ -193,7 +193,7 @@ test('rangeInclusive set.union', function() {
 	 *
 	 * X U Y = [A100, ..., A299]
 	 */
-	res = set.union({start: 200, end: 299}, {start: 100, end: 199}, comparator);
+	res = set.union({start: 200, end: 299}, {start: 100, end: 199}, prop);
 	deepEqual(res, {start:100, end:299}, "no intersection with either argument order");
 
 	/*
@@ -202,7 +202,7 @@ test('rangeInclusive set.union', function() {
 	 *
 	 * X U Y = [A100, ..., A299]
 	 */
-	res = set.union({start: 200, end: 299}, {start: 100, end: 209}, comparator);
+	res = set.union({start: 200, end: 299}, {start: 100, end: 209}, prop);
 	deepEqual(res, {start:100, end:299}, "sets can intersect");
 
 	/*
@@ -211,7 +211,7 @@ test('rangeInclusive set.union', function() {
 	 *
 	 * X U Y = [A100, ..., A299]
 	 */
-	res = set.union({start: 100, end: 209}, {start: 200, end: 299}, comparator);
+	res = set.union({start: 100, end: 209}, {start: 200, end: 299}, prop);
 	deepEqual(res, {start:100, end:299}, "sets can intersect with either argument order");
 
 	/*
@@ -220,7 +220,7 @@ test('rangeInclusive set.union', function() {
 	 *
 	 * X U Y = [A100, ..., A299]
 	 */
-	res = set.union({start: 100, end: 299}, {start: 103, end: 209}, comparator);
+	res = set.union({start: 100, end: 299}, {start: 103, end: 209}, prop);
 	deepEqual(res, {start:100, end:299}, "first set contains second");
 
 	/*
@@ -229,7 +229,7 @@ test('rangeInclusive set.union', function() {
 	 *
 	 * X U Y = [A100, ..., A299]
 	 */
-	res = set.union({start: 100, end: 299}, {start: 103, end: 209}, comparator);
+	res = set.union({start: 100, end: 299}, {start: 103, end: 209}, prop);
 	deepEqual(res, {start:100, end:299}, "second set contains first");
 
 	/*
@@ -238,25 +238,25 @@ test('rangeInclusive set.union', function() {
 	 *
 	 * X U Y = [A100, ..., A299]
 	 */
-	res = set.union({start: 100, end: 299}, {start: 100, end: 299}, comparator);
+	res = set.union({start: 100, end: 299}, {start: 100, end: 299}, prop);
 	deepEqual(res, {start:100, end:299}, "union of identical sets is the same as those sets");
 });
 
 
 
 test('rangeInclusive set.count', function(){
-	var comparator = comparators.rangeInclusive('start', 'end');
+	var prop = props.rangeInclusive('start', 'end');
 
 	/*
 	 * X = [A0, ..., A99]
 	 * |X| = 100
 	 */
-	var res = set.count({ start: 0, end: 99 }, comparator);
+	var res = set.count({ start: 0, end: 99 }, prop);
 	equal(res, 100, "count is right");
 });
 
 test('rangeInclusive set.intersection', function(){
-	var comparator = comparators.rangeInclusive('start', 'end');
+	var prop = props.rangeInclusive('start', 'end');
 
 	/*
 	 * X = [A0, A99]
@@ -264,13 +264,13 @@ test('rangeInclusive set.intersection', function(){
 	 *
 	 * X ∩ Y = [A50, A99]
 	 */
-	var res = set.intersection({ start: 0, end: 99 }, { start: 50, end: 101 }, comparator);
+	var res = set.intersection({ start: 0, end: 99 }, { start: 50, end: 101 }, prop);
 	deepEqual(res, { start: 50, end: 99 }, "got a intersection");
 });
 
 test('rangeInclusive with string numbers (#17)', function(){
 	var algebra = new set.Algebra(
-		comparators.rangeInclusive('start','end')
+		props.rangeInclusive('start','end')
 	);
 	ok(
 		algebra.subset(

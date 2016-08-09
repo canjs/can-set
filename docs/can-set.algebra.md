@@ -22,4 +22,5 @@ var algebra = new set.Algebra(
   are returned by the functions on [can-set.props] or can be created
   manually.
 
+
   @return {can-set.Algebra} Returns an instance of an algebra.

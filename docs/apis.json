@@ -1,7 +1,7 @@
 [
     {"can-set.Algebra": [
         "can-set.compares",
-        "can-set.comparator",
+        "can-set.prop",
         "can-set.Algebra.prototype.difference",
         "can-set.Algebra.prototype.equal",
         "can-set.Algebra.prototype.getSubset",

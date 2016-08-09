@@ -18,10 +18,9 @@ utilities and middleware for the client.
 
 - [Install](#install)
 - [Use](#use)
-- [API](#api)
 - <code>[new set.Algebra(compares...)](#new-setalgebracompares)</code>
-  - <code>[compares Object\<String,comparator()\>](#compares-objectstringcomparator)</code>
-  - <code>[comparator(aValue, bValue, a, b, prop, algebra)](#comparatoravalue-bvalue-a-b-prop-algebra)</code>
+  - <code>[Compares Object\<String,Prop()\>](#compares-objectstringprop)</code>
+  - <code>[prop(aValue, bValue, a, b, prop, algebra)](#propavalue-bvalue-a-b-prop-algebra)</code>
   - <code>[algebra.difference(a, b)](#algebradifferencea-b)</code>
   - <code>[algebra.equal(a, b)](#algebraequala-b)</code>
   - <code>[algebra.getSubset(a, b, bData)](#algebragetsubseta-b-bdata)</code>
@@ -32,12 +31,12 @@ utilities and middleware for the client.
   - <code>[algebra.properSubset(a, b)](#algebrapropersubseta-b)</code>
   - <code>[algebra.subset(a, b)](#algebrasubseta-b)</code>
   - <code>[algebra.union(a, b)](#algebrauniona-b)</code>
-- <code>[can-set.props Object](#can-setcomparators-object)</code>
-  - <code>[set.props.boolean(property)](#setcomparatorsbooleanproperty)</code>
-  - <code>[set.props.rangeInclusive(startIndexProperty, endIndexProperty)](#setcomparatorsrangeinclusivestartindexproperty-endindexproperty)</code>
-  - <code>[set.props.enum(property, propertyValues)](#setcomparatorsenumproperty-propertyvalues)</code>
-  - <code>[set.props.sort(prop, [sortFunc])](#setcomparatorssortprop-sortfunc)</code>
-  - <code>[set.props.id(prop)](#setcomparatorsidprop)</code>
+- <code>[props Object](#props-object)</code>
+  - <code>[set.props.boolean(property)](#setpropsbooleanproperty)</code>
+  - <code>[set.props.rangeInclusive(startIndexProperty, endIndexProperty)](#setpropsrangeinclusivestartindexproperty-endindexproperty)</code>
+  - <code>[set.props.enum(property, propertyValues)](#setpropsenumproperty-propertyvalues)</code>
+  - <code>[set.props.sort(prop, [sortFunc])](#setpropssortprop-sortfunc)</code>
+  - <code>[set.props.id(prop)](#setpropsidprop)</code>
 - <code>[new set.Translate(clauseType, propertyName)](#new-settranslateclausetype-propertyname)</code>
 - [Contributing](#contributing)
 
@@ -124,6 +123,7 @@ var getTodos = function(set, cb) {
 ```
 
 
+
 ## API
 
 
@@ -142,18 +142,19 @@ var algebra = new set.Algebra(
 ```
 
 
-1. __compares__ <code>{[compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra)}</code>:
+1. __compares__ <code>{[Compares](#compares-objectstringproppropavalue-bvalue-a-b-prop-algebra)}</code>:
   Each argument is a compares. These
-  are returned by the functions on [can-set.props](#-object) or can be created
+  are returned by the functions on [props](#props-object) or can be created
   manually.
 
 
-- __returns__ <code>{[can-set.Algebra](#new-setalgebracompares)([compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra))}</code>:
+
+- __returns__ <code>{[Algebra](#new-setalgebracompares)([compares](#compares-objectstringproppropavalue-bvalue-a-b-prop-algebra))}</code>:
   Returns an instance of an algebra.
 
-### compares `{Object\<String,comparator()\>}`
+### Compares `{Object\<String,Prop()\>}`
 
-An object of property names and `comparator` functions.
+An object of property names and `prop` functions.
 ```js
 {
   // return `true` if the values should be considered the same:
@@ -167,10 +168,10 @@ An object of property names and `comparator` functions.
 
 
 
-### <code>comparator(aValue, bValue, a, b, prop, algebra)</code>
+### <code>prop(aValue, bValue, a, b, prop, algebra)</code>
 
 
-A comparator function returns algebra values for two values for a given property.
+A prop function returns algebra values for two values for a given property.
 
 
 1. __aValue__ <code>{*}</code>:
@@ -183,7 +184,7 @@ A comparator function returns algebra values for two values for a given property
   The B set in a set difference A and B (A  B).
 
 - __returns__ <code>{Object|Boolean}</code>:
-  A comparator function should either return a Boolean which indicates if `aValue` and `bValue` are
+  A prop function should either return a Boolean which indicates if `aValue` and `bValue` are
   equal or an `AlgebraResult` object that details information about the union, intersection, and difference of `aValue` and `bValue`.
 
   An `AlgebraResult` object has the following values:
@@ -230,12 +231,12 @@ algebra2.difference( {completed: true}, {} )  //-> false
 ```
 
 
-1. __a__ <code>{can-set/Set}</code>:
+1. __a__ <code>{[Set](#set-object)}</code>:
   A set.
-1. __b__ <code>{can-set/Set}</code>:
+1. __b__ <code>{[Set](#set-object)}</code>:
   A set.
 
-- __returns__ <code>{can-set/Set|Boolean}</code>:
+- __returns__ <code>{[Set](#set-object)|Boolean}</code>:
   If an object is returned, it is difference of sets _A_ and _B_ (_A_ \ _B_).
 
   If `true` is returned, that means that _B_ is a subset of _A_, but no set object
@@ -254,9 +255,9 @@ algebra2.difference( {completed: true}, {} )  //-> false
   ```
 
 
-1. __a__ <code>{can-set/Set}</code>:
+1. __a__ <code>{[Set](#set-object)}</code>:
   A set.
-1. __b__ <code>{can-set/Set}</code>:
+1. __b__ <code>{[Set](#set-object)}</code>:
   A set.
 
 - __returns__ <code>{Boolean}</code>:
@@ -280,9 +281,9 @@ algebra.getSubset(
 ```
 
 
-1. __a__ <code>{can-set/Set}</code>:
+1. __a__ <code>{[Set](#set-object)}</code>:
   The set whose data will be returned.
-1. __b__ <code>{can-set/Set}</code>:
+1. __b__ <code>{[Set](#set-object)}</code>:
   A superset of set `a`.
 1. __bData__ <code>{Array\<Object\>}</code>:
   The data in set `b`.
@@ -309,9 +310,9 @@ algebra.getUnion(
 ```
 
 
-1. __a__ <code>{can-set/Set}</code>:
+1. __a__ <code>{[Set](#set-object)}</code>:
   A set.
-1. __b__ <code>{can-set/Set}</code>:
+1. __b__ <code>{[Set](#set-object)}</code>:
   A set.
 1. __aItems__ <code>{Array\<Object\>}</code>:
   Set `a`'s items.
@@ -339,12 +340,12 @@ algebra.index(
 ```
 
 The default sort property is what is specified by
-[can-set.props.id](#setcomparatorsidprop). This means if that if the sort property
+[id](#setpropsidprop). This means if that if the sort property
 is not specified, it will assume the set is sorted by the specified
 id property.
 
 
-1. __set__ <code>{can-set/Set}</code>:
+1. __set__ <code>{[Set](#set-object)}</code>:
   The `set` that describes `items`.
 1. __items__ <code>{Array\<Object\>}</code>:
   An array of data objects.
@@ -370,7 +371,7 @@ algebra.count({}) //-> Infinity
 ```
 
 
-1. __set__ <code>{can-set/Set}</code>:
+1. __set__ <code>{[Set](#set-object)}</code>:
   [description]
 
 - __returns__ <code>{Number}</code>:
@@ -394,7 +395,7 @@ algebra.has(
 ```
 
 
-1. __set__ <code>{can-set/Set}</code>:
+1. __set__ <code>{[Set](#set-object)}</code>:
   A set.
 1. __props__ <code>{Object}</code>:
   An instance's raw data.
@@ -415,9 +416,9 @@ algebra.properSubset({}, {}) //-> false
 ```
 
 
-1. __a__ <code>{can-set/Set}</code>:
+1. __a__ <code>{[Set](#set-object)}</code>:
   A set.
-1. __b__ <code>{can-set/Set}</code>:
+1. __b__ <code>{[Set](#set-object)}</code>:
   A set.
 
 - __returns__ <code>{Boolean}</code>:
@@ -435,9 +436,9 @@ algebra.subset({}, {}) //-> true
 ```
 
 
-1. __a__ <code>{can-set/Set}</code>:
+1. __a__ <code>{[Set](#set-object)}</code>:
   A set.
-1. __b__ <code>{can-set/Set}</code>:
+1. __b__ <code>{[Set](#set-object)}</code>:
   A set.
 
 - __returns__ <code>{Boolean}</code>:
@@ -457,22 +458,23 @@ algebra.union(
 ```
 
 
-1. __a__ <code>{can-set/Set}</code>:
+1. __a__ <code>{[Set](#set-object)}</code>:
   A set.
-1. __b__ <code>{can-set/Set}</code>:
+1. __b__ <code>{[Set](#set-object)}</code>:
   A set.
 
-- __returns__ <code>{can-set/Set|undefined}</code>:
+- __returns__ <code>{[Set](#set-object)|undefined}</code>:
   If an object is returned, it is the union of _A_ and _B_ (_A_ ∪ _B_).
 
   If `undefined` is returned, it means a union can't be created.
 
-## can-set.props `{Object}`
+## props `{Object}`
 
-Contains a collection of comparator generating functions.
+Contains a collection of prop generating functions.
 The following functions create `compares` objects that can be mixed together to create a set `Algebra`.
 
 ```js
+var set = require("can-set");
 var algebra = new set.Algebra(
   {
     // ignore this property in set algebra
@@ -501,13 +503,22 @@ A(undefined) \ B(false) = true
 It understands that `true` and `false` are complementary sets that combined to `undefined`. Another way to think of this is that if you load `{complete: false}` and `{complete: true}` you've loaded `{}`.
 
 
+1. __property__ <code>{String}</code>:
+  The name of the boolean property.
+1. __A__ <code>{[Compares](#compares-objectstringproppropavalue-bvalue-a-b-prop-algebra)}</code>:
+  `Compares` object that can be an argument to [Algebra](#new-setalgebracompares)
+
 
 ### <code>set.props.rangeInclusive(startIndexProperty, endIndexProperty)</code>
 
 
-Makes a comparator for two ranged properties that specify a range of items
+Makes a prop for two ranged properties that specify a range of items
 that includes both the startIndex and endIndex.  For example, a range of
 [0,20] loads 21 items.
+
+```
+set.props.rangeInclusive("start","end")
+```
 
 
 1. __startIndexProperty__ <code>{String}</code>:
@@ -515,14 +526,14 @@ that includes both the startIndex and endIndex.  For example, a range of
 1. __endIndexProperty__ <code>{String}</code>:
   The ending property name
 
-- __returns__ <code>{[compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra)}</code>:
-  Returns a comparator
+- __returns__ <code>{[Compares](#compares-objectstringproppropavalue-bvalue-a-b-prop-algebra)}</code>:
+  Returns a prop
 
 
 ### <code>set.props.enum(property, propertyValues)</code>
 
 
-Makes a comparator for a set of values.
+Makes a prop for a set of values.
 
 ```
 var compare = set.props.enum("type", ["new","accepted","pending","resolved"])
@@ -555,7 +566,7 @@ algebra.index(
   sortable behavior. The default behavior assumes the sort property value
   looks like `PROPERTY DIRECTION` (ex: `name desc`).
 
-- __returns__ <code>{[compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra)}</code>:
+- __returns__ <code>{[Compares](#compares-objectstringproppropavalue-bvalue-a-b-prop-algebra)}</code>:
   Returns a compares that can be used to create
   a `set.Algebra`.
 
@@ -565,7 +576,7 @@ algebra.index(
 
 Defines the property name on items that uniquely
 identifies them. This is the default sorted property if no
-[can-set.props.sort](#setcomparatorssortprop-sortfunc) is provided.
+[sort](#setpropssortprop-sortfunc) is provided.
 
 ```js
 var algebra = new set.Algebra(set.props.id("_id"));
@@ -584,7 +595,7 @@ algebra.index(
 1. __prop__ <code>{String}</code>:
   The property name that defines the unique property id.
 
-- __returns__ <code>{[compares](#compares-objectstringcomparatorcomparatoravalue-bvalue-a-b-prop-algebra)}</code>:
+- __returns__ <code>{[Compares](#compares-objectstringproppropavalue-bvalue-a-b-prop-algebra)}</code>:
   Returns a compares that can be used to create
   a `set.Algebra`.
 
@@ -613,12 +624,8 @@ within a nested object.
 1. __propertyName__ <code>{String|Object}</code>:
   The property name which contains the clauses's properties.
 
-- __returns__ <code>{set.compares}</code>:
+- __returns__ <code>{[Compares](#compares-objectstringproppropavalue-bvalue-a-b-prop-algebra)}</code>:
   A set compares object that can do the translation.
-
-
-
-
 
 
 
