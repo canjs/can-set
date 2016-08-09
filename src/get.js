@@ -2,11 +2,11 @@ var compare = require("./compare");
 var h = require("./helpers");
 var each = require("can-util/js/each/each");
 
-var filterData = function(data, clause, comparators) {
+var filterData = function(data, clause, props) {
 	// reduce response to items in data that meet clause criteria
 	return h.filter.call(data, function(item) {
 		var isSubset = compare.subset(item, clause, undefined, undefined,
-			undefined, comparators, {});
+			undefined, props, {});
 
 		return isSubset;
 	});

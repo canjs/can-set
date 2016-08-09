@@ -1,31 +1,31 @@
 var QUnit = require("steal-qunit");
 
 var set = require('src/set-core'),
-	comparators = require("src/comparators");
+	props = require("src/props");
 
 var each = require("can-util/js/each/each");
 
-QUnit.module("comparators.sort");
+QUnit.module("props.sort");
 
 test('set.difference', function(){
-	var comparator = comparators.sort('sort');
+	var prop = props.sort('sort');
 
-	var res = set.difference({sort: "foo"}, { completed: true }, comparator);
+	var res = set.difference({sort: "foo"}, { completed: true }, prop);
 	ok(res === true, "diff should be true");
 
-	res = set.difference({ completed: true }, { completed: true, sort: "foo" }, comparator);
+	res = set.difference({ completed: true }, { completed: true, sort: "foo" }, prop);
 	equal(res, false, "the same except for sort");
 
-	res = set.difference({ completed: true }, { sort: "foo"}, comparator);
+	res = set.difference({ completed: true }, { sort: "foo"}, prop);
 	equal(res, false);
 
-	res = set.difference({ completed: true }, { foo: 'bar', sort: "foo" }, comparator);
+	res = set.difference({ completed: true }, { foo: 'bar', sort: "foo" }, prop);
 	equal(res, false);
 });
 
 test('set.difference({ function })', function() {
 	var algebra = new set.Algebra(
-		comparators.sort('sort'),
+		props.sort('sort'),
 		{
 			colors: function() {
 				return {
@@ -44,34 +44,34 @@ test('set.difference({ function })', function() {
 });
 
 test('set.union', function(){
-	var comparator = comparators.sort('sort');
+	var prop = props.sort('sort');
 	// set / subset
-	var res = set.union({sort: "name"}, { completed: true }, comparator);
+	var res = set.union({sort: "name"}, { completed: true }, prop);
 	deepEqual(res , {}, "set / subset sort left");
 
-	res = set.union({}, { completed: true, sort: "name" }, comparator);
+	res = set.union({}, { completed: true, sort: "name" }, prop);
 	deepEqual(res , {}, "set / subset sort right");
 
-	res = set.union({ sort: "name" }, { completed: true, sort: "namer" }, comparator);
+	res = set.union({ sort: "name" }, { completed: true, sort: "namer" }, prop);
 	deepEqual(res , {}, "set / subset both sorts");
 
-	res = set.union({ completed: true }, {sort: "foo"}, comparator);
+	res = set.union({ completed: true }, {sort: "foo"}, prop);
 	deepEqual(res , {}, "subset / set");
 
-	res = set.union({foo: "bar", sort: "foo"},{foo: "bar"}, comparator);
+	res = set.union({foo: "bar", sort: "foo"},{foo: "bar"}, prop);
 	deepEqual(res, {foo: "bar"}, "equal");
 
-	res = set.union({foo: "bar"},{foo: "zed", sort: "foo"}, comparator);
+	res = set.union({foo: "bar"},{foo: "zed", sort: "foo"}, prop);
 	ok(!res, "values not equal");
 
-	res = set.union({foo: "bar", sort: "foo"},{name: "A"}, comparator);
+	res = set.union({foo: "bar", sort: "foo"},{name: "A"}, prop);
 	ok(!res, "values not equal");
 });
 
 test('set.union Array', function(){
-	var comparator = comparators.sort('sort');
+	var prop = props.sort('sort');
 	var res = set.union({foo: ["a","b"], sort: "foo"}, { foo: ["a","c"] },
-		comparator);
+		prop);
 
 	deepEqual(res , {foo: ["a","b","c"]}, "set / subset");
 });
@@ -91,25 +91,25 @@ test('set.count', function(){
 
 test('set.intersection', function(){
 
-	var comparator = comparators.sort('sort');
+	var prop = props.sort('sort');
 
-	var res = set.intersection({} , { sort: 'name' }, comparator);
+	var res = set.intersection({} , { sort: 'name' }, prop);
 	deepEqual(res, {}, "no sort if only one is sorted");
 
-	res = set.intersection({ sort: 'name' } , { sort: 'name' }, comparator);
+	res = set.intersection({ sort: 'name' } , { sort: 'name' }, prop);
 	deepEqual(res, {sort: 'name'}, "");
 
-	res = set.intersection({type: 'new'} , { sort: 'name', userId: 5 }, comparator);
+	res = set.intersection({type: 'new'} , { sort: 'name', userId: 5 }, prop);
 	deepEqual(res, {type: 'new', userId: 5 }, "");
 
-	res = set.intersection({type: 'new', sort: "age"} , { sort: 'name', userId: 5 }, comparator);
+	res = set.intersection({type: 'new', sort: "age"} , { sort: 'name', userId: 5 }, prop);
 	deepEqual(res, {type: 'new', userId: 5 }, "");
 });
 
 test('set.intersection Array', function(){
-	var comparator = comparators.sort('sort');
+	var prop = props.sort('sort');
 	var res = set.intersection({foo: ["a","b"], sort: 'foo'},
-		{ foo: ["a","c"] }, comparator);
+		{ foo: ["a","c"] }, prop);
 
 	deepEqual(res , {foo: ["a"]}, "intersection");
 });
@@ -117,7 +117,7 @@ test('set.intersection Array', function(){
 test('set.subset', function(){
 	var ignoreProp = function(){ return true; };
 
-	var algebra = new set.Algebra(comparators.sort('sort'),{
+	var algebra = new set.Algebra(props.sort('sort'),{
 		foo: ignoreProp,
 		bar: ignoreProp,
 		kind: ignoreProp,
@@ -159,7 +159,7 @@ test('set.subset', function(){
 });
 
 test('set.subset with range', function(){
-	var algebra = new set.Algebra(comparators.sort('sort'),comparators.rangeInclusive('start','end'));
+	var algebra = new set.Algebra(props.sort('sort'),props.rangeInclusive('start','end'));
 
 	// add sort .. same .. different
 	// add range .. same ... more ... less
@@ -245,7 +245,7 @@ test('set.subset with range', function(){
 });
 
 test("set.index", function(){
-	var algebra = new set.Algebra(comparators.sort('sort'));
+	var algebra = new set.Algebra(props.sort('sort'));
 
 	var index = algebra.index(
 		{sort: "name"},
@@ -256,7 +256,7 @@ test("set.index", function(){
 
 
 test("set.getSubset (#14)", function(){
-	var algebra = new set.Algebra(comparators.sort('sort'));
+	var algebra = new set.Algebra(props.sort('sort'));
 	var subset = algebra.getSubset({sort: "name"},{},[{id: 1, name:"s"}, {id: 2, name:"j"}, {id: 3, name:"m"}, {id: 4, name:"g"}]);
 	deepEqual(subset, [ {id: 4, name:"g"},{id: 2, name:"j"}, {id: 3, name:"m"},{id: 1, name:"s"}]);
 });
@@ -264,8 +264,8 @@ test("set.getSubset (#14)", function(){
 
 test("set.getUnion", function(){
 	var algebra = new set.Algebra(
-		comparators.sort('sort'),
-		comparators.boolean('complete')
+		props.sort('sort'),
+		props.boolean('complete')
 	);
 
 	// a,b,aItems, bItems
@@ -284,8 +284,8 @@ test("set.getUnion", function(){
 
 test("set.union keeps sort", function(){
 	var algebra = new set.Algebra(
-		comparators.sort('sort'),
-		comparators.boolean('complete')
+		props.sort('sort'),
+		props.boolean('complete')
 	);
 
 	var union = algebra.union(
@@ -297,8 +297,8 @@ test("set.union keeps sort", function(){
 
 test("paginated and sorted is subset (#17)", function(){
 	var algebra = new set.Algebra(
-		comparators.sort('sort'),
-		comparators.rangeInclusive('start','end')
+		props.sort('sort'),
+		props.rangeInclusive('start','end')
 	);
 
 	var res = algebra.subset({start: 0, end: 100, sort: "name"},{start: 0, end: 100, sort: "name"});

@@ -12,13 +12,13 @@ var set = require('can-set');
 // create an algebra
 var algebra = new set.Algebra(
     // specify the unique identifier on data
-    set.comparators.id("_id"),  
+    set.props.id("_id"),  
     // specify that completed can be true, false or undefined
-    set.comparators.boolean("completed"),
+    set.props.boolean("completed"),
     // specify properties that define pagination
-    set.comparators.rangeInclusive("start","end"),
+    set.props.rangeInclusive("start","end"),
     // specify the property that controls sorting
-    set.comparators.sort("orderBy"),
+    set.props.sort("orderBy"),
 )
 
 // compare two sets
