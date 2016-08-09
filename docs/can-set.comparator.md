@@ -1,5 +1,5 @@
-@typedef {function} can-set.comparator comparator
-@parent can-set
+@typedef {function} can-set.comparator Comparator
+@parent can-set.types
 
 @signature `comparator(aValue, bValue, a, b, prop, algebra)`
 

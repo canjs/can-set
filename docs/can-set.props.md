@@ -1,17 +1,18 @@
-@property {{}} can-set.comparators
-@parent can-set
+@property {{}} can-set.props props
+@parent can-set.properties
 
 @description Contains a collection of comparator generating functions.
 
 The following functions create `compares` objects that can be mixed together to create a set `Algebra`.
 
 ```js
+var set = require("can-set");
 var algebra = new set.Algebra(
   {
     // ignore this property in set algebra
     sessionId:  function(){ return true }
   },
-  set.comparators.boolean("completed"),
-  set.comparators.rangeInclusive("start","end")
+  set.props.boolean("completed"),
+  set.props.rangeInclusive("start","end")
 );
 ```

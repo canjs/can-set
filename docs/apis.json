@@ -13,12 +13,12 @@
         "can-set.Algebra.prototype.subset",
         "can-set.Algebra.prototype.union"
     ]},
-    {"can-set.comparators": [
-        "can-set.comparators.boolean",
-        "can-set.comparators.rangeInclusive",
-        "can-set.comparators.enum",
-        "can-set.comparators.sort",
-        "can-set.comparators.id"
+    {"can-set.props": [
+        "can-set.props.boolean",
+        "can-set.props.rangeInclusive",
+        "can-set.props.enum",
+        "can-set.props.sort",
+        "can-set.props.id"
     ]},
     "can-set.Translate"
 ]

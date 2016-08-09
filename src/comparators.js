@@ -135,15 +135,15 @@ var convertToBoolean = function(value){
 
 module.exports = {
 	/**
-	 * @function can-set.comparators.enum
-	 * @parent can-set.comparators
+	 * @function can-set.props.enum enum
+	 * @parent can-set.props
 	 *
-	 * @signature `set.comparators.enum(property, propertyValues)`
+	 * @signature `set.props.enum(property, propertyValues)`
 	 *
 	 * Makes a comparator for a set of values.
 	 *
 	 * ```
-	 * var compare = set.comparators.enum("type", ["new","accepted","pending","resolved"])
+	 * var compare = set.props.enum("type", ["new","accepted","pending","resolved"])
 	 * ```
 	 */
 	'enum': function(prop, enumData){
@@ -174,16 +174,20 @@ module.exports = {
 		return compares;
 	},
 	/**
-	 * @function can-set.comparators.rangeInclusive
-	 * @parent can-set.comparators
+	 * @function can-set.props.rangeInclusive rangeInclusive
+	 * @parent can-set.props
 	 *
 	 * @description Supports ranged properties.
 	 *
-	 * @signature `set.comparators.rangeInclusive(startIndexProperty, endIndexProperty)`
+	 * @signature `set.props.rangeInclusive(startIndexProperty, endIndexProperty)`
 	 *
 	 * Makes a comparator for two ranged properties that specify a range of items
 	 * that includes both the startIndex and endIndex.  For example, a range of
 	 * [0,20] loads 21 items.
+	 *
+	 * ```
+	 * set.props.rangeInclusive("start","end")
+	 * ```
 	 *
 	 *   @param  {String} startIndexProperty The starting property name
 	 *   @param  {String} endIndexProperty The ending property name
@@ -263,12 +267,12 @@ module.exports = {
 		return new clause.Paginate(compares);
 	},
 	/**
-	 * @function can-set.comparators.boolean
-	 * @parent can-set.comparators
+	 * @function can-set.props.boolean boolean
+	 * @parent can-set.props
 	 *
 	 * @description Supports boolean properties.
 	 *
-	 * @signature `set.comparators.boolean(property)`
+	 * @signature `set.props.boolean(property)`
 	 *
 	 * Makes a compare object with a `property` function that has the following logic:
 	 *
@@ -281,6 +285,8 @@ module.exports = {
 	 *
 	 * It understands that `true` and `false` are complementary sets that combined to `undefined`. Another way to think of this is that if you load `{complete: false}` and `{complete: true}` you've loaded `{}`.
 	 *
+	 * @param {String} property The name of the boolean property.
+	 * @param {can-set.compares} A `Compares` object that can be an argument to [can-set.Algebra]
 	 */
 	"boolean": function(propertyName) {
 		var compares = new clause.Where({});
@@ -308,17 +314,17 @@ module.exports = {
 		return compares;
 	},
 	/**
-	 * @function can-set.comparators.sort
-	 * @parent can-set.comparators
+	 * @function can-set.props.sort sort
+	 * @parent can-set.props
 	 *
 	 * @description Defines the sortable property and behavior.
 	 *
-	 * @signature `set.comparators.sort(prop, [sortFunc])`
+	 * @signature `set.props.sort(prop, [sortFunc])`
 	 *
 	 * Defines the sortable property and behavior.
 	 *
 	 * ```js
-	 * var algebra = new set.Algebra(set.comparators.sort("sortBy"));
+	 * var algebra = new set.Algebra(set.props.sort("sortBy"));
 	 * algebra.index(
 	 *   {sortBy: "name desc"},
 	 *   [{name: "Meyer"}],
@@ -346,19 +352,19 @@ module.exports = {
 		return new clause.Order(compares);
 	},
 	/**
-	 * @function can-set.comparators.id
-	 * @parent can-set.comparators
+	 * @function can-set.props.id id
+	 * @parent can-set.props
 	 *
 	 * @description Defines the identify property.
 	 *
-	 * @signature `set.comparators.id(prop)`
+	 * @signature `set.props.id(prop)`
 	 *
 	 * Defines the property name on items that uniquely
 	 * identifies them. This is the default sorted property if no
-	 * [can-set.comparators.sort] is provided.
+	 * [can-set.props.sort] is provided.
 	 *
 	 * ```js
-	 * var algebra = new set.Algebra(set.comparators.id("_id"));
+	 * var algebra = new set.Algebra(set.props.id("_id"));
 	 * algebra.index(
 	 *   {sortBy: "name desc"},
 	 *   [{name: "Meyer"}],
