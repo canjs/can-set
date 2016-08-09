@@ -1,6 +1,7 @@
 @typedef {function} can-set.prop Prop
 @parent can-set.types
 
+
 @signature `prop(aValue, bValue, a, b, prop, algebra)`
 
 A prop function returns algebra values for two values for a given property.

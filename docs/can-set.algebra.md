@@ -20,7 +20,6 @@ var algebra = new set.Algebra(
 
   @param {can-set.compares} compares Each argument is a compares. These
   are returned by the functions on [can-set.props] or can be created
-  manually.
-
+  manually. 
 
   @return {can-set.Algebra} Returns an instance of an algebra.

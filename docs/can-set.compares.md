@@ -1,6 +1,7 @@
 @typedef {Object<String,can-set.prop>} can-set.compares Compares
 @parent can-set.types
 
+
 @description An object of property names and `prop` functions.
 
 ```js

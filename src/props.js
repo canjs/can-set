@@ -356,7 +356,7 @@ module.exports = {
 	 * @parent can-set.props
 	 *
 	 * @description Defines the identify property.
-	 * 
+	 *
 	 * @signature `set.props.id(prop)`
 	 *
 	 * Defines the property name on items that uniquely
