@@ -133,7 +133,7 @@ var convertToBoolean = function(value){
 	return value;
 };
 
-module.exports = {
+var props = {
 	/**
 	 * @function can-set.props.enum enum
 	 * @parent can-set.props
@@ -173,33 +173,15 @@ module.exports = {
 		};
 		return compares;
 	},
-	/**
-	 * @function can-set.props.rangeInclusive rangeInclusive
-	 * @parent can-set.props
-	 *
-	 * @description Supports ranged properties.
-	 *
-	 * @signature `set.props.rangeInclusive(startIndexProperty, endIndexProperty)`
-	 *
-	 * Makes a prop for two ranged properties that specify a range of items
-	 * that includes both the startIndex and endIndex.  For example, a range of
-	 * [0,20] loads 21 items.
-	 *
-	 * ```
-	 * set.props.rangeInclusive("start","end")
-	 * ```
-	 *
-	 *   @param  {String} startIndexProperty The starting property name
-	 *   @param  {String} endIndexProperty The ending property name
-	 *   @return {can-set.compares} Returns a prop
-	 */
-	rangeInclusive: function(startIndexProperty, endIndexProperty){
+	paginate: function(propStart, propEnd, translateToStartEnd, reverseTranslate) {
+
 		var compares = {};
 		var makeResult = function(result, index) {
 			var res = {};
 			each(["intersection","difference","union"], function(prop){
 				if(result[prop]) {
-					res[prop] = result[prop][index];
+					var set = {start: result[prop][0], end: result[prop][1]};
+					res[prop] = reverseTranslate(set)[index === 0 ? propStart: propEnd];
 				}
 			});
 			if(result.count) {
@@ -210,13 +192,15 @@ module.exports = {
 
 		// returns the `start` properties values for different algebra methods and a
 		// getSubset+getUnion that really dont do anything.
-		compares[startIndexProperty] = function(vA, vB, A, B){
+		compares[propStart] = function(vA, vB, A, B){
 			if(vA === undefined) {
 				return;
 			}
-			var res = diff(A, B, startIndexProperty, endIndexProperty);
+
+			var res = diff(translateToStartEnd(A), translateToStartEnd(B), "start", "end");
 
 			var result = makeResult(res, 0);
+
 			result.getSubset = function(a, b, bItems, algebra, options){
 				return bItems;
 			};
@@ -227,37 +211,41 @@ module.exports = {
 		};
 		// returns the `end` property values for different algebra methods and
 		// a getSubset+getUnion that actually perform a mution on the items.
-		compares[endIndexProperty] = function(vA, vB, A, B){
+		compares[propEnd] = function(vA, vB, A, B){
 			if(vA === undefined) {
 				return;
 			}
-			var data= diff(A, B, startIndexProperty, endIndexProperty);
+			var data= diff(translateToStartEnd(A), translateToStartEnd(B), "start", "end");
 			var res = makeResult( data, 1);
 			// if getSubset ... remove from the .get
 			res.getSubset = function(a, b, bItems, algebra, options){
-				var numProps = numericProperties(a, b, startIndexProperty, endIndexProperty);
+				var tA = translateToStartEnd(a);
+				var tB = translateToStartEnd(b);
+				var numProps = numericProperties(tA, tB, "start", "end");
 				var aStartValue = numProps.sAv1,
 					aEndValue = numProps.sAv2;
 
 				var bStartValue = numProps.sBv1;
 
-				if(  ! (endIndexProperty in b) || ! (endIndexProperty in a)  ) {
+				if(  ! ("end" in tB) || ! ("end" in tA)  ) {
 					return bItems.slice(aStartValue, aEndValue+1);
 				}
 				return bItems.slice( aStartValue - bStartValue, aEndValue - bStartValue + 1 );
 			};
 			res.getUnion = function(a, b, aItems, bItems, algebra, options){
+				var tA = translateToStartEnd(a);
+				var tB = translateToStartEnd(b);
 				// if a is after b
 				if(data.meta.indexOf("after") >= 0) {
 					// if they overlap ... shave some off
 					if(data.intersection) {
-						bItems = bItems.slice( 0, data.intersection[0]- (+b[startIndexProperty])  );
+						bItems = bItems.slice( 0, data.intersection[0]- (+tB.start)  );
 					}
 					return [bItems, aItems];
 				}
 
 				if(data.intersection) {
-					aItems = aItems.slice( 0, data.intersection[0]- (+a[startIndexProperty])  );
+					aItems = aItems.slice( 0, data.intersection[0]- (+tA.start)  );
 				}
 				return [aItems,bItems];
 			};
@@ -386,3 +374,109 @@ module.exports = {
 		return new clause.Id(compares);
 	}
 };
+
+var assignExcept = function(d, s, props){
+	for(var prop in s) {
+		if(!props[prop]) {
+			d[prop] = s[prop];
+		}
+	}
+	return d;
+};
+var translateToOffsetLimit = function(set, offsetProp, limitProp) {
+	var newSet = assignExcept({}, set, {start: 1, end: 1});
+	if("start" in set) {
+		newSet[offsetProp] = set.start;
+	}
+	if("end" in set) {
+		newSet[limitProp] = (set.end - set.start) + 1;
+	}
+	return newSet;
+};
+var translateToStartEnd = function(set, offsetProp, limitProp) {
+	var except = {};
+	except[offsetProp] = except[limitProp] = 1;
+	var newSet = assignExcept({}, set,except);
+	if(offsetProp in set) {
+		newSet.start = set[offsetProp];
+	}
+	if(limitProp in set) {
+		newSet.end = set[offsetProp] + set[limitProp] - 1;
+	}
+	return newSet;
+};
+/**
+ * @function can-set.props.offsetLimit offsetLimit
+ * @parent can-set.props
+ *
+ * @description Supports sets that include a limit and offset.
+ *
+ * @signature `set.props.offsetLimit( [offsetProperty][, limitProperty] )`
+ *
+ * Makes a prop for two ranged properties that specify a range of items
+ * that includes both the offsetProperty and limitProperty.  For example, set like:
+ * `{offset: 20, limit: 10}` loads 10 items starting at index 20.
+ *
+ * ```
+ * new set.Algebra( set.props.offsetLimit("offset","limit") );
+ * ```
+ *
+ *   @param  {String} offsetProperty The offset property name on sets.  Defaults to `"offset"` if none is provided.
+ *   @param  {String} limitProperty The offset limit name on sets. Defaults to `"limit"` if none is provided.
+ *   @return {can-set.compares} Returns a comparator used to build a set algebra.
+ */
+props.offsetLimit = function(offsetProp, limitProp){
+	return props.paginate(
+		offsetProp, limitProp,
+		function(set){
+			return translateToStartEnd(set, offsetProp, limitProp);
+		}, function(set){
+			return translateToOffsetLimit(set, offsetProp, limitProp);
+		});
+};
+
+/**
+ * @function can-set.props.rangeInclusive rangeInclusive
+ * @parent can-set.props
+ *
+ * @description Supports ranged properties.
+ *
+ * @signature `set.props.rangeInclusive(startIndexProperty, endIndexProperty)`
+ *
+ * Makes a prop for two ranged properties that specify a range of items
+ * that includes both the startIndex and endIndex.  For example, a range of
+ * [0,20] loads 21 items.
+ *
+ * ```
+ * set.props.rangeInclusive("start","end")
+ * ```
+ *
+ *   @param  {String} startIndexProperty The starting property name
+ *   @param  {String} endIndexProperty The ending property name
+ *   @return {can-set.compares} Returns a prop
+ */
+props.rangeInclusive = function(startIndexProperty, endIndexProperty){
+	return props.paginate(
+		startIndexProperty,
+		endIndexProperty,
+		function(set){
+			var except = {};
+			except[startIndexProperty] = except[endIndexProperty] = 1;
+			var newSet = assignExcept({}, set,except);
+			if(startIndexProperty in set) {
+				newSet.start = set[startIndexProperty];
+			}
+			if(endIndexProperty in set) {
+				newSet.end = set[endIndexProperty];
+			}
+			return newSet;
+		}, function(set){
+			var except = {start: 1, end: 1};
+			var newSet = assignExcept({}, set,except);
+			newSet[startIndexProperty] = set.start;
+			newSet[endIndexProperty] = set.end;
+			return newSet;
+		});
+};
+
+module.exports = props;
