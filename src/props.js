@@ -398,10 +398,10 @@ var translateToStartEnd = function(set, offsetProp, limitProp) {
 	except[offsetProp] = except[limitProp] = 1;
 	var newSet = assignExcept({}, set,except);
 	if(offsetProp in set) {
-		newSet.start = set[offsetProp];
+		newSet.start = parseInt(set[offsetProp],10);
 	}
 	if(limitProp in set) {
-		newSet.end = set[offsetProp] + set[limitProp] - 1;
+		newSet.end = newSet.start + parseInt(set[limitProp]) - 1;
 	}
 	return newSet;
 };
@@ -427,7 +427,7 @@ var translateToStartEnd = function(set, offsetProp, limitProp) {
  */
 props.offsetLimit = function(offsetProp, limitProp){
 	return props.paginate(
-		offsetProp, limitProp,
+		offsetProp || "offset", limitProp || "limit",
 		function(set){
 			return translateToStartEnd(set, offsetProp, limitProp);
 		}, function(set){
@@ -457,8 +457,8 @@ props.offsetLimit = function(offsetProp, limitProp){
  */
 props.rangeInclusive = function(startIndexProperty, endIndexProperty){
 	return props.paginate(
-		startIndexProperty,
-		endIndexProperty,
+		startIndexProperty || "start",
+		endIndexProperty || "end",
 		function(set){
 			var except = {};
 			except[startIndexProperty] = except[endIndexProperty] = 1;
