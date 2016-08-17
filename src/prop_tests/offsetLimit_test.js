@@ -1,0 +1,125 @@
+var QUnit = require("steal-qunit");
+
+var set = require('src/set-core'),
+	props = require("src/props");
+
+QUnit.module("props.limitOffset");
+
+test('offsetLimit set.equal', function(){
+
+	/*
+	 * X = [A0, ..., An]
+	 * Y = [A0, ..., An]
+	 */
+	ok(
+		set.equal(
+			{offset: 0, limit: 99},
+			{offset: 0, limit: 99},
+			props.offsetLimit("offset", "limit")),
+		"they are equal" );
+
+	/*
+	 * X = [A0, ..., An]
+	 * Y = [A0, ..., A(n+1)]
+	 */
+	ok(
+		!set.equal(
+			{offset: 0, limit: 100},
+			{offset: 0, limit: 101},
+			props.offsetLimit("offset", "limit")),
+		"they are not equal" );
+
+	/*
+	 * X = [A0, ..., An]
+	 * Y = [A1, ..., An]
+	 */
+	ok(
+		!set.equal(
+			{offset: 0, limit: 100},
+			{offset: 1, limit: 100},
+			props.offsetLimit("offset", "limit")),
+		"they are not equal" );
+});
+
+
+
+
+test('offsetLimit set.union', function() {
+	var prop = props.offsetLimit('offset', 'limit');
+
+
+	/*
+	 * X = [A0, ..., A99]
+	 * Y = [A50, ..., A101]
+	 *
+	 * X U Y = [A0, ..., A101]
+	 */
+	var res = set.union({ offset: 0, limit: 100 }, { offset: 50, limit: 52 }, prop);
+	deepEqual(res, { offset: 0, limit: 102 }, "got a union");
+
+	/*
+	 * X = universal set
+	 * Y = [A0, ..., A10]
+	 *
+	 * X U Y = X
+	 */
+	res = set.union({}, { offset: 0, limit: 10 }, prop);
+	deepEqual(res, {}, "universal set");
+
+	/*
+	 * X = [A100, ..., A199]
+	 * Y = [A200, ..., A299]
+	 *
+	 * X U Y = [A100, ..., A299]
+	 */
+	res = set.union({offset: 100, limit: 100}, {offset: 200, limit: 100}, prop);
+	deepEqual(res, {offset:100, limit:200}, "no intersection");
+
+	/*
+	 * X = [A200, ..., A299]
+	 * Y = [A100, ..., A199]
+	 *
+	 * X U Y = [A100, ..., A299]
+	 */
+	res = set.union({offset: 200, limit: 100}, {offset: 100, limit: 100}, prop);
+	deepEqual(res, {offset:100, limit:200}, "no intersection with either argument order");
+
+
+
+	/*
+	 * X = [A200, ..., A299]
+	 * Y = [A100, ..., A209]
+	 *
+	 * X U Y = [A100, ..., A299]
+	 */
+	res = set.union({offset: 100, limit: 110}, {offset: 200, limit: 100}, prop);
+	deepEqual(res, {offset:100, limit:200}, "sets can intersect with either argument order");
+
+
+});
+
+
+
+test('rangeInclusive set.count', function(){
+	var prop = props.offsetLimit('offset', 'limit');
+
+	/*
+	 * X = [A0, ..., A99]
+	 * |X| = 100
+	 */
+	var res = set.count({ offset: 0, limit: 100 }, prop);
+	equal(res, 100, "count is right");
+});
+
+test('rangeInclusive set.intersection', function(){
+	var prop = props.offsetLimit('offset', 'limit');
+
+	/*
+	 * X = [A0, A99]
+	 * Y = [A50, A101]
+	 *
+	 * X ∩ Y = [A50, A99]
+	 */
+	var res = set.intersection({ offset: 0, limit: 100 }, { offset: 50, limit: 52 }, prop);
+	deepEqual(res, { offset: 50, limit: 50 }, "got a intersection");
+});
