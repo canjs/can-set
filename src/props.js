@@ -426,8 +426,10 @@ var translateToStartEnd = function(set, offsetProp, limitProp) {
  *   @return {can-set.compares} Returns a comparator used to build a set algebra.
  */
 props.offsetLimit = function(offsetProp, limitProp){
+	offsetProp = offsetProp || "offset";
+	limitProp = limitProp || "limit";
 	return props.paginate(
-		offsetProp || "offset", limitProp || "limit",
+		offsetProp, limitProp,
 		function(set){
 			return translateToStartEnd(set, offsetProp, limitProp);
 		}, function(set){
@@ -456,9 +458,11 @@ props.offsetLimit = function(offsetProp, limitProp){
  *   @return {can-set.compares} Returns a prop
  */
 props.rangeInclusive = function(startIndexProperty, endIndexProperty){
+	startIndexProperty = startIndexProperty || "start";
+	endIndexProperty = endIndexProperty || "end";
 	return props.paginate(
-		startIndexProperty || "start",
-		endIndexProperty || "end",
+		startIndexProperty,
+		endIndexProperty,
 		function(set){
 			var except = {};
 			except[startIndexProperty] = except[endIndexProperty] = 1;
