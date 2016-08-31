@@ -43,7 +43,7 @@
     "bit-docs": "^0.0.7"
   },
   "dependencies": {
-    "can-util": "^3.0.0-pre.11"
+    "can-util": "^3.0.0-pre.35"
   },
   "bit-docs": {
     "dependencies": {
