@@ -2,6 +2,7 @@
 @parent can-core
 @group can-set.types types
 @group can-set.properties properties
+@package ../package.json
 
 @description
 
