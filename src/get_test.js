@@ -3,7 +3,7 @@ var QUnit = require("steal-qunit");
 var props = require("./props");
 var h = require("./helpers");
 
-QUnit.module("set/src/set-core get methods");
+QUnit.module("can-set get");
 
 var getId = function(d){ return d.id; };
 

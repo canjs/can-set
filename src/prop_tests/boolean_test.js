@@ -1,9 +1,9 @@
 var QUnit = require("steal-qunit");
 
-var set = require('src/set-core'),
-	props = require("src/props");
+var set = require('../set-core'),
+	props = require("../props");
 
-QUnit.module("props.boolean");
+QUnit.module("can-set props.boolean");
 
 /*
  * For the boolean prop, we define sets like so:

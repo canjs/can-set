@@ -4,7 +4,7 @@ var set = require('./set-core');
 
 var ignoreProp = function(){ return true; };
 
-QUnit.module("set core");
+QUnit.module("can-set core");
 
 test('set.equal', function(){
 	var res;
