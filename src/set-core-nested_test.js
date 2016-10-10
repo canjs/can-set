@@ -1,4 +1,4 @@
-QUnit.module("set core - nested");
+QUnit.module("can/set core - nested");
 
 
 require("steal-qunit");
@@ -7,7 +7,7 @@ var set = require('./set-core');
 
 var ignoreProp = function(){ return true; };
 
-QUnit.module("set core - nested where");
+QUnit.module("can-set core - nested where");
 
 test('set.equal', function(){
 	

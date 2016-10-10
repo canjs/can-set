@@ -1,11 +1,11 @@
 var QUnit = require("steal-qunit");
 
-var set = require('src/set-core'),
-	props = require("src/props");
+var set = require('../set-core'),
+	props = require("../props");
 
 var each = require("can-util/js/each/each");
 
-QUnit.module("props.sort");
+QUnit.module("can-set props.sort");
 
 test('set.difference', function(){
 	var prop = props.sort('sort');

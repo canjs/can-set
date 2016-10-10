@@ -1,6 +1,6 @@
 var QUnit = require("steal-qunit");
 
-QUnit.module("props");
+QUnit.module("can-set props");
 
 require('./prop_tests/sort_test');
 require('./prop_tests/rangeInclusive_test');
