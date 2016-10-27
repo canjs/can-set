@@ -41,7 +41,7 @@ algebra.getSubset({start: 2,end: 3},{start: 1,end: 4},
 ## Use
 
 A [can-set/Set] is a plain JavaScript object used to represent a
-[https://en.wikipedia.org/wiki/Set_theory#Basic_concepts_and_notation set] of data usually returned by the server.  For example,
+[https://en.wikipedia.org/wiki/Set_theory#Basic_concepts_and_notation set] of data usually sent to the server to fetch a list of records.  For example,
 a list of all completed todos might be represented by:
 
 ```
@@ -54,7 +54,7 @@ This set might be passed to [can-connect/can/map/map.getList] like:
 Todo.getList({complete: true})
 ```
 
-A [can-set.Algebra] is used to detail the behavior of these sets,
+An [can-set.Algebra] is used to detail the behavior of these sets,
 often using already provided [can-set.props] comparators:
 
 ```
@@ -105,3 +105,72 @@ fixture("/todos/{_id}", todoStore);
 
 The best way to think about `can-set` is that its a way to detail
 the behavior of your service layer so other utilities can benefit.
+
+## Solving Common Issues
+
+Configuring the proper `set.Algebra` can be tricky.  The best way to make sure you
+have things working is to create an algebra and make sure some of the basics
+work.  
+
+The most common problem is that your `algebra` isn't configured to know what
+instance data belongs in which set.  
+
+For example, `{id: 1, name: "do dishes"}` should belong to the
+set `{sort: "name asc"}`, but it doesn't:
+
+```js
+var algebra = new set.Algebra();
+algebra.has({sort: "name asc"}, {id: 1, name: "do dishes"}) //-> false
+```
+
+The fix is to either ignore `sort` like:
+
+```js
+var algebra = new set.Algebra({
+    sort: function() { return true; }
+});
+algebra.has({sort: "name asc"}, {id: 1, name: "do dishes"}) //-> false
+```
+
+Or even better, make `sort` actually able to understand sorting:
+
+```js
+var algebra = new set.Algebra(
+    set.props.sort("sort")
+);
+algebra.has({sort: "name asc"}, {id: 1, name: "do dishes"}) //-> true
+```
+
+Similarly, you can verify that [can-set.Algebra.prototype.getSubset]
+works.  The following, with a default algebra gives
+the wrong results:
+
+```js
+var algebra = new set.Algebra();
+algebra.getSubset(
+    {offset: 1, limit: 2},
+    {},
+    [
+        {id: 1, name: "do dishes"}
+        {id: 2, name: "mow lawn"},
+        {id: 3, name: "trash"}]) //-> []
+```
+
+This is because it's looking for instance data where `offset===1` and `limit===2`.
+Again, you can teach your algebra what to do with these properties like:
+
+```js
+var algebra = new set.Algebra(
+    set.props.offsetLimit("offset","limit")
+);
+algebra.getSubset(
+    {offset: 1, limit: 2},
+    {},
+    [
+        {id: 1, name: "do dishes"}
+        {id: 2, name: "mow lawn"},
+        {id: 3, name: "trash"}]) //-> [
+            //  {id: 2, name: "mow lawn"},
+            // {id: 3, name: "trash"}
+            // ]
+```
