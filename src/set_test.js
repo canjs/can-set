@@ -14,3 +14,7 @@ test('set.Algebra constructors', function(){
 	var res = algebra.subset({ type: ['new'] },{type: ['new','prep']});
 	deepEqual(res, true, "enum");
 });
+
+test('set.clause', function(){
+	QUnit.ok(set.clause);
+});
