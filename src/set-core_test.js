@@ -7,7 +7,8 @@ var ignoreProp = function(){ return true; };
 QUnit.module("can-set core");
 
 test('set.equal', function(){
-	var res;
+	var res,
+		now;
 
 	res = set.equal(
 		{ type: 'FOLDER' },
@@ -41,6 +42,14 @@ test('set.equal', function(){
 		{foo: {}}
 	);
 	ok(!res, 'nulls and empty objects are not considered the same. (#773)');
+
+	// Issue #35
+	now = new Date();
+	res = set.equal(
+		{foo: now},
+		{foo: new Date(now.getTime())}
+	);
+	ok(res, 'date objects with same time values are considered the same. (#35)');
 
 });
 

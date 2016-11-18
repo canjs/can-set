@@ -84,8 +84,8 @@ module.exports = compareHelpers = {
 		if (a === null || b === null) {
 			return a === b;
 		}
-		if (a instanceof Date || b instanceof Date) {
-			return a === b;
+		if (a instanceof Date && b instanceof Date) {
+			return a.getTime() === b.getTime();
 		}
 		if (options.deep === -1) {
 			return typeof a === 'object' || a === b;
