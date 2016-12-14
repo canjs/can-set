@@ -1,5 +1,5 @@
 var set = require("./set-core");
-var ns = require("can-util/namespace");
+var ns = require("can-namespace");
 
 var props = require("./props");
 var clause = require("./clause");
