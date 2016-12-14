@@ -43,6 +43,7 @@
     "bit-docs": "^0.0.7"
   },
   "dependencies": {
+    "can-namespace": "^1.0.0",
     "can-util": "^3.0.1"
   },
   "bit-docs": {
