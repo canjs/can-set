@@ -256,3 +256,12 @@ test('set.index', function(){
 
 	equal(index, 0);
 });
+
+test('algebra.id', function(){
+	var algebra = new set.Algebra(set.props.id("_id"));
+	QUnit.equal(algebra.id({_id: 5}), 5, "only one id, returns value");
+
+	algebra = new set.Algebra(set.props.id("studentId"), set.props.id("classId"));
+	QUnit.equal(algebra.id({studentId: 6, classId: "7", foo: "bar"}), JSON.stringify({studentId: 6, classId: "7"}), "only one id, returns set as JSON");
+
+});
