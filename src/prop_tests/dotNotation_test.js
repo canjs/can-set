@@ -27,5 +27,5 @@ test('dotNotation set membership', function() {
    * x ∉ X | x.n.p != 'IL'
    */
   res = alg.has({'n.p': 'IL'}, {n:{p:'MI'}});
-  notOk(res, "object with nested property not a member of set using dotNotation");
+  ok(res === false, "object with nested property not a member of set using dotNotation");
 });
