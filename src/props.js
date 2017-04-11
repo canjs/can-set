@@ -483,6 +483,17 @@ props.rangeInclusive = function(startIndexProperty, endIndexProperty){
 		});
 };
 
+var nestedLookup = function(obj, propNameArray) {
+	if (obj === undefined) {
+		return undefined;
+	}
+
+	if (propNameArray.length === 1) {
+		return obj[propNameArray[0]];
+	} else {
+		return nestedLookup(obj[propNameArray[0]], propNameArray.slice(1));
+	}
+};
 /**
  * @function can-set.props.dotNotation dotNotation
  * @parent can-set.props
@@ -509,10 +520,10 @@ props.dotNotation = function(dotProperty){
 
 		// one of the value arguments being defined implies its the can-set definition prop, since a set member itself wont
 		// have obj['nested.property.name'] defined
-		if (aVal != undefined) {
+		if (aVal !== undefined) {
 			propertyVal = aVal;
 			modelVal = nestedLookup(b, propertyName.split('.'));
-		} else if (bVal != undefined) {
+		} else if (bVal !== undefined) {
 			propertyVal = bVal;
 			modelVal = nestedLookup(a, propertyName.split('.'));
 		}
@@ -521,17 +532,6 @@ props.dotNotation = function(dotProperty){
 	};
 
 	return compares;
-};
-var nestedLookup = function(obj, propNameArray) {
-	if (obj === undefined) {
-		return undefined;
-	}
-
-	if (propNameArray.length == 1) {
-		return obj[propNameArray[0]];
-	} else {
-		return nestedLookup(obj[propNameArray[0]], propNameArray.slice(1));
-	}
 };
 
 module.exports = props;
