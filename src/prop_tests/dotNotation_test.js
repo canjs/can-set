@@ -28,4 +28,13 @@ test('dotNotation set membership', function() {
    */
   res = alg.has({'n.p': 'IL'}, {n:{p:'MI'}});
   ok(res === false, "object with nested property not a member of set using dotNotation");
+
+  /*
+   * For a property 'n.p.s', with value 'IL'
+   * x ∈ X | x.n.p.s == 'IL'
+   */
+  prop = props.dotNotation('n.p.s');
+  alg = new set.Algebra(prop);
+  res = alg.has({'n.p.s': 'IL'}, {n:{p:{s:'IL'}}});
+  ok(res, "object with deep nested property is member of set using dotNotation");
 });
