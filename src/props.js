@@ -517,10 +517,10 @@ props.dotNotation = function(dotProperty){
 
 	compares[dotProperty] = function(aVal, bVal, a, b, propertyName) {
 		// if the value wasn't picked out from the parent try a dotNotation lookup
-		if (aVal == undefined) {
+		if (aVal === undefined) {
 			aVal = nestedLookup(a, propertyName.split('.'));
 		}
-		if (bVal == undefined) {
+		if (bVal === undefined) {
 			bVal = nestedLookup(b, propertyName.split('.'));
 		}
 
