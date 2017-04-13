@@ -3,7 +3,7 @@ var QUnit = require("steal-qunit");
 var set = require('../set-core'),
   props = require("../props");
 
-QUnit.module("can-set props.boolean");
+QUnit.module("can-set props.dotNotation");
 
 /*
  * For the dotNotation prop, we define sets like so:
@@ -18,8 +18,8 @@ test('dotNotation set membership', function() {
    * x ∈ X | x.n.p == 'IL'
    */
   var prop = props.dotNotation('n.p'),
-      alg = new set.Algebra(prop),
-      res = alg.has({'n.p': 'IL'}, {n:{p:'IL'}});
+    alg = new set.Algebra(prop),
+    res = alg.has({'n.p': 'IL'}, {n:{p:'IL'}});
   ok(res, "object with nested property is member of set using dotNotation");
 
   /*
@@ -37,4 +37,58 @@ test('dotNotation set membership', function() {
   alg = new set.Algebra(prop);
   res = alg.has({'n.p.s': 'IL'}, {n:{p:{s:'IL'}}});
   ok(res, "object with deep nested property is member of set using dotNotation");
+});
+
+test('dotNotation set equality', function() {
+  var prop = props.dotNotation('n.p'),
+    alg = new set.Algebra(prop),
+    set1 = {'n.p': 'IL'},
+    set2 = {'n.p': 'IL'},
+    set3 = {'n.p': 'MI'},
+    set4 = {n:{p:'MI'}};
+
+  /*
+   * {x | x ∈ X, x.n.p == 'IL'} = {y | y ∈ Y, y.n.p == 'IL'}
+   */
+  ok(alg.equal(set1, set2) && alg.equal(set2, set1), "sets with dotNotation properties are equivalent");
+
+  /*
+   * {x | x ∈ X, x.n.p == 'IL'} != {y | y ∈ Y, y.n.p == 'MI'}
+   */
+  ok(alg.equal(set1, set3) === false, "sets with dotNotation properties are not equivalent");
+
+  /*
+   * {x | x ∈ X, x.n.p == 'MI'} = {y | y ∈ Y, y.n.p == 'MI'}
+   */
+  ok(alg.equal(set4, set3) === false, "sets with dotNotation properties are equivalent to sets with nested properties");
+});
+
+test('dotNotation set subset', function() {
+  var alg = new set.Algebra(
+      props.dotNotation('address.state'),
+      props.dotNotation('address.city')
+    ),
+    set1 = {'address.state': 'IL'},
+    set2 = {'address.state': 'IL', 'address.city': 'Chicago'},
+    set3 = {address: {state: 'IL', city: 'Chicago'}};
+
+  /*
+   * {x | x ∈ X, x.address.state = 'IL', x.address.city = 'Chicago'} ⊆ {y | y ∈ Y, y.address.state == 'IL'}
+   */
+  ok(alg.subset(set2, set1), "sets with dotNotation property is a subset of another dotNotation set");
+
+  /*
+   * {x | x ∈ X, x.address.state = 'IL', x.address.city = 'Chicago'} ⊆ {y | y ∈ Y, y.address.state == 'IL'}
+   */
+  ok(alg.subset(set3, set1), "sets with nested property notation is a subset of a dotNotation set");
+
+  /*
+   * {y | y ∈ Y, y.address.state == 'IL'} ⊆ ξ
+   */
+  ok(alg.subset(set1, {}), "sets with dotNotation properties are subsets of the universal set");
+
+  /*
+   * ξ ⊄ {y | y ∈ Y, y.address.state == 'IL'}
+   */
+  ok(alg.subset({}, set1) === false, "the universal set is not a subset of a set with dotNotation");
 });

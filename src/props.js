@@ -516,19 +516,15 @@ props.dotNotation = function(dotProperty){
 	var compares = new clause.Where({});
 
 	compares[dotProperty] = function(aVal, bVal, a, b, propertyName) {
-		var modelVal, propertyVal;
-
-		// one of the value arguments being defined implies its the can-set definition prop, since a set member itself wont
-		// have obj['nested.property.name'] defined
-		if (aVal !== undefined) {
-			propertyVal = aVal;
-			modelVal = nestedLookup(b, propertyName.split('.'));
-		} else if (bVal !== undefined) {
-			propertyVal = bVal;
-			modelVal = nestedLookup(a, propertyName.split('.'));
+		// if the value wasn't picked out from the parent try a dotNotation lookup
+		if (aVal == undefined) {
+			aVal = nestedLookup(a, propertyName.split('.'));
+		}
+		if (bVal == undefined) {
+			bVal = nestedLookup(b, propertyName.split('.'));
 		}
 
-		return propertyVal === modelVal;
+		return aVal === bVal;
 	};
 
 	return compares;
