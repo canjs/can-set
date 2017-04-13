@@ -483,4 +483,51 @@ props.rangeInclusive = function(startIndexProperty, endIndexProperty){
 		});
 };
 
+var nestedLookup = function(obj, propNameArray) {
+	if (obj === undefined) {
+		return undefined;
+	}
+
+	if (propNameArray.length === 1) {
+		return obj[propNameArray[0]];
+	} else {
+		return nestedLookup(obj[propNameArray[0]], propNameArray.slice(1));
+	}
+};
+/**
+ * @function can-set.props.dotNotation dotNotation
+ * @parent can-set.props
+ *
+ * @description Supports MongoDB-style 'dot notation' properties.
+ *
+ * @signature `set.props.dotNotation(dotProperty)`
+ *
+ * Defines a property that specifies a MongoDB-style nested property match.
+ * For example, a set property of "address.city" matches against the value of the nested `{address: {city}}` value.
+ *
+ * ```
+ * set.props.dotNotation("address.city")
+ * ```
+ *
+ *   @param  {String} dotProperty The MongoDB-style nested property name
+ *   @return {can-set.compares} Returns a comparator used to build a set algebra
+ */
+props.dotNotation = function(dotProperty){
+	var compares = new clause.Where({});
+
+	compares[dotProperty] = function(aVal, bVal, a, b, propertyName) {
+		// if the value wasn't picked out from the parent try a dotNotation lookup
+		if (aVal === undefined) {
+			aVal = nestedLookup(a, propertyName.split('.'));
+		}
+		if (bVal === undefined) {
+			bVal = nestedLookup(b, propertyName.split('.'));
+		}
+
+		return aVal === bVal;
+	};
+
+	return compares;
+};
+
 module.exports = props;
