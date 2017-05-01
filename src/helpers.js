@@ -164,17 +164,40 @@ module.exports = helpers = {
 		return high;
 		// bisect by calling sortFunc
 	},
+
+	// Gives back the value of an object at a provided dot-separated path string.
+	getValueFromPath: function(obj, path) {
+		path = path.split('.');
+		for (var i = 0; i < path.length; i++){
+			obj = obj[path[i]];
+		};
+		return obj;
+	},
+
 	defaultSort: function(sortPropValue, item1, item2) {
-		var parts = sortPropValue.split(' ');
-		var sortProp = parts[0];
-		var item1Value = item1[sortProp];
-		var item2Value = item2[sortProp];
-		var temp;
-		var desc = parts[1] || '';
-		desc = desc.toLowerCase()	=== 'desc';
+		var parts = [], sortProp, item1Value, item2Value, desc;
+
+		if (typeof sortPropValue === 'string') {
+			parts = sortPropValue.split(' ');
+			sortProp = parts[0];
+			item1Value = item1[sortProp];
+			item2Value = item2[sortProp];
+			desc = parts[1] || '';
+			desc = desc.toLowerCase()	=== 'desc';
+
+		} else {
+			var path = Object.keys(sortPropValue)[0];
+			var sortDir = sortPropValue[Object.keys(sortPropValue)[0]];
+			if (sortDir === -1) {
+				desc = true;
+			}
+
+			item1Value = helpers.getValueFromPath(item1, path);
+			item2Value = helpers.getValueFromPath(item2, path);
+		}
 
 		if(desc) {
-			temp = item1Value;
+			var temp = item1Value;
 			item1Value = item2Value;
 			item2Value = temp;
 		}
