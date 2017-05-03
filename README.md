@@ -1,5 +1,7 @@
 # can-set
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-set.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/canjs/can-set.svg?branch=master)](https://travis-ci.org/canjs/can-set)
 
 __can-set__ is a utility for comparing [sets](http://en.wikipedia.org/wiki/Set_theory#Basic_concepts_and_notation) that
