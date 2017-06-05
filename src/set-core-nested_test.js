@@ -10,7 +10,7 @@ var ignoreProp = function(){ return true; };
 QUnit.module("can-set core - nested where");
 
 test('set.equal', function(){
-	
+
 	var algebra = new set.Algebra(
 		new set.Translate("where","$where"),
 		{
@@ -22,7 +22,7 @@ test('set.equal', function(){
 			}
 		}
 	);
-	
+
 	var res;
 
 	res = algebra.equal(
@@ -35,14 +35,14 @@ test('set.equal', function(){
 		{$where: { type: 'folder' }},
 		{$where: { type: 'FOLDER' }}
 	);
-	
+
 	ok(res, 'folder case ignored');
 
 });
 
 
 test('set.subset', function(){
-	
+
 	var algebra = new set.Algebra(
 		new set.Translate("where","$where"),
 		{
@@ -55,7 +55,7 @@ test('set.subset', function(){
 			foo: ignoreProp, bar: ignoreProp, kind: ignoreProp
 		}
 	);
-	
+
 	var res;
 
 	res = algebra.subset({$where:{ type: 'FOLDER' }}, {$where:{ type: 'FOLDER' }});
@@ -97,7 +97,7 @@ test('set.properSubset', function(){
 	var algebra = new set.Algebra(
 		new set.Translate("where","$where")
 	);
-	
+
 	equal( algebra.properSubset( {$where:{foo: "bar"}}, {$where:{}}), true );
 	equal( algebra.properSubset({$where:{}},{$where:{}}), false );
 	equal( algebra.properSubset({$where:{}},{$where:{foo: "bar"}}), false );
@@ -109,7 +109,7 @@ test('set.difference', function(){
 	var algebra = new set.Algebra(
 		new set.Translate("where","$where")
 	);
-	
+
 	var res = algebra.difference({$where:{}}, {$where:{ completed: true }});
 	ok(res === true, "diff should be true");
 
@@ -137,7 +137,7 @@ test('set.difference({ function })', function() {
 				};
 			}
 		});
-	
+
 	var res = algebra.difference({$where:{ colors: ['red','blue'] }}, {$where:{ colors: ['blue'] }});
 
 	deepEqual(res, {$where:{ colors: [ 'red' ] }});
@@ -238,7 +238,7 @@ test('set.has', function(){
 		}
 	);
 
-	ok( algebra.has({$where: {someId: 5}}, {someId: 5, name: "foo"}), true);
+	ok( algebra.has({$where: {someId: 5}}, {someId: 5, name: "foo"}), 'contains');
 
 	var res;
 
@@ -276,6 +276,3 @@ test('set.has', function(){
 	);
 	ok(res,	'ignores nulls');
 });
-
-
-
