@@ -265,3 +265,10 @@ test('algebra.id', function(){
 	QUnit.equal(algebra.id({studentId: 6, classId: "7", foo: "bar"}), JSON.stringify({studentId: 6, classId: "7"}), "only one id, returns set as JSON");
 
 });
+
+test('set.has algebra with pagination', function () {
+	var algebra = new set.Algebra(set.props.offsetLimit('$skip', '$limit'));
+	var setA = {$limit: 5, $skip: 0};
+	var props = {name: 'My Portfolio'};
+	ok(algebra.has(setA, props));
+});
