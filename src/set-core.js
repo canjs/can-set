@@ -513,7 +513,11 @@ assign(Algebra.prototype, {
 			result = false;
 		}
 		else {
-			result = this.evaluateOperator(compare.subset, props, set, {isProperties: true}, undefined);
+			result = this.evaluateOperator(compare.subset, props, set, {isProperties: true}, undefined, {
+				shouldEvaluatePaginate: function () {
+					return false;
+				}
+			});
 		}
 
 		return result;
