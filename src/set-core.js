@@ -99,7 +99,7 @@ assign(Algebra.prototype, {
 
 	// Breakup `set`'s properties by clauses in the algebra.
 	// options:
-	//  - omitCluases - clauses that should not be pulled out
+  //  - omitClauses - clauses that should not be pulled out
 	//
 	// returns:
 	//   - enabled - an object of which clauses are actually being used by this set. Where is true no matter what.
@@ -113,7 +113,7 @@ assign(Algebra.prototype, {
 		var setClone = assign({}, set);
 
 		var clauses = this.clauses;
-		var checkClauses = ['order', 'paginate','id'];
+		var checkClauses = ['order', 'paginate', 'id'];
 
 		var clauseProps = {
 			enabled: {
@@ -137,7 +137,11 @@ assign(Algebra.prototype, {
 				// if it exists in the set, add it as a value for that clause
 				if(prop in setClone) {
 					valuesForClause[prop] = setClone[prop];
-					delete setClone[prop];
+
+					// id clause properties are also where clause properties, so leave them to be added to where clause
+					if (clauseName !== 'id') {
+						delete setClone[prop];
+					}
 				}
 			}
 

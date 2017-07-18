@@ -53,7 +53,6 @@ test('set.equal', function(){
 
 });
 
-
 test('set.subset', function(){
 	var res;
 
@@ -198,7 +197,6 @@ test('set.intersection Array', function(){
 
 });
 
-
 test('set.has', function(){
 	var res;
 
@@ -237,6 +235,19 @@ test('set.has', function(){
 		{ foo: ignoreProp, bar: ignoreProp, kind: ignoreProp }
 	);
 	ok(res,	'ignores nulls');
+
+	var algebra = new set.Algebra(set.props.id('invoice_number'), set.props.id('product_code'));
+	res = algebra.has(
+		{invoice_number: 5},
+		{invoice_number: 6, product_code: 10, product_name: 'Soap'}
+	);
+	ok(res === false, 'understands compound ids subset exclusion');
+
+	res = algebra.has(
+		{invoice_number: 5},
+		{invoice_number: 5, product_code: 10, product_name: 'Soap'}
+	);
+	ok(res, 'understands compound id subset inclusion');
 });
 
 test('set.index', function(){
