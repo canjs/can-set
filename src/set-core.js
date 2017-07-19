@@ -445,7 +445,7 @@ assign(Algebra.prototype, {
 		return this.evaluateOperator(compare.intersection, a, b);
 	},
 	/**
-	 * @function can-set.Algebra.prototype.intersection intersection
+	 * @function can-set.Algebra.prototype.count count
 	 * @parent can-set.Algebra.prototype
 	 *
 	 * @signature `algebra.count(set)`
@@ -513,7 +513,11 @@ assign(Algebra.prototype, {
 			result = false;
 		}
 		else {
-			result = this.evaluateOperator(compare.subset, props, set, {isProperties: true}, undefined);
+			result = this.evaluateOperator(compare.subset, props, set, {isProperties: true}, undefined, {
+				shouldEvaluatePaginate: function () {
+					return false;
+				}
+			});
 		}
 
 		return result;
