@@ -114,8 +114,6 @@ test('set.difference', function(){
 
 	res = set.difference({ completed: true }, { userId: 5 });
 	equal(res, false); // TODO: probably should be undefined
-
-
 });
 
 test('set.difference({ function })', function() {
@@ -133,7 +131,6 @@ test('set.difference({ function })', function() {
 });
 
 test('set.union', function(){
-
 	// set / subset
 	var res = set.union({}, { completed: true });
 	deepEqual(res , {}, "set / subset");
@@ -149,6 +146,17 @@ test('set.union', function(){
 
 	res = set.union({foo: "bar"},{name: "A"});
 	ok(!res, "values not equal");
+
+	res = set.union(
+		{sort: {name: {first: 'Rick', last: 'Flair'}, type: 'split'}},
+		{sort: {name: {first: 'Rick', last: 'Flair'}, type: 'split'}}
+	);
+
+	deepEqual(
+		res,
+		{sort: {name: {first: 'Rick', last: 'Flair'}, type: 'split'}},
+		'correctly unifies nested objects'
+	);
 });
 
 test('set.union Array', function(){
@@ -185,8 +193,18 @@ test('set.intersection', function(){
 	res = set.intersection({foo: "bar"},{foo: "zed"});
 	ok(!res, "values not equal");
 
-	res = set.intersection({foo: 'bar'},{completed: true});
+	res = set.intersection({foo: 'bar'}, {completed: true});
 	deepEqual(res, {foo: 'bar', completed: true}, 'intersection should combine definitions');
+
+	res = set.intersection(
+		{name: {title: 'Ravishing', last: 'Rude'}, type: 'split'},
+		{name: {first: 'Rick'}}
+	);
+	deepEqual(
+		res,
+		{name: {title: 'Ravishing', first: 'Rick', last: 'Rude'}, type: 'split'},
+		'intersects nested objects'
+	);
 });
 
 test('set.intersection Array', function(){

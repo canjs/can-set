@@ -52,6 +52,32 @@ var addToResult = function(fn, name){
 	};
 };
 
+// takes an existing comparator function and returns a new comparator function that runs the
+// existing comparator with an empty object results object. if that existing comparator execution
+// evaluates to true the results it produced are included as part of the larger result set.
+// this is done to include results from comparisons made within sub-objects at the expected level of
+// nesting within the final results object.
+var addResultsToNewObject = function(fn, name){
+	return function(a, b, aParent, bParent, prop, compares, options) {
+		var existingResult = options.result;
+		options.result = {};
+
+		var res = fn.apply(this, arguments);
+		if (res) {
+			// if we are comparing a sub-object assign results to the given prop,
+			// if we are comparing the root assign all props to results
+			if (prop !== undefined) {
+				existingResult[prop] = options.result;
+			} else {
+				assign(existingResult, options.result);
+			}
+		}
+
+		options.result = existingResult;
+		return res;
+	};
+};
+
 module.exports = compareHelpers = {
 	equal: function(a, b, aParent, bParent, prop, compares, options) {
 		options.checks = [
@@ -323,9 +349,9 @@ module.exports = compareHelpers = {
 		options.performedUnion = 0;
 		options.checks = [
 			compareHelpers.unionComparesType,
-			addToResult(compareHelpers.equalBasicTypes,"equalBasicTypes"),
-			addToResult(compareHelpers.unionArrayLike,"unionArrayLike"),
-			addToResult(compareHelpers.unionObject, "unionObject")
+			addToResult(compareHelpers.equalBasicTypes, "equalBasicTypes"),
+			addToResult(compareHelpers.unionArrayLike, "unionArrayLike"),
+			addResultsToNewObject(compareHelpers.unionObject, "unionObject")
 		];
 		options.getUnions = [];
 
@@ -370,7 +396,6 @@ module.exports = compareHelpers = {
 	// if everything is the same OR doesn't have a property on the left or right (only)
 	unionObject: function(a, b, aParent, bParent, prop, compares, options){
 		var subsetCompare = function(a, b, aParent, bParent, prop){
-
 			var compare = compares[prop] === undefined ? compares['*'] : compares[prop];
 
 			if (! loop(a, b, aParent, bParent, prop, compare, options ) ) {
@@ -394,11 +419,7 @@ module.exports = compareHelpers = {
 
 		var aType = typeof a;
 		if(aType === 'object' || aType === 'function') {
-			return h.eachInUnique(a,
-				subsetCompare,
-				b,
-				subsetCompare,
-				true);
+			return h.eachInUnique(a, subsetCompare, b, subsetCompare, true);
 		}
 	},
 	// this might be expensive, but work that out later
@@ -469,7 +490,7 @@ module.exports = compareHelpers = {
 			compareHelpers.intersectionComparesType,
 			addToResult(compareHelpers.equalBasicTypes,"equalBasicTypes"),
 			addToResult(compareHelpers.intersectionArrayLike,"intersectionArrayLike"),
-			compareHelpers.intersectionObject,
+			addResultsToNewObject(compareHelpers.intersectionObject),
 		];
 
 		options["default"] = false;
