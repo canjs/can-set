@@ -52,16 +52,28 @@ var addToResult = function(fn, name){
 	};
 };
 
+// takes an existing comparator function and returns a new comparator function that runs the
+// existing comparator with an empty object results object. if that existing comparator execution
+// evaluates to true the results it produced are included as part of the larger result set.
+// this is done to include results from comparisons made within sub-objects at the expected level of
+// nesting within the final results object.
 var addResultsToNewObject = function(fn, name){
 	return function(a, b, aParent, bParent, prop, compares, options) {
 		var existingResult = options.result;
 		options.result = {};
 
 		var res = fn.apply(this, arguments);
-		if (res && prop !== undefined) {
-			existingResult[prop] = options.result;
-			options.result = existingResult;
+		if (res) {
+			// if we are comparing a sub-object assign results to the given prop,
+			// if we are comparing the root assign all props to results
+			if (prop !== undefined) {
+				existingResult[prop] = options.result;
+			} else {
+				assign(existingResult, options.result);
+			}
 		}
+
+		options.result = existingResult;
 		return res;
 	};
 };
