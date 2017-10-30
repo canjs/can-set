@@ -1,5 +1,6 @@
 @module {{}} can-set
-@parent can-core
+@parent can-data-modeling
+@collection can-core
 @group can-set.types types
 @group can-set.properties properties
 @package ../package.json
