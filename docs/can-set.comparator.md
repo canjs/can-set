@@ -6,10 +6,10 @@
 
 A prop function returns algebra values for two values for a given property.
 
-  @param {*} aValue The value of A's property in a set difference A and B (A \ B).
-  @param {*} bValue The value of A's property in a set difference A and B (A \ B).
-  @param {*} a The A set in a set difference A and B (A \ B).
-  @param {*} b The B set in a set difference A and B (A \ B).
+  @param {*} aValue The value of A's property in a set difference A and B (A ∖ B).
+  @param {*} bValue The value of A's property in a set difference A and B (A ∖ B).
+  @param {*} a The A set in a set difference A and B (A ∖ B).
+  @param {*} b The B set in a set difference A and B (A ∖ B).
   @return {Object|Boolean} A prop function should either return a Boolean which indicates if `aValue` and `bValue` are
   equal or an `AlgebraResult` object that details information about the union, intersection, and difference of `aValue` and `bValue`.
 
