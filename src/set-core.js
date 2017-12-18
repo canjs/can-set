@@ -501,29 +501,11 @@ assign(Algebra.prototype, {
 		// if where is shifted ... we need to restore it later.
 
 		// the rest is subset code
-		var aClauseProps = this.getClauseProperties(set);
-		var propsClauseProps = this.getClauseProperties(props,{isProperties: true});
-		var compatibleSort = true;
-		var result;
-
-		// if there is a paginate and an order, order has to be the same first.
-		if((propsClauseProps.enabled.paginate || aClauseProps.enabled.paginate) &&
-			(propsClauseProps.enabled.order || aClauseProps.enabled.order)) {
-			// compare order clauses without any special props
-			compatibleSort = compare.equal(propsClauseProps.order, aClauseProps.order,
-				undefined, undefined, undefined, {}, {});
-		}
-
-		if(!compatibleSort) {
-			result = false;
-		}
-		else {
-			result = this.evaluateOperator(compare.subset, props, set, {isProperties: true}, undefined, {
-				shouldEvaluatePaginate: function () {
-					return false;
-				}
-			});
-		}
+		var result = this.evaluateOperator(compare.subset, props, set, {isProperties: true}, undefined, {
+			shouldEvaluatePaginate: function () {
+				return false;
+			}
+		});
 
 		return result;
 	},
