@@ -7,7 +7,8 @@ QUnit.module("can-set props.id");
 
 test("id set.difference", function(){
 
-  var idProps = props.id("color")
+  var idProps = props.id("color");
+  var res;
 
   res = set.difference({ color: "red" }, { color: "blue" }, idProps);
   deepEqual(res, false, "id changes always false");
@@ -25,6 +26,7 @@ test("id set.difference with where", function() {
     props.id("color"),
     props.enum("type", ["light", "dark"])
   );
+  var res;
 
   res = set.difference({ color: "red", type: ["light", "dark"] }, { color: "blue", type: "light" }, algebra);
   deepEqual(res, false, "id changes always false");
