@@ -369,30 +369,57 @@ assign(Algebra.prototype, {
 
 		var differentClauses = this.getDifferentClauseTypes(aClauseProps, bClauseProps);
 
-		var result; // if too many clauses are different, then we won't be able
+		var clause, result; // if too many clauses are different, then we won't be able
 					// to determine the difference
 
-		switch(differentClauses.length) {
-			case 0 : {
-				// if all the clauses are the same, then there can't be a difference
-				result = false;
-				break;
-			}
-			case 1 : {
-				var clause = differentClauses[0];
-				// if there's only one clause to evaluate, then we can try to determine
-				// the difference set
-				result = compare.difference(aClauseProps[clause],
-					bClauseProps[clause], undefined, undefined, undefined,
-					this.clauses[clause], {});
-
-				if(this.translators[clause] && typeof result === "object") {
-					result = this.translators[clause].toSet({}, result);
+		if(differentClauses.length > 2) {
+			result = false;
+		} else if (differentClauses.length === 2 && (differentClauses[0] !== "where" || differentClauses[1] !== "id")) {
+			result = false;
+		} else {
+			switch(clause = differentClauses[0]) {
+				case undefined :
+					// if all the clauses are the same, then there can't be a difference
+				case "order" : {
+					// if order is the only difference, then there can't be a difference
+					// if items are paged but the order is different, though, the sets are not comparable
+					// Either way, the result is false
+					result = false;
+					break;
 				}
-				break;
+				case "paginate" :
+				case "where" : {
+					// if there's only one clause to evaluate or the clauses are where + id,
+					// then we can try to determine the difference set.
+					// Note that any difference in the ID clause will cause the result to be
+					// true (if A has no ID but B has ID) or false (any case where A has ID)
+					result = compare.difference(aClauseProps[clause],
+						bClauseProps[clause], undefined, undefined, undefined,
+						this.clauses[clause], {});
+
+					if(typeof result === "object") {
+						if (this.translators[clause]) {
+							result = this.translators[clause].toSet({}, result);
+						}
+						// If where changed, don't preserve the same pagination (can't predict how many are needed),
+						//   but do preserve sort order.
+						// If pagination is what changed, preserve the same where *and* sort.
+						assign(result, aClauseProps.order);
+						if(clause === "paginate") {
+							assign(result, aClauseProps.where);
+						} else if(differentClauses[1] === "id") {
+							// If there was a possible ID difference, there is a case we need to handle where
+							// A has no ID clause but B has an ID clause, causing an incalculable subset of
+							// A where IDs aren't B's ID, so return true instead.
+							result = compare.difference(aClauseProps.id,
+								bClauseProps.id, undefined, undefined, undefined,
+								this.clauses.id, {});
+						}
+					}
+					break;
+				}
 			}
 		}
-
 		return result;
 	},
 	/**
