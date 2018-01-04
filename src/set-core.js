@@ -439,9 +439,9 @@ assign(Algebra.prototype, {
 	 *
 	 *   @param  {can-set/Set} a A set.
 	 *   @param  {can-set/Set} b A set.
-	 *   @return {can-set/Set|undefined} If an object is returned, it is the union of _A_ and _B_ (_A_ ∪ _B_).
+	 *   @return {can-set/Set|Boolean} If an object is returned, it is the union of _A_ and _B_ (_A_ ∪ _B_).
 	 *
-	 *   If `undefined` is returned, it means a union can't be created.
+	 *   If `false` is returned, it means a union can't be created.
 	 */
 	union: function(a, b){
 		// if everything is equal or has a difference
@@ -462,15 +462,15 @@ assign(Algebra.prototype, {
 	 * ) //-> {completed: true, due: "tomorrow", type: "critical"}
 	 * ```
 	 *
-	 *   @param  {[type]} a A set.
-	 *   @param  {[type]} b A set.
+	 *   @param  {can-set/Set} a A set.
+	 *   @param  {can-set/Set} b A set.
 	 *   @return {can-set/Set|Boolean} If an object is returned, it
 	 *   represents the intersection of sets _A_ and _B_ (_A_ ∩ _B_).
 	 *
 	 *   If `true` is returned, that means that an intersection exists, but no set object
 	 *   can be returned that represents that set.
 	 *
-	 *   If `false` is returned, that means there is intersection.
+	 *   If `false` is returned, that means there is no intersection.
 	 */
 	intersection: function(a, b){
 		// if everything is equal or has a difference
@@ -727,7 +727,7 @@ assign(Algebra.prototype, {
 	 * ```
 	 *
 	 *   @param  {Object} obj An instance's raw data.
-	 *   @return {*|String} If a single [can-set.props.id] is configured, it's value will be returned.
+	 *   @return {*|String} If a single [can-set.props.id] is configured, its value will be returned.
 	 *   If multiple [can-set.props.id] properties are configured a `JSON.stringify`-ed object is returned.
 	 */
 	id: function(props){
