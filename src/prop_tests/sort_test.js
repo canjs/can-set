@@ -40,7 +40,7 @@ test('set.difference({ function })', function() {
 	var res = algebra.difference({ colors: ['red','blue'], sort: 'colors' },
 		{ colors: ['blue'] });
 
-	deepEqual(res, { colors: [ 'red' ] });
+	deepEqual(res, { colors: [ 'red' ], sort: 'colors' });
 });
 
 test('set.union', function(){
