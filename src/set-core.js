@@ -6,8 +6,7 @@ var assign = require("can-assign");
 var each = require("can-util/js/each/each");
 var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
-var getProps = require("can-util/js/get/get");
-var CIDSet = require("can-cid/set/set");
+var getProp = require("can-util/js/get/get");
 
 // concatUnique
 // concat all items in bItems onto aItems that do not already exist in aItems.
@@ -15,23 +14,38 @@ var CIDSet = require("can-cid/set/set");
 // an item matches another.
 function concatUnique(aItems, bItems, algebra) {
 	var idTree = {};
-	var aSet = new CIDSet();
+	var aSet;
+	// IE 9 and 10 don't have Set.
+	if(typeof Set !== "undefined") {
+		aSet = new Set();  // jshint ignore:line
+	}
 
 	aItems.forEach(function(item) {
 		var keyNode = idTree;
-		aSet.add(item);
+		if(aSet) {
+			aSet.add(item);
+		}
 		each(algebra.clauses.id, function(prop) {
-			keyNode = keyNode[getProps(item, prop)] = keyNode[getProps(item, prop)] || {};
+			var propVal = getProp(item, prop);
+			if(keyNode && typeof propVal !== "undefined") {
+				keyNode = keyNode[propVal] = keyNode[propVal] || {};
+			} else {
+				keyNode = undefined;
+			}
 		});
 	});
 
 	return aItems.concat(bItems.filter(function(item) {
 		var keyNode = idTree;
-		if(aSet.has(item)) {
+		if(aSet && aSet.has(item)) {
+			return false;
+		}
+		// IE9/10 case
+		if(!aSet && aItems.indexOf(item) > -1) {
 			return false;
 		}
 		each(algebra.clauses.id, function(prop) {
-			keyNode = keyNode && keyNode[getProps(item, prop)];
+			keyNode = keyNode && keyNode[getProp(item, prop)];
 		});
 		return keyNode === idTree || !keyNode;
 	}));

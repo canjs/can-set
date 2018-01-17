@@ -179,6 +179,11 @@ test("getUnion filters for uniqueness", function(){
 	var union = set.getUnion({type: "critical"},{note: "C"}, aItems, bItems, props.id("id"));
 	deepEqual(union, unionItems);
 
+	// case with no ID in set algebra, but some same items.
+	union = set.getUnion({type: "critical"},{note: "C"}, aItems, bItems, {});
+	deepEqual(union, unionItems);
+
+	// Case with not-same items with same ID
 	bItems = bItems.map(function(b) {
 		return assign({}, b);
 	});
