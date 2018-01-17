@@ -45,6 +45,7 @@
     "testee": "^0.7.0"
   },
   "dependencies": {
+    "can-assign": "^1.1.1",
     "can-namespace": "^1.0.0",
     "can-util": "^3.9.0"
   }
