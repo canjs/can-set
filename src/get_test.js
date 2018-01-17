@@ -2,7 +2,7 @@ var set = require("./set");
 var QUnit = require("steal-qunit");
 var props = require("./props");
 var h = require("./helpers");
-var assign = require("can-util/js/assign/assign");
+var assign = require("can-assign");
 
 QUnit.module("can-set get");
 

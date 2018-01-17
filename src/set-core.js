@@ -7,30 +7,33 @@ var each = require("can-util/js/each/each");
 var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
 var getProps = require("can-util/js/get/get");
+var CIDSet = require("can-cid/set/set");
 
 // concatUnique
 // concat all items in bItems onto aItems that do not already exist in aItems.
 // same-object and ID collisions are both looked at when deciding whether
 // an item matches another.
 function concatUnique(aItems, bItems, algebra) {
-	var keyTree = {};
+	var idTree = {};
+	var aSet = new CIDSet();
 
 	aItems.forEach(function(item) {
-		var keyNode = keyTree;
+		var keyNode = idTree;
+		aSet.add(item);
 		each(algebra.clauses.id, function(prop) {
 			keyNode = keyNode[getProps(item, prop)] = keyNode[getProps(item, prop)] || {};
 		});
 	});
 
 	return aItems.concat(bItems.filter(function(item) {
-		var keyNode = keyTree;
-		if(aItems.indexOf(item) > -1) {
+		var keyNode = idTree;
+		if(aSet.has(item)) {
 			return false;
 		}
 		each(algebra.clauses.id, function(prop) {
 			keyNode = keyNode && keyNode[getProps(item, prop)];
 		});
-		return keyNode === keyTree || !keyNode;
+		return keyNode === idTree || !keyNode;
 	}));
 }
 
