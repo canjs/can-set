@@ -182,7 +182,7 @@ test("getUnion filters for uniqueness", function(){
 	bItems = bItems.map(function(b) {
 		return assign({}, b);
 	});
-	var union = set.getUnion({type: "critical"},{note: "C"}, aItems, bItems, props.id("id"));
+	union = set.getUnion({type: "critical"},{note: "C"}, aItems, bItems, props.id("id"));
 	deepEqual(union, unionItems);
 
 });
