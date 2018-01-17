@@ -2,6 +2,7 @@ var set = require("./set");
 var QUnit = require("steal-qunit");
 var props = require("./props");
 var h = require("./helpers");
+var assign = require("can-assign");
 
 QUnit.module("can-set get");
 
@@ -164,6 +165,31 @@ test("getUnion against overlapping ranged sets", function(){
 		props.rangeInclusive("start","end"));
 
 	deepEqual(union, items);
+});
+
+test("getUnion filters for uniqueness", function(){
+	var aItems = items.filter(function(a) {
+		return a.type === "critical";
+	});
+	var bItems = items.filter(function(b) {
+		return b.note === "C";
+	});
+	var unionItems = aItems.concat([bItems[0]]); // bItems[1] is already in aItems
+
+	var union = set.getUnion({type: "critical"},{note: "C"}, aItems, bItems, props.id("id"));
+	deepEqual(union, unionItems);
+
+	// case with no ID in set algebra, but some same items.
+	union = set.getUnion({type: "critical"},{note: "C"}, aItems, bItems, {});
+	deepEqual(union, unionItems);
+
+	// Case with not-same items with same ID
+	bItems = bItems.map(function(b) {
+		return assign({}, b);
+	});
+	union = set.getUnion({type: "critical"},{note: "C"}, aItems, bItems, props.id("id"));
+	deepEqual(union, unionItems);
+
 });
 
 test("getSubset passed same object works (#3)", function(){

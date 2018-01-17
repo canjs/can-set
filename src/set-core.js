@@ -2,10 +2,54 @@ var h = require("./helpers");
 var clause = require("./clause");
 var compare = require("./compare");
 var get = require("./get");
-var assign = require("can-util/js/assign/assign");
+var assign = require("can-assign");
 var each = require("can-util/js/each/each");
 var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
+var getProp = require("can-util/js/get/get");
+
+// concatUnique
+// concat all items in bItems onto aItems that do not already exist in aItems.
+// same-object and ID collisions are both looked at when deciding whether
+// an item matches another.
+function concatUnique(aItems, bItems, algebra) {
+	var idTree = {};
+	var aSet;
+	// IE 9 and 10 don't have Set.
+	if(typeof Set !== "undefined") {
+		aSet = new Set();  // jshint ignore:line
+	}
+
+	aItems.forEach(function(item) {
+		var keyNode = idTree;
+		if(aSet) {
+			aSet.add(item);
+		}
+		each(algebra.clauses.id, function(prop) {
+			var propVal = getProp(item, prop);
+			if(keyNode && typeof propVal !== "undefined") {
+				keyNode = keyNode[propVal] = keyNode[propVal] || {};
+			} else {
+				keyNode = undefined;
+			}
+		});
+	});
+
+	return aItems.concat(bItems.filter(function(item) {
+		var keyNode = idTree;
+		if(aSet && aSet.has(item)) {
+			return false;
+		}
+		// IE9/10 case
+		if(!aSet && aItems.indexOf(item) > -1) {
+			return false;
+		}
+		each(algebra.clauses.id, function(prop) {
+			keyNode = keyNode && keyNode[getProp(item, prop)];
+		});
+		return keyNode === idTree || !keyNode;
+	}));
+}
 
 /**
  * @function can-set.Translate Translate
@@ -685,10 +729,10 @@ assign(Algebra.prototype, {
 					aItems = items[0];
 					bItems = items[1];
 				});
-				combined = aItems.concat(bItems);
+				combined = concatUnique(aItems, bItems, this);
 			}
 		} else {
-			combined = aItems.concat(bItems);
+			combined = concatUnique(aItems, bItems, this);
 		}
 
 		// If sorting is the same, sort the result.
