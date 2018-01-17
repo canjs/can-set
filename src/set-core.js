@@ -6,6 +6,33 @@ var assign = require("can-util/js/assign/assign");
 var each = require("can-util/js/each/each");
 var makeArray = require("can-util/js/make-array/make-array");
 var isEmptyObject = require("can-util/js/is-empty-object/is-empty-object");
+var getProps = require("can-util/js/get/get");
+
+// concatUnique
+// concat all items in bItems onto aItems that do not already exist in aItems.
+// same-object and ID collisions are both looked at when deciding whether
+// an item matches another.
+function concatUnique(aItems, bItems, algebra) {
+	var keyTree = {};
+
+	aItems.forEach(function(item) {
+		var keyNode = keyTree;
+		each(algebra.clauses.id, function(prop) {
+			keyNode = keyNode[getProps(item, prop)] = keyNode[getProps(item, prop)] || {};
+		});
+	});
+
+	return aItems.concat(bItems.filter(function(item) {
+		var keyNode = keyTree;
+		if(aItems.indexOf(item) > -1) {
+			return false;
+		}
+		each(algebra.clauses.id, function(prop) {
+			keyNode = keyNode && keyNode[getProps(item, prop)];
+		});
+		return keyNode === keyTree || !keyNode;
+	}));
+}
 
 /**
  * @function can-set.Translate Translate
@@ -685,10 +712,10 @@ assign(Algebra.prototype, {
 					aItems = items[0];
 					bItems = items[1];
 				});
-				combined = aItems.concat(bItems);
+				combined = concatUnique(aItems, bItems, this);
 			}
 		} else {
-			combined = aItems.concat(bItems);
+			combined = concatUnique(aItems, bItems, this);
 		}
 
 		// If sorting is the same, sort the result.
