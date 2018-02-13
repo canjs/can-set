@@ -152,9 +152,11 @@ algebra.getSubset(
     {offset: 1, limit: 2},
     {},
     [
-        {id: 1, name: "do dishes"}
+        {id: 1, name: "do dishes"},
         {id: 2, name: "mow lawn"},
-        {id: 3, name: "trash"}]) //-> []
+        {id: 3, name: "trash"}
+    ]
+) //-> []
 ```
 
 This is because it's looking for instance data where `offset===1` and `limit===2`.
@@ -168,10 +170,12 @@ algebra.getSubset(
     {offset: 1, limit: 2},
     {},
     [
-        {id: 1, name: "do dishes"}
+        {id: 1, name: "do dishes"},
         {id: 2, name: "mow lawn"},
-        {id: 3, name: "trash"}]) //-> [
-            //  {id: 2, name: "mow lawn"},
-            // {id: 3, name: "trash"}
-            // ]
+        {id: 3, name: "trash"}
+    ]
+) //-> [
+  //  {id: 2, name: "mow lawn"},
+  // {id: 3, name: "trash"}
+  // ]
 ```
