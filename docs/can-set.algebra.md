@@ -14,22 +14,22 @@ using the `compares` configuration.
 A default `algebra` instance can be created like:
 
 ```js
-var set = require("can-set");
-var defaultAlgebra = new set.Algebra();
+import set from "can-set";
+const defaultAlgebra = new set.Algebra();
 ```
 
 This treats every property as a filter in a `where` clause.  For example:
 
 ```js
 // `{id: 2, ownerId: 5}` belongs to ``.getList({ownerId: 5})`
-defaultAlgebra.has({ownerId: 5}, {id: 2, ownerId: 5}) //-> true
+defaultAlgebra.has( { ownerId: 5 }, { id: 2, ownerId: 5 } ); //-> true
 
-defaultAlgebra.getSubset({ownerId: 5}, {},
-    [
-        {id: 1, ownerId: 2},
-        {id: 2, ownerId: 5},
-        {id: 3, ownerId: 12}
-    ]) //-> [{id: 2, ownerId: 5}]
+defaultAlgebra.getSubset( { ownerId: 5 }, {},
+	[
+		{ id: 1, ownerId: 2 },
+		{ id: 2, ownerId: 5 },
+		{ id: 3, ownerId: 12 }
+	] ); //-> [{id: 2, ownerId: 5}]
 ```
 
 [can-set.compares] configurations can be passed to
@@ -37,19 +37,19 @@ add better property behavior awareness:
 
 
 ```js
-var set = require("can-set");
-var todoAlgebra = new set.Algebra(
-  set.props.boolean("completed"),
-  set.props.id("_id"),
-  set.props.offsetLimit("offset","limit")
+import set from "can-set";
+const todoAlgebra = new set.Algebra(
+	set.props.boolean( "completed" ),
+	set.props.id( "_id" ),
+	set.props.offsetLimit( "offset", "limit" )
 );
 
-defaultAlgebra.getSubset({limit: 2, offset: 1}, {},
-    [
-        {id: 1, ownerId: 2},
-        {id: 2, ownerId: 5},
-        {id: 3, ownerId: 12}
-    ]) //-> [{id: 2, ownerId: 5},{id: 3, ownerId: 12}]
+defaultAlgebra.getSubset( { limit: 2, offset: 1 }, {},
+	[
+		{ id: 1, ownerId: 2 },
+		{ id: 2, ownerId: 5 },
+		{ id: 3, ownerId: 12 }
+	] ); //-> [{id: 2, ownerId: 5},{id: 3, ownerId: 12}]
 ```
 
 [can-set.props] has helper functions that make common [can-set.compares]

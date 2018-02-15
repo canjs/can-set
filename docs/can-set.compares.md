@@ -6,10 +6,11 @@
 
 ```js
 {
-  // return `true` if the values should be considered the same:
-  lastName: function(aValue, bValue){
-    return (""+aValue).toLowerCase() === (""+bValue).toLowerCase();
-  }
+
+	// return `true` if the values should be considered the same:
+	lastName: function( aValue, bValue ) {
+		return ( "" + aValue ).toLowerCase() === ( "" + bValue ).toLowerCase();
+	}
 }
 ```
 
