@@ -4,6 +4,10 @@
 
 @description An object of property names and `prop` functions.
 
+
+
+@option {Object<String,can-set.prop>}
+
 ```js
 {
 
@@ -13,6 +17,3 @@
 	}
 }
 ```
-
-
-@option {Object<String,can-set.prop>}
