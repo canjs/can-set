@@ -1,3 +1,4 @@
+"use strict";
 var compare = require("./compare");
 var h = require("./helpers");
 var each = require("can-util/js/each/each");
