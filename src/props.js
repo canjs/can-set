@@ -1,3 +1,4 @@
+"use strict";
 var h = require("./helpers");
 var clause = require("./clause");
 var each = require("can-util/js/each/each");

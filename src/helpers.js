@@ -1,3 +1,4 @@
+"use strict";
 var assign = require("can-util/js/assign/assign");
 var each = require("can-util/js/each/each");
 var last = require("can-util/js/last/last");

@@ -1,3 +1,4 @@
+"use strict";
 var h = require("./helpers");
 var assign = require("can-util/js/assign/assign");
 var each = require("can-util/js/each/each");

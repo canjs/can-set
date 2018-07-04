@@ -1,3 +1,4 @@
+"use strict";
 var set = require("./set-core");
 var ns = require("can-namespace");
 
