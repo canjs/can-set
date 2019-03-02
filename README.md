@@ -5,15 +5,13 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/canjs/can-set/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/can-set.svg)](https://www.npmjs.com/package/can-set)
 [![Travis build status](https://travis-ci.org/canjs/can-set.svg?branch=master)](https://travis-ci.org/canjs/can-set)
-[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/canjs/can-set?branch=master&svg=true)](https://ci.appveyor.com/project/matthewp/can-set)
-[![Coverage status](https://coveralls.io/repos/github/canjs/can-set/badge.svg?branch=master)](https://coveralls.io/github/canjs/can-set?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-set.svg)](https://greenkeeper.io/)
 
-are represented by the parameters commonly passed to service requests.
+**Deprecated:** newer versions of CanJS use [can-query-logic](https://canjs.com/doc/can-query-logic.html). See the [CanJS 5 migration guide](https://canjs.com/doc/migrate-5.html#Replacecan_setwithcan_set_legacy) for details.
 
 ## Documentation
 
-Read the [can-set API docs on CanJS.com](https://canjs.com/doc/can-set.html).
+Read the [can-set API docs on CanJS.com](https://v4.canjs.com/doc/can-set.html).
 
 ## Changelog
 
