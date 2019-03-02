@@ -1,24 +1,15 @@
 # can-set
 
-[![Join the chat at https://gitter.im/canjs/canjs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/canjs/canjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join our Slack](https://img.shields.io/badge/slack-join%20chat-611f69.svg)](https://www.bitovi.com/community/slack?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join our Discourse](https://img.shields.io/discourse/https/forums.bitovi.com/posts.svg)](https://forums.bitovi.com/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/canjs/can-set/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/can-set.svg)](https://www.npmjs.com/package/can-set)
 [![Travis build status](https://travis-ci.org/canjs/can-set.svg?branch=master)](https://travis-ci.org/canjs/can-set)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/canjs/can-set?branch=master&svg=true)](https://ci.appveyor.com/project/matthewp/can-set)
+[![Coverage status](https://coveralls.io/repos/github/canjs/can-set/badge.svg?branch=master)](https://coveralls.io/github/canjs/can-set?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-set.svg)](https://greenkeeper.io/)
 
-__can-set__ is a utility for comparing [sets](http://en.wikipedia.org/wiki/Set_theory#Basic_concepts_and_notation) that
 are represented by the parameters commonly passed to service requests.
-
-For example, the set `{type: "critical"}` might represent all
-critical todos.  It is a superset of the set `{type: "critical", due: "today"}`
-which might represent all critical todos due today.
-
-__can-set__ is useful for building caching and other data-layer
-optimizations.  It can be used in client or server
-environments. [can-connect](http://connect.canjs.com) uses can-set to create data modeling
-utilities and middleware for the client.
-
-[Play around in this JSBin!](https://justinbmeyer.jsbin.com/faveda/4/edit?js,console)
 
 ## Documentation
 
@@ -35,4 +26,3 @@ The [contribution guide](https://github.com/canjs/can-set/blob/master/CONTRIBUTI
 ## License
 
 [MIT](https://github.com/canjs/can-set/blob/master/LICENSE)
-
